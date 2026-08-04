@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository": "gft-registry research artifact",
+    "commit": "acee553",
+    "operation": "gft.fs_sharp_constant(..., verify_grid=False)",
+    "audit_date": "2026-08-04"
+  },
+  "scope": {
+    "generators": [
+      "starlike",
+      "bell",
+      "cosh_sqrt",
+      "crescent",
+      "exponential",
+      "lemniscate",
+      "rational_kr",
+      "sigmoid",
+      "sine"
+    ],
+    "mu_grid": [
+      "-2",
+      "-1",
+      "0",
+      "1/2",
+      "1",
+      "2"
+    ],
+    "case_count": 54
+  },
+  "cases": [
+    {
+      "id": "starlike-mu--2",
+      "generator": "starlike",
+      "mu": "-2",
+      "value_exact": "11"
+    },
+    {
+      "id": "starlike-mu--1",
+      "generator": "starlike",
+      "mu": "-1",
+      "value_exact": "7"
+    },
+    {
+      "id": "starlike-mu-0",
+      "generator": "starlike",
+      "mu": "0",
+      "value_exact": "3"
+    },
+    {
+      "id": "starlike-mu-1/2",
+      "generator": "starlike",
+      "mu": "1/2",
+      "value_exact": "1"
+    },
+    {
+      "id": "starlike-mu-1",
+      "generator": "starlike",
+      "mu": "1",
+      "value_exact": "1"
+    },
+    {
+      "id": "starlike-mu-2",
+      "generator": "starlike",
+      "mu": "2",
+      "value_exact": "5"
+    },
+    {
+      "id": "bell-mu--2",
+      "generator": "bell",
+      "mu": "-2",
+      "value_exact": "3"
+    },
+    {
+      "id": "bell-mu--1",
+      "generator": "bell",
+      "mu": "-1",
+      "value_exact": "2"
+    },
+    {
+      "id": "bell-mu-0",
+      "generator": "bell",
+      "mu": "0",
+      "value_exact": "1"
+    },
+    {
+      "id": "bell-mu-1/2",
+      "generator": "bell",
+      "mu": "1/2",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "bell-mu-1",
+      "generator": "bell",
+      "mu": "1",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "bell-mu-2",
+      "generator": "bell",
+      "mu": "2",
+      "value_exact": "1"
+    },
+    {
+      "id": "cosh_sqrt-mu--2",
+      "generator": "cosh_sqrt",
+      "mu": "-2",
+      "value_exact": "31/48"
+    },
+    {
+      "id": "cosh_sqrt-mu--1",
+      "generator": "cosh_sqrt",
+      "mu": "-1",
+      "value_exact": "19/48"
+    },
+    {
+      "id": "cosh_sqrt-mu-0",
+      "generator": "cosh_sqrt",
+      "mu": "0",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "cosh_sqrt-mu-1/2",
+      "generator": "cosh_sqrt",
+      "mu": "1/2",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "cosh_sqrt-mu-1",
+      "generator": "cosh_sqrt",
+      "mu": "1",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "cosh_sqrt-mu-2",
+      "generator": "cosh_sqrt",
+      "mu": "2",
+      "value_exact": "17/48"
+    },
+    {
+      "id": "crescent-mu--2",
+      "generator": "crescent",
+      "mu": "-2",
+      "value_exact": "11/4"
+    },
+    {
+      "id": "crescent-mu--1",
+      "generator": "crescent",
+      "mu": "-1",
+      "value_exact": "7/4"
+    },
+    {
+      "id": "crescent-mu-0",
+      "generator": "crescent",
+      "mu": "0",
+      "value_exact": "3/4"
+    },
+    {
+      "id": "crescent-mu-1/2",
+      "generator": "crescent",
+      "mu": "1/2",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "crescent-mu-1",
+      "generator": "crescent",
+      "mu": "1",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "crescent-mu-2",
+      "generator": "crescent",
+      "mu": "2",
+      "value_exact": "5/4"
+    },
+    {
+      "id": "exponential-mu--2",
+      "generator": "exponential",
+      "mu": "-2",
+      "value_exact": "11/4"
+    },
+    {
+      "id": "exponential-mu--1",
+      "generator": "exponential",
+      "mu": "-1",
+      "value_exact": "7/4"
+    },
+    {
+      "id": "exponential-mu-0",
+      "generator": "exponential",
+      "mu": "0",
+      "value_exact": "3/4"
+    },
+    {
+      "id": "exponential-mu-1/2",
+      "generator": "exponential",
+      "mu": "1/2",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "exponential-mu-1",
+      "generator": "exponential",
+      "mu": "1",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "exponential-mu-2",
+      "generator": "exponential",
+      "mu": "2",
+      "value_exact": "5/4"
+    },
+    {
+      "id": "lemniscate-mu--2",
+      "generator": "lemniscate",
+      "mu": "-2",
+      "value_exact": "9/16"
+    },
+    {
+      "id": "lemniscate-mu--1",
+      "generator": "lemniscate",
+      "mu": "-1",
+      "value_exact": "5/16"
+    },
+    {
+      "id": "lemniscate-mu-0",
+      "generator": "lemniscate",
+      "mu": "0",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "lemniscate-mu-1/2",
+      "generator": "lemniscate",
+      "mu": "1/2",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "lemniscate-mu-1",
+      "generator": "lemniscate",
+      "mu": "1",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "lemniscate-mu-2",
+      "generator": "lemniscate",
+      "mu": "2",
+      "value_exact": "7/16"
+    },
+    {
+      "id": "rational_kr-mu--2",
+      "generator": "rational_kr",
+      "mu": "-2",
+      "value_exact": "21/2 - 7*sqrt(2)"
+    },
+    {
+      "id": "rational_kr-mu--1",
+      "generator": "rational_kr",
+      "mu": "-1",
+      "value_exact": "15/2 - 5*sqrt(2)"
+    },
+    {
+      "id": "rational_kr-mu-0",
+      "generator": "rational_kr",
+      "mu": "0",
+      "value_exact": "9/2 - 3*sqrt(2)"
+    },
+    {
+      "id": "rational_kr-mu-1/2",
+      "generator": "rational_kr",
+      "mu": "1/2",
+      "value_exact": "-1/2 + sqrt(2)/2"
+    },
+    {
+      "id": "rational_kr-mu-1",
+      "generator": "rational_kr",
+      "mu": "1",
+      "value_exact": "-1/2 + sqrt(2)/2"
+    },
+    {
+      "id": "rational_kr-mu-2",
+      "generator": "rational_kr",
+      "mu": "2",
+      "value_exact": "-1/2 + sqrt(2)/2"
+    },
+    {
+      "id": "sigmoid-mu--2",
+      "generator": "sigmoid",
+      "mu": "-2",
+      "value_exact": "5/8"
+    },
+    {
+      "id": "sigmoid-mu--1",
+      "generator": "sigmoid",
+      "mu": "-1",
+      "value_exact": "3/8"
+    },
+    {
+      "id": "sigmoid-mu-0",
+      "generator": "sigmoid",
+      "mu": "0",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "sigmoid-mu-1/2",
+      "generator": "sigmoid",
+      "mu": "1/2",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "sigmoid-mu-1",
+      "generator": "sigmoid",
+      "mu": "1",
+      "value_exact": "1/4"
+    },
+    {
+      "id": "sigmoid-mu-2",
+      "generator": "sigmoid",
+      "mu": "2",
+      "value_exact": "3/8"
+    },
+    {
+      "id": "sine-mu--2",
+      "generator": "sine",
+      "mu": "-2",
+      "value_exact": "5/2"
+    },
+    {
+      "id": "sine-mu--1",
+      "generator": "sine",
+      "mu": "-1",
+      "value_exact": "3/2"
+    },
+    {
+      "id": "sine-mu-0",
+      "generator": "sine",
+      "mu": "0",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "sine-mu-1/2",
+      "generator": "sine",
+      "mu": "1/2",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "sine-mu-1",
+      "generator": "sine",
+      "mu": "1",
+      "value_exact": "1/2"
+    },
+    {
+      "id": "sine-mu-2",
+      "generator": "sine",
+      "mu": "2",
+      "value_exact": "3/2"
+    }
+  ]
+}

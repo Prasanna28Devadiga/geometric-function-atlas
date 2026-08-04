@@ -1,0 +1,73 @@
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+
+
+def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, "-m", "gft_registry", *args],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_generators_command_emits_stable_json() -> None:
+    completed = run_cli("generators", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert [row["key"] for row in payload] == sorted(row["key"] for row in payload)
+    assert next(row for row in payload if row["key"] == "sine")["formula"] == "sin(z) + 1"
+
+
+def test_coefficients_command_emits_exact_strings() -> None:
+    completed = run_cli("coefficients", "sine", "--order", "4", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["generator"] == "sine"
+    assert payload["order"] == 4
+    assert payload["coefficients"] == ["1", "0", "-1/6", "0"]
+    assert payload["evidence_status"] == "proven_exact_algebraic"
+    assert payload["package_version"] == "0.1.0"
+
+
+def test_fekete_szego_command_emits_evidence_typed_result() -> None:
+    completed = run_cli("fekete-szego", "exponential", "--mu", "0", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["value_exact"] == "3/4"
+    assert payload["evidence_status"] == "proven_exact_under_declared_assumptions"
+    assert payload["novelty_claim"] is False
+
+
+def test_cli_reports_unknown_generator_without_traceback() -> None:
+    completed = run_cli("coefficients", "missing", "--order", "2")
+
+    assert completed.returncode == 2
+    assert "unknown generator 'missing'" in completed.stderr
+    assert "Traceback" not in completed.stderr
+
+
+def test_cli_rejects_excessive_order_and_precision() -> None:
+    order = run_cli("coefficients", "sine", "--order", "65")
+    precision = run_cli(
+        "fekete-szego", "sine", "--mu", "0", "--precision", "1001"
+    )
+
+    assert order.returncode == 2
+    assert "order must be at most 64" in order.stderr
+    assert precision.returncode == 2
+    assert "precision must be at most 1000" in precision.stderr
+
+
+def test_fekete_szego_cli_reports_unknown_generator_without_traceback() -> None:
+    completed = run_cli("fekete-szego", "missing", "--mu", "0")
+
+    assert completed.returncode == 2
+    assert "unknown generator 'missing'" in completed.stderr
+    assert "Traceback" not in completed.stderr

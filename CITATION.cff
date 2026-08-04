@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+title: gft-registry
+message: "If you use this software, please cite the software release and the associated paper."
+type: software
+version: 0.1.0
+date-released: 2026-08-04
+authors:
+  - family-names: Devadiga
+    given-names: Prasanna
+  - family-names: Suneesh
+    given-names: Arya
+  - family-names: Gurumurthy
+    given-names: Kishan
+  - family-names: Devadiga
+    given-names: Pushparaj
+  - family-names: Sebastian
+    given-names: Asha
+license: MIT
+keywords:
+  - geometric function theory
+  - Ma-Minda functions
+  - reproducible research
+  - certified computation
