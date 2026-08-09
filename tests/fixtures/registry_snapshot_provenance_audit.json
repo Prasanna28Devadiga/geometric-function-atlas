@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "kind": "registry_snapshot_provenance_audit",
+  "audit": {
+    "audited_at_utc": "2026-08-09T16:51:24.934082+00:00",
+    "audit_scope": "public GitHub release, release assets, matching research source, and website population observations",
+    "release_tag": "registry-2026.08.05"
+  },
+  "release": {
+    "repository": "https://github.com/Prasanna28Devadiga/geometric-function-atlas",
+    "release_url": "https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/tag/registry-2026.08.05",
+    "api_url": "https://api.github.com/repos/Prasanna28Devadiga/geometric-function-atlas/releases/365295986",
+    "tag": "registry-2026.08.05",
+    "target_commitish": "473bf6a1cc63648b0b6b999ea7428cbc6b455611",
+    "created_at": "2026-08-04T18:15:30Z",
+    "published_at": "2026-08-05T05:02:49Z",
+    "draft": false,
+    "prerelease": false,
+    "visibility_observed": "public",
+    "repository_license_observed": "MIT",
+    "body_classification": "private_development_snapshot_claimed_by_release_body",
+    "body_boundary": "The release body calls this a private research snapshot, says it is not yet the public archival/DOI release, and provides no separate data license.",
+    "assets": [
+      {
+        "name": "gft-registry-2026.08.05.sqlite.zst",
+        "url": "https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/registry-2026.08.05/gft-registry-2026.08.05.sqlite.zst",
+        "bytes": 2254015,
+        "github_digest": "sha256:4fea49b741e57964f411cebfa388881a64d81f3aefd2a08d3940c296dc2acef6",
+        "downloaded_sha256": "4fea49b741e57964f411cebfa388881a64d81f3aefd2a08d3940c296dc2acef6",
+        "content_type": "application/zstd",
+        "state": "uploaded",
+        "hash_match": true
+      },
+      {
+        "name": "registry-manifest.json",
+        "url": "https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/registry-2026.08.05/registry-manifest.json",
+        "bytes": 2792,
+        "github_digest": "sha256:0a42493e1d0812cb0cff96112c7279bbfac3adefe2a536efbb0373153555fdec",
+        "downloaded_sha256": "0a42493e1d0812cb0cff96112c7279bbfac3adefe2a536efbb0373153555fdec",
+        "content_type": "application/json",
+        "state": "uploaded",
+        "hash_match": true
+      },
+      {
+        "name": "registry-schema.sql",
+        "url": "https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/registry-2026.08.05/registry-schema.sql",
+        "bytes": 15166,
+        "github_digest": "sha256:5298e3885a922d2207e3d0e5aa54b5569854674ce2297ffd0ad3b5ff77359f47",
+        "downloaded_sha256": "5298e3885a922d2207e3d0e5aa54b5569854674ce2297ffd0ad3b5ff77359f47",
+        "content_type": "application/sql",
+        "state": "uploaded",
+        "hash_match": true
+      },
+      {
+        "name": "SHA256SUMS",
+        "url": "https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/registry-2026.08.05/SHA256SUMS",
+        "bytes": 373,
+        "github_digest": "sha256:de5909187c698e5953e298fa1cd81a565e25c0d0355c80244e19380a9f67a569",
+        "downloaded_sha256": "de5909187c698e5953e298fa1cd81a565e25c0d0355c80244e19380a9f67a569",
+        "content_type": "application/octet-stream",
+        "state": "uploaded",
+        "hash_match": true
+      }
+    ]
+  },
+  "snapshot": {
+    "dataset_version": "2026.08.05",
+    "manifest_schema_version": 1,
+    "compressed_asset": {
+      "filename": "gft-registry-2026.08.05.sqlite.zst",
+      "format": "zstd",
+      "compression_command_declared": "zstd -15 -T0",
+      "compression_tool_version_declared": "1.5.7",
+      "bytes": 2254015,
+      "sha256": "4fea49b741e57964f411cebfa388881a64d81f3aefd2a08d3940c296dc2acef6",
+      "zstd_frame_count_observed": 1,
+      "zstd_window_size_bytes_observed": 4194304,
+      "zstd_decompressed_bytes_observed": 24961024,
+      "zstd_check_observed": "XXH64 b8c6312f",
+      "round_trip_verified": true
+    },
+    "database": {
+      "filename": "gft-registry-2026.08.05.sqlite",
+      "format": "SQLite 3",
+      "bytes": 24961024,
+      "sha256": "e20ab91171cbe7515fbb8ad116311e98cf09054407140fbb93746d1c6608f82e",
+      "sqlite_library_version": "3.53.1",
+      "pragma_user_version": 0,
+      "page_size": 4096,
+      "page_count": 6094,
+      "freelist_count": 2869,
+      "quick_check": "ok",
+      "integrity_check": "ok",
+      "application_table_count": 25,
+      "total_rows_across_application_tables": 10120,
+      "application_tables": [
+        "daily_stats",
+        "dlmf_catalog",
+        "evidence",
+        "facts",
+        "function_aliases",
+        "function_families",
+        "function_instances",
+        "function_relations",
+        "function_tags",
+        "functions",
+        "gft_properties",
+        "merge_candidates",
+        "page_views",
+        "paper_claims",
+        "paper_class_tags",
+        "paper_family_links",
+        "paper_queue",
+        "paper_tags",
+        "papers",
+        "properties",
+        "property_implications",
+        "tags",
+        "verification_queue",
+        "verification_runs",
+        "verify_queue"
+      ],
+      "row_counts": {
+        "daily_stats": 398,
+        "dlmf_catalog": 0,
+        "evidence": 961,
+        "facts": 1040,
+        "function_aliases": 0,
+        "function_families": 151,
+        "function_instances": 543,
+        "function_relations": 0,
+        "function_tags": 281,
+        "functions": 137,
+        "gft_properties": 18,
+        "merge_candidates": 49,
+        "page_views": 0,
+        "paper_claims": 1039,
+        "paper_class_tags": 186,
+        "paper_family_links": 2606,
+        "paper_queue": 0,
+        "paper_tags": 126,
+        "papers": 1088,
+        "properties": 137,
+        "property_implications": 15,
+        "tags": 54,
+        "verification_queue": 4,
+        "verification_runs": 1287,
+        "verify_queue": 0
+      },
+      "sqlite_internal_tables_observed": [
+        "sqlite_sequence",
+        "sqlite_stat1"
+      ]
+    },
+    "schema_asset": {
+      "filename": "registry-schema.sql",
+      "bytes": 15166,
+      "sha256": "5298e3885a922d2207e3d0e5aa54b5569854674ce2297ffd0ad3b5ff77359f47",
+      "declared_application_table_count": 25,
+      "declared_internal_table_count": 2,
+      "declared_index_count": 39,
+      "declared_application_tables_match_database": true,
+      "standalone_replay": {
+        "status": "failed",
+        "sqlite3_exit_code": 1,
+        "parse_error_count": 41,
+        "first_error": "no such table: main.function_aliases",
+        "root_causes": [
+          "CREATE INDEX statements precede the CREATE TABLE statements they reference.",
+          "The dump includes reserved sqlite_sequence and sqlite_stat1 declarations that SQLite rejects in a fresh database."
+        ]
+      }
+    },
+    "checksums_asset": {
+      "filename": "SHA256SUMS",
+      "bytes": 373,
+      "sha256": "de5909187c698e5953e298fa1cd81a565e25c0d0355c80244e19380a9f67a569",
+      "declared_entries": [
+        {
+          "filename": "gft-registry-2026.08.05.sqlite.zst",
+          "sha256": "4fea49b741e57964f411cebfa388881a64d81f3aefd2a08d3940c296dc2acef6"
+        },
+        {
+          "filename": "registry-manifest.json",
+          "sha256": "0a42493e1d0812cb0cff96112c7279bbfac3adefe2a536efbb0373153555fdec"
+        },
+        {
+          "filename": "registry-schema.sql",
+          "sha256": "5298e3885a922d2207e3d0e5aa54b5569854674ce2297ffd0ad3b5ff77359f47"
+        },
+        {
+          "filename": "gft-registry-2026.08.05.sqlite",
+          "sha256": "e20ab91171cbe7515fbb8ad116311e98cf09054407140fbb93746d1c6608f82e"
+        }
+      ],
+      "all_downloaded_entries_verified": true
+    }
+  },
+  "source": {
+    "repository": "https://github.com/Prasanna28Devadiga/gft-registry",
+    "repository_label": "gft-registry research artifact",
+    "repository_commit": "acee553e03f9ca2bdcb55977e18ff7d9deb57e40",
+    "database_relative_path": "data/registry.db",
+    "database_git_tracked": false,
+    "manifest_declared_database_sha256": "5dfd7060c232bcfeb61b4118d667b59127cb5142a91eee9d030c633789de5634",
+    "manifest_declared_database_bytes": 24961024,
+    "manifest_declared_database_modified_at": "2026-07-18T20:07:58.660655+00:00",
+    "manifest_declared_worktree_dirty": true,
+    "matching_source_sidecar": {
+      "relative_path": "data/registry.db.bak.ocr_apply_batch.20260806-120044",
+      "sha256": "5dfd7060c232bcfeb61b4118d667b59127cb5142a91eee9d030c633789de5634",
+      "bytes": 24961024,
+      "logical_content_equal_to_released_database": true
+    },
+    "current_live_database": {
+      "relative_path": "data/registry.db",
+      "sha256": "51e0e7cbbef124c761cf31b784140f1f2e7f79589377e1fdbf76601417782e51",
+      "bytes": 24961024,
+      "modified_at": "2026-08-06T12:54:53.197416+00:00",
+      "quick_check": "ok",
+      "integrity_check": "ok",
+      "pragma_user_version": 0,
+      "page_size": 4096,
+      "page_count": 6094,
+      "application_table_count": 25,
+      "total_rows_across_application_tables": 10120,
+      "logical_content_equal_to_released_database": false,
+      "logical_mismatch_tables": ["papers"],
+      "papers_changed_row_count": 335,
+      "papers_added_row_count": 0,
+      "papers_removed_row_count": 0,
+      "released_papers_table_sha256": "c5e6727b044df37514470d0ee4a0631875dfab35a2390a180a944a3b841d7797",
+      "current_papers_table_sha256": "f7309b7348fe7ff621986674b169509aeb6085a72e1d031b9cd07cd032ccf853"
+    },
+    "source_association_status": "manifest_hash_matches_preserved_sidecar_but_not_current_live_database"
+  },
+  "package_association": {
+    "manifest_package_repository": "https://github.com/Prasanna28Devadiga/gft-registry-python",
+    "manifest_package_commit": "473bf6a1cc63648b0b6b999ea7428cbc6b455611",
+    "manifest_package_version_present": false,
+    "release_target_commitish": "473bf6a1cc63648b0b6b999ea7428cbc6b455611",
+    "target_commit_package_name": "gft-registry",
+    "current_package_repository": "https://github.com/Prasanna28Devadiga/geometric-function-atlas",
+    "current_package_commit": "e504452eb399bf9818fbf79fff078f4104ab94ae",
+    "current_package_name": "geometric-function-atlas",
+    "association_status": "historical_base_commit_only",
+    "reason": "The snapshot targets the pre-rename 0.1.0 package commit. The current package renamed its distribution/import surface after the snapshot; the manifest repository URL is also the old name. Do not infer that the snapshot is the current RC package payload."
+  },
+  "website_observation": {
+    "endpoint": "https://gft-registry.fly.dev/api/v2/stats",
+    "observed_at_utc": "2026-08-09T16:51:24.934082+00:00",
+    "response_sha256": "f499e92939f8d87e18425bd04e9ad6b1a7e98ed7946682329ca0ad25c7056c85",
+    "reported_stats": {
+      "n_evidence": 961,
+      "n_facts": 1040,
+      "n_facts_disproven": 220,
+      "n_facts_proven": 401,
+      "n_facts_ready_for_proof": 0,
+      "n_families": 151,
+      "n_families_parametric": 18,
+      "n_families_with_closed_form": 92,
+      "n_instances": 543,
+      "n_merge_candidates": 49,
+      "n_relations": 0,
+      "n_subordinations": 0,
+      "n_verification_runs": 1287,
+      "n_witnesses": 546
+    },
+    "population_fields_match_snapshot": [
+      "n_evidence",
+      "n_facts",
+      "n_families",
+      "n_instances",
+      "n_merge_candidates",
+      "n_relations",
+      "n_verification_runs"
+    ],
+    "identity_status": "website_counts_are_not_snapshot_identity",
+    "divergence_evidence": "The endpoint reports matching headline populations while the current source database has 335 changed rows in papers. Website-only counts cannot establish the released database bytes or row-level provenance."
+  },
+  "license_and_redistribution": {
+    "repository_license": "MIT",
+    "database_or_snapshot_license_declared": false,
+    "release_body_says_private_development_snapshot": true,
+    "manifest_visibility_at_creation": "private",
+    "current_download_visibility": "public",
+    "redistribution_status": "unresolved",
+    "required_follow_up": "Obtain and record an explicit license/redistribution decision for the database and schema/data assets before treating this snapshot as a public archival dependency."
+  },
+  "negative_fixtures": [
+    {
+      "id": "wrong-compressed-hash",
+      "category": "wrong_hash",
+      "mutation": {
+        "asset_name": "gft-registry-2026.08.05.sqlite.zst",
+        "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "bytes_unchanged": true
+      },
+      "expected_failure_codes": ["asset_hash_mismatch"]
+    },
+    {
+      "id": "truncated-compressed-asset",
+      "category": "truncation",
+      "mutation": {
+        "asset_name": "gft-registry-2026.08.05.sqlite.zst",
+        "remove_trailing_bytes": 1,
+        "mutated_bytes": 2254014,
+        "failure_semantics": "at_least_one_expected_failure_code"
+      },
+      "expected_failure_codes": ["asset_size_mismatch", "asset_hash_mismatch", "decompression_failed"]
+    },
+    {
+      "id": "unsupported-manifest-schema",
+      "category": "wrong_schema",
+      "mutation": {
+        "path": "manifest_schema_version",
+        "replace": 999
+      },
+      "expected_failure_codes": ["manifest_schema_version_unsupported"]
+    },
+    {
+      "id": "missing-required-table",
+      "category": "missing_table",
+      "mutation": {
+        "database": "remove_table",
+        "table": "papers",
+        "preserve_manifest": true,
+        "artifact_stage": "after_archive_hash_and_decompression_verification",
+        "recompute_mutated_database_hash": true
+      },
+      "expected_failure_codes": ["required_table_missing"]
+    },
+    {
+      "id": "missing-required-manifest-field",
+      "category": "missing_field",
+      "mutation": {
+        "manifest": "remove_path",
+        "path": "database.row_counts.papers"
+      },
+      "expected_failure_codes": ["required_manifest_field_missing"]
+    },
+    {
+      "id": "stale-software-snapshot-association",
+      "category": "stale_software_snapshot_association",
+      "mutation": {
+        "path": "package.commit",
+        "replace": "e504452eb399bf9818fbf79fff078f4104ab94ae",
+        "release_target_commitish_unchanged": true
+      },
+      "expected_failure_codes": ["package_commit_not_equal_release_target"]
+    },
+    {
+      "id": "decompression-resource-limit",
+      "category": "decompression_resource_limit",
+      "mutation": {
+        "max_decompressed_bytes": 24961023,
+        "declared_decompressed_bytes": 24961024
+      },
+      "expected_failure_codes": ["decompressed_size_limit_exceeded"]
+    },
+    {
+      "id": "website-only-divergence",
+      "category": "website_only_divergence",
+      "mutation": {
+        "website_stats_unchanged": true,
+        "released_papers_table_sha256": "c5e6727b044df37514470d0ee4a0631875dfab35a2390a180a944a3b841d7797",
+        "alternate_papers_table_sha256": "f7309b7348fe7ff621986674b169509aeb6085a72e1d031b9cd07cd032ccf853",
+        "alternate_changed_row_count": 335
+      },
+      "expected_failure_codes": ["website_observation_cannot_establish_snapshot_identity"]
+    }
+  ],
+  "package_boundary": {
+    "database_in_wheel": false,
+    "database_in_fixture": false,
+    "validator_implemented": false,
+    "audit_artifact_contains_only_metadata_and_fixture_descriptors": true
+  }
+}
