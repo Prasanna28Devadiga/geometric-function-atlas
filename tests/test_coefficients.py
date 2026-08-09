@@ -60,10 +60,27 @@ def test_generator_series_carries_reproducibility_metadata() -> None:
 
     assert result.coefficients == (1, 0, -sp.Rational(1, 6), 0)
     assert payload["method"] == "exact_symbolic_taylor_series"
-    assert payload["evidence_status"] == "proven_exact_algebraic"
+    assert payload["evidence_status"] == "proven_exact_under_declared_assumptions"
     assert payload["package_version"] == "0.1.0"
     assert payload["artifact_versions"]["generator_catalog"]
     assert payload["novelty_claim"] is False
+
+
+def test_verification_report_detects_mutated_coefficients() -> None:
+    generator = Generator(
+        key="mutated",
+        name="Mutated",
+        expression=1 + z + z**2,
+        citation="Test",
+    )
+    result = generator_series(generator, order=2)
+    mutated = result.__class__(
+        generator=result.generator,
+        order=result.order,
+        coefficients=(sp.Integer(99), sp.Integer(99)),
+    )
+
+    assert mutated.verification_report.success is False
 
 
 def test_taylor_coefficients_reject_excessive_order() -> None:

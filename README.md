@@ -13,6 +13,7 @@ The first release provides:
 - a typed catalog of the Ma–Minda generators used by the paper’s exact-radius portfolio;
 - exact Taylor coefficients of a generator using SymPy;
 - exact Ma–Minda Fekete–Szegő constants and their derivation metadata;
+- versioned structured result and fail-closed verification reports;
 - JSON-capable command-line output suitable for independent checks.
 
 Later phases will add sharp-radius certificate replay, general coefficient-certificate replay, registry snapshot validation, and literature-reconciliation audit tools.
@@ -65,6 +66,8 @@ unbounded symbolic integer construction.
 
 See `docs/PROVENANCE.md` for claim semantics and `docs/ROADMAP.md` for the
 incremental path to full registry and paper reproduction.
+The versioned result envelope, verification checks, failure states, and CLI
+exit codes are specified in `docs/RESULT_CONTRACT.md`.
 
 ## Development
 

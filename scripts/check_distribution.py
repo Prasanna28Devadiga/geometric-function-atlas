@@ -13,11 +13,32 @@ def _assert_common(names: list[str], *, archive: Path) -> None:
     assert not any("gft_registry" in name for name in names), (
         f"{archive.name} contains the old import package"
     )
-    assert not any(name.endswith(('.db', '.sqlite', '.env')) for name in names), (
-        f"{archive.name} contains a private/data artifact"
+    forbidden_suffixes = (
+        ".db",
+        ".sqlite",
+        ".sqlite-shm",
+        ".sqlite-wal",
+        ".env",
+        ".pem",
+        ".key",
+        ".secret",
+        ".audit",
+        ".log",
+    )
+    assert not any(name.lower().endswith(forbidden_suffixes) for name in names), (
+        f"{archive.name} contains a private/data/audit artifact"
+    )
+    assert not any("__pycache__" in name or name.endswith(".pyc") for name in names), (
+        f"{archive.name} contains a Python cache"
     )
     assert "geometric_function_atlas/py.typed" in joined, (
         f"{archive.name} is missing py.typed"
+    )
+    assert "geometric_function_atlas/schema/result.schema.json" in joined, (
+        f"{archive.name} is missing the result schema"
+    )
+    assert "geometric_function_atlas/schema/error.schema.json" in joined, (
+        f"{archive.name} is missing the error schema"
     )
 
 

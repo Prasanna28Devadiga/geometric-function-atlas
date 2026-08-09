@@ -82,6 +82,88 @@ def test_fekete_szego_rejects_scientific_notation_before_sympy_parsing() -> None
         fekete_szego("sine", mu="1e1000")
 
 
+def test_verification_report_fails_closed_for_mutated_fekete_result() -> None:
+    from geometric_function_atlas import Generator, z
+
+    result = FeketeSzegoResult(
+        generator=Generator(
+            key="mutated",
+            name="Mutated",
+            expression=1 + z,
+            citation="Test",
+        ),
+        mu=sp.Rational(0),
+        b1=sp.Integer(-1),
+        b2=sp.Integer(0),
+        value=sp.Integer(1),
+    )
+
+    assert result.verification_report.success is False
+
+
+def test_verification_recomputes_coefficients_from_generator() -> None:
+    from geometric_function_atlas import Generator, z
+
+    generator = Generator(
+        key="forged",
+        name="Forged coefficients",
+        expression=1 + z + z**2 / 2,
+        citation="Test",
+    )
+    result = FeketeSzegoResult(
+        generator=generator,
+        mu=sp.Rational(0),
+        b1=sp.Integer(2),
+        b2=sp.Integer(7),
+        value=sp.Integer(99),
+    )
+
+    report = result.verification_report
+
+    assert report.success is False
+    assert any(
+        check.name == "generator_taylor_coefficients" and check.status.value == "fail"
+        for check in report.checks
+    )
+
+
+def test_verification_rejects_coherent_but_forged_coefficients_and_value() -> None:
+    from geometric_function_atlas import Generator, z
+
+    generator = Generator(
+        key="coherent-forgery",
+        name="Coherent forged coefficients",
+        expression=1 + z + z**2 / 2,
+        citation="Test",
+    )
+    # These values are mutually coherent for a different generator, but not for
+    # the generator carried by this result.
+    forged = FeketeSzegoResult(
+        generator=generator,
+        mu=sp.Rational(0),
+        b1=sp.Integer(2),
+        b2=sp.Integer(7),
+        value=sp.Rational(11, 2),
+    )
+
+    report = forged.verification_report
+
+    assert report.success is False
+    assert report.status == "failed"
+    assert any(
+        check.name == "generator_taylor_coefficients"
+        and check.status == "fail"
+        for check in report.checks
+    )
+
+
+def test_fekete_result_rejects_float_and_bool_mu() -> None:
+    with pytest.raises(TypeError, match="real rational"):
+        fekete_szego("sine", mu=0.5)
+    with pytest.raises(TypeError, match="real rational"):
+        fekete_szego("sine", mu=True)
+
+
 @pytest.mark.parametrize(
     "mu",
     [sp.Integer(10) ** 128, sp.Rational(1, sp.Integer(10) ** 128)],
