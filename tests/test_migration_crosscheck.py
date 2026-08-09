@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from gft_registry import fekete_szego
+from geometric_function_atlas import fekete_szego
 
 _FIXTURE = Path(__file__).with_name("fixtures") / "fekete_szego_research_artifact.json"
 _PAYLOAD = json.loads(_FIXTURE.read_text(encoding="utf-8"))

@@ -5,7 +5,7 @@ import json
 import pytest
 import sympy as sp
 
-from gft_registry import FeketeSzegoResult, fekete_szego
+from geometric_function_atlas import FeketeSzegoResult, fekete_szego
 
 
 def test_classical_starlike_anchor_matches_known_constants() -> None:
@@ -43,7 +43,7 @@ def test_result_serializes_without_losing_exact_values() -> None:
 
 
 def test_fekete_szego_rejects_generator_without_positive_b1() -> None:
-    from gft_registry import Generator, z
+    from geometric_function_atlas import Generator, z
 
     generator = Generator(
         key="bad",
@@ -56,7 +56,7 @@ def test_fekete_szego_rejects_generator_without_positive_b1() -> None:
 
 
 def test_fekete_szego_rejects_non_real_b2() -> None:
-    from gft_registry import Generator, z
+    from geometric_function_atlas import Generator, z
 
     generator = Generator(
         key="complex-b2",

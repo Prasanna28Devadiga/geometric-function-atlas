@@ -7,7 +7,7 @@ import sys
 
 def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, "-m", "gft_registry", *args],
+        [sys.executable, "-m", "geometric_function_atlas", *args],
         check=False,
         capture_output=True,
         text=True,

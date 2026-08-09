@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: gft-registry
+title: geometric-function-atlas
 message: "If you use this software, please cite the software release and the associated paper."
 type: software
 version: 0.1.0
@@ -16,6 +16,8 @@ authors:
   - family-names: Sebastian
     given-names: Asha
 license: MIT
+repository-code: https://github.com/Prasanna28Devadiga/geometric-function-atlas
+url: https://github.com/Prasanna28Devadiga/geometric-function-atlas
 keywords:
   - geometric function theory
   - Ma-Minda functions

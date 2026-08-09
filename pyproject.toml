@@ -3,9 +3,9 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gft-registry"
+name = "geometric-function-atlas"
 dynamic = ["version"]
-description = "Reproducible computations for geometric function theory registries"
+description = "Reproducible computations for a geometric function theory atlas"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
@@ -33,12 +33,17 @@ classifiers = [
 ]
 dependencies = ["sympy>=1.12"]
 
+[project.urls]
+Homepage = "https://github.com/Prasanna28Devadiga/geometric-function-atlas"
+Repository = "https://github.com/Prasanna28Devadiga/geometric-function-atlas"
+Issues = "https://github.com/Prasanna28Devadiga/geometric-function-atlas/issues"
+
 [project.optional-dependencies]
 test = ["mypy>=1.15", "pytest>=8", "ruff>=0.16"]
 build = ["build>=1.2", "twine>=5"]
 
 [project.scripts]
-gft-registry = "gft_registry.cli:main"
+geometric-function-atlas = "geometric_function_atlas.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
@@ -48,10 +53,10 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-gft_registry = ["py.typed"]
+geometric_function_atlas = ["py.typed"]
 
 [tool.setuptools.dynamic]
-version = { attr = "gft_registry.version.__version__" }
+version = { attr = "geometric_function_atlas.version.__version__" }
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers --strict-config"

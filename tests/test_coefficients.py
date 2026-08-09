@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 import sympy as sp
 
-from gft_registry import Generator, generator_series, taylor_coefficients, z
+from geometric_function_atlas import Generator, generator_series, taylor_coefficients, z
 
 
 def test_exact_taylor_coefficients_for_sine_generator() -> None:

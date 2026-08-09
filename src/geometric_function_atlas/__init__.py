@@ -1,4 +1,4 @@
-"""Public API for reproducible GFT Registry computations."""
+"""Public API for reproducible Geometric Function Atlas computations."""
 
 from .catalog import get_generator, list_generators
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients

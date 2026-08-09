@@ -49,8 +49,8 @@ def _fekete_szego(args: argparse.Namespace) -> None:
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="gft-registry",
-        description="Reproduce and review GFT Registry computations.",
+        prog="geometric-function-atlas",
+        description="Reproduce and review Geometric Function Atlas computations.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 

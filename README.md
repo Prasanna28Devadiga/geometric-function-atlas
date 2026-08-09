@@ -1,6 +1,8 @@
-# gft-registry
+# geometric-function-atlas
 
-`gft-registry` is a standalone Python package for independently reproducing and reviewing computations published by the GFT Registry.
+`geometric-function-atlas` is a standalone Python package for independently reproducing and reviewing computations published by the Geometric Function Atlas.
+
+Source repository: <https://github.com/Prasanna28Devadiga/geometric-function-atlas>
 
 This repository is intentionally separate from the registry website and its research workspace. It contains only researcher-facing mathematical APIs, compact reference data, machine-readable provenance, tests, and command-line workflows. It does not contain the Flask application, OCR pipeline, deployment configuration, private review state, or mutable registry database.
 
@@ -18,7 +20,7 @@ Later phases will add sharp-radius certificate replay, general coefficient-certi
 ## Python API
 
 ```python
-from gft_registry import Generator, fekete_szego, generator_series, z
+from geometric_function_atlas import Generator, fekete_szego, generator_series, z
 
 # phi(z) = 1 + sin(z) = 1 + z - z^3/6 + ...
 series = generator_series("sine", order=4)
@@ -52,9 +54,9 @@ symbols are rejected.
 ## Command line
 
 ```bash
-gft-registry generators --json
-gft-registry coefficients sine --order 5 --json
-gft-registry fekete-szego exponential --mu 1/2 --precision 40 --json
+geometric-function-atlas generators --json
+geometric-function-atlas coefficients sine --order 5 --json
+geometric-function-atlas fekete-szego exponential --mu 1/2 --precision 40 --json
 ```
 
 `--mu` accepts an exact signed integer or `integer/integer` fraction. Decimal

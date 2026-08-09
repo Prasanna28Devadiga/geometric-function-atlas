@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 import sympy as sp
 
-from gft_registry import Generator, get_generator, list_generators, z
+from geometric_function_atlas import Generator, get_generator, list_generators, z
 
 
 def test_portfolio_generators_are_available_with_exact_normalization() -> None:
