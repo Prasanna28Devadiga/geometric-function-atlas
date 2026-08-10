@@ -5,8 +5,8 @@ separate from PyPI publication and from versioned registry-data snapshots.
 
 ## Free-tier GitHub policy
 
-The repository is public. CI uses only standard `ubuntu-latest` and
-`windows-latest` GitHub-hosted runners, which GitHub documents as free for public
+The repository is public. CI uses only standard `ubuntu-24.04` and
+`windows-2025` GitHub-hosted runners, which GitHub documents as free for public
 repositories. The workflow does not use larger runners, Actions artifact uploads,
 or persistent Actions caches. Release files are attached directly to the GitHub
 release; GitHub documents no total release-size or bandwidth limit, subject to a
@@ -24,16 +24,16 @@ explicit approval from the repository owner.
 
    ```bash
    uv sync --extra test --extra build --locked
-   uv run --extra test python -m ruff check src tests scripts
-   uv run --extra test python -m mypy src --ignore-missing-imports
-   uv run --extra test python -W error -m pytest -q
+   uv run --frozen --extra test python -m ruff check src tests scripts
+   uv run --frozen --extra test python -m mypy src --ignore-missing-imports
+   uv run --frozen --extra test python -W error -m pytest -q
    rm -rf dist build
-   uv run --extra build python -m build
-   uv run --extra build python -m twine check dist/*
-   uv run python scripts/check_distribution.py dist
-   uv run python scripts/check_clean_install.py \
+   uv run --frozen --extra build python -m build
+   uv run --frozen --extra build python -m twine check dist/*
+   uv run --frozen python scripts/check_distribution.py dist
+   uv run --frozen python scripts/check_clean_install.py \
      dist/geometric_function_atlas-0.1.1-py3-none-any.whl
-   uv run python scripts/check_uv_tool_install.py \
+   uv run --frozen python scripts/check_uv_tool_install.py \
      dist/geometric_function_atlas-0.1.1-py3-none-any.whl --python 3.12
    ```
 
@@ -48,9 +48,36 @@ explicit approval from the repository owner.
    downloaded wheel.
 10. Run both public installer commands and verify `gfa --version`.
 
-There is deliberately no tag-triggered PyPI workflow. PyPI Trusted Publishing
-will be configured and reviewed as a separate future step. No PyPI token belongs
-in this repository.
+## PyPI publication
+
+PyPI publication is a separate, explicitly triggered step after a GitHub release
+has passed every gate above. The `publish-pypi.yml` workflow uses PyPI Trusted
+Publishing; no PyPI password or API token belongs in this repository.
+
+1. Update and independently review `.github/pypi-publish.json` so it pins the
+   release tag, commit, exact asset names, and independently recorded SHA-256
+   digests.
+2. Confirm that the PyPI trusted publisher matches this public repository,
+   `.github/workflows/publish-pypi.yml`, and the `pypi` GitHub environment.
+3. Manually dispatch **Publish to PyPI**. It accepts no release input; the
+   reviewed manifest is the sole publication target.
+4. The workflow verifies the pinned tag/commit, downloads the exact wheel,
+   sdist, and `SHA256SUMS`, checks both the manifest-pinned digests and the
+   release checksum file, and runs the metadata and distribution-content gates.
+5. A separate minimal OIDC job downloads and reverifies the pinned distribution
+   digests before uploading only those artifacts through
+   short-lived OpenID Connect credentials.
+6. Verify the new PyPI release through its JSON API and install it by name in a
+   fresh uv-managed Python environment.
+
+The workflow uses a standard public-repository runner and does not upload Actions
+artifacts or use persistent Actions caches. Release and CI environments are
+resolved from the committed `uv.lock` with `--locked`/`--frozen`; `uv`, Python
+for publishing, and every third-party Action are pinned (Actions by full commit
+SHA). Runtime dependency ranges remain compatible library metadata, while the
+lockfile is the exact reproducibility record. Do not enable automatic
+tag-triggered publishing, mutable Action tags, dependency caches, or long-lived
+PyPI credentials.
 
 ## Maintained scripts
 
