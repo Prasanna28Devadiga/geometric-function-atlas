@@ -32,9 +32,9 @@ explicit approval from the repository owner.
    uv run --extra build python -m twine check dist/*
    uv run python scripts/check_distribution.py dist
    uv run python scripts/check_clean_install.py \
-     dist/geometric_function_atlas-0.1.0-py3-none-any.whl
+     dist/geometric_function_atlas-0.1.1-py3-none-any.whl
    uv run python scripts/check_uv_tool_install.py \
-     dist/geometric_function_atlas-0.1.0-py3-none-any.whl --python 3.12
+     dist/geometric_function_atlas-0.1.1-py3-none-any.whl --python 3.12
    ```
 
 4. Obtain an independent review of the exact diff.

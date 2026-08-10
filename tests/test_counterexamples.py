@@ -107,6 +107,20 @@ def test_counterexample_rejects_point_outside_unit_disk() -> None:
         )
 
 
+@pytest.mark.parametrize("coefficients", ["1", b"1", {"2": 0}, {1.0}])
+def test_counterexample_rejects_non_sequence_coefficient_containers(
+    coefficients: object,
+) -> None:
+    from geometric_function_atlas import verify_counterexample
+
+    with pytest.raises(TypeError, match="sequence of real numbers"):
+        verify_counterexample(
+            coefficients=coefficients,  # type: ignore[arg-type]
+            point=(0.25, 0.0),
+            property="starlike",
+        )
+
+
 def test_starlike_origin_uses_the_removable_limit() -> None:
     from geometric_function_atlas import verify_counterexample
 

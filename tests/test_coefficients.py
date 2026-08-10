@@ -61,7 +61,7 @@ def test_generator_series_carries_reproducibility_metadata() -> None:
     assert result.coefficients == (1, 0, -sp.Rational(1, 6), 0)
     assert payload["method"] == "exact_symbolic_taylor_series"
     assert payload["evidence_status"] == "proven_exact_under_declared_assumptions"
-    assert payload["package_version"] == "0.1.0"
+    assert payload["package_version"] == "0.1.1"
     assert payload["artifact_versions"]["generator_catalog"]
     assert payload["novelty_claim"] is False
 

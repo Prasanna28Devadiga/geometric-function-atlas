@@ -2,6 +2,18 @@
 
 All notable changes to Geometric Function Atlas are recorded here.
 
+## 0.1.1 — 2026-08-10
+
+Contract-integrity repair release.
+
+### Fixed
+
+- The shipped Draft 2020-12 result schema now couples exact-result evidence,
+  computational, verification, and failure states as strictly as the Python
+  validator.
+- The public counterexample API rejects strings, bytes, mappings, sets, and
+  other non-sequence coefficient containers instead of coercing them.
+
 ## 0.1.0 — 2026-08-10
 
 First software release.
