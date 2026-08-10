@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geometric-function-atlas.org/schema/error-1.json",
+  "title": "Geometric Function Atlas structured error",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "result_type", "failure_state", "error", "package_version", "literature_status", "novelty_claim"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "result_type": {"const": "error"},
+    "failure_state": {"enum": ["unsupported", "unresolved", "invalid_input", "resource_limit", "corrupt_artifact"]},
+    "error": {"type": "string", "minLength": 1},
+    "package_version": {"type": "string", "minLength": 1},
+    "literature_status": {"const": "not_assessed"},
+    "novelty_claim": {"const": false}
+  }
+}

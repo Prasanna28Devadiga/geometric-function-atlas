@@ -93,6 +93,6 @@ def generator_artifact_version(generator: Generator) -> str:
 
     return (
         GENERATOR_CATALOG_VERSION
-        if _BY_KEY.get(generator.key) == generator
+        if _BY_KEY.get(generator.key) is generator
         else "user-supplied"
     )

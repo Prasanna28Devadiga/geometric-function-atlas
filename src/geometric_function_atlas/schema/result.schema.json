@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geometric-function-atlas.org/schema/result-1.json",
+  "title": "Geometric Function Atlas structured result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "result_type", "canonical_inputs", "exact_expressions",
+    "exact_expression_dag", "method", "evidence_status", "computational_status",
+    "assumptions", "source_references", "package_version", "artifact_versions",
+    "literature_status", "novelty_claim", "failure_state", "verification", "provenance"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "result_type": {"enum": ["generator_series", "fekete_szego", "counterexample_verification"]},
+    "canonical_inputs": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "generator": {"type": "string", "minLength": 1},
+        "order": {"type": "integer", "minimum": 1},
+        "mu": {"type": "string", "minLength": 1},
+        "inner": {"type": "string", "minLength": 1},
+        "target": {"type": "string", "minLength": 1},
+        "property": {"type": "string", "minLength": 1},
+        "coefficients": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "exact_expressions": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "generator": {"type": "string", "minLength": 1},
+        "coefficients": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "B1": {"type": "string", "minLength": 1},
+        "B2": {"type": "string", "minLength": 1},
+        "value": {"type": "string", "minLength": 1},
+        "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+        "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+        "threshold": {"type": "string", "minLength": 1}
+      }
+    },
+    "exact_expression_dag": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "nodes", "roots"],
+      "properties": {
+        "version": {"const": 1},
+        "nodes": {
+          "type": "array", "minItems": 1, "maxItems": 10000,
+          "items": {"$ref": "#/$defs/dag_node"}
+        },
+        "roots": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "generator": {"type": "string", "pattern": "^n[0-9]+$"},
+            "coefficients": {"type": "array", "items": {"type": "string", "pattern": "^n[0-9]+$"}},
+            "B1": {"type": "string", "pattern": "^n[0-9]+$"},
+            "B2": {"type": "string", "pattern": "^n[0-9]+$"},
+            "value": {"type": "string", "pattern": "^n[0-9]+$"},
+            "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^n[0-9]+$"}},
+            "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^n[0-9]+$"}},
+            "threshold": {"type": "string", "pattern": "^n[0-9]+$"}
+          }
+        }
+      }
+    },
+    "method": {"enum": ["exact_symbolic_taylor_series", "ma_minda_fekete_szego_closed_form", "certified_point_interval_evaluation"]},
+    "evidence_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
+    "computational_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
+    "assumptions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "source_references": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "package_version": {"type": "string", "minLength": 1},
+    "artifact_versions": {
+      "type": "object", "minProperties": 3,
+      "required": ["generator_catalog", "source_commit", "fixture_or_proof"],
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "literature_status": {"enum": ["not_assessed", "known", "candidate_improvement", "no_extracted_claim", "unresolved"]},
+    "novelty_claim": {"const": false},
+    "failure_state": {"type": ["string", "null"], "enum": ["unsupported", "unresolved", "invalid_input", "resource_limit", "corrupt_artifact", null]},
+    "provenance": {"enum": ["built_in", "caller_supplied"]},
+    "verification": {"$ref": "#/$defs/verification"},
+    "generator": {"type": "string", "minLength": 1},
+    "generator_formula": {"type": "string", "minLength": 1},
+    "generator_citation": {"type": "string", "minLength": 1},
+    "order": {"type": "integer", "minimum": 1},
+    "coefficients": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "mu": {"type": "string", "minLength": 1},
+    "B1": {"type": "string", "minLength": 1},
+    "B2": {"type": "string", "minLength": 1},
+    "value_exact": {"type": "string", "minLength": 1},
+    "value_decimal": {"type": "string", "minLength": 1},
+    "theorem_reference": {"type": "string", "minLength": 1},
+    "property": {"enum": ["starlike", "becker_univalent", "nehari_univalent"]},
+    "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+    "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+    "threshold": {"type": "string", "minLength": 1},
+    "certified": {"type": "boolean"},
+    "direction": {"enum": ["disproves", "not_disproved", "violates_criterion", "not_violated"]}
+  },
+  "$defs": {
+    "json_value": {
+      "anyOf": [
+        {"type": "null"}, {"type": "boolean"}, {"type": "integer"},
+        {"type": "number"}, {"type": "string"},
+        {"type": "array", "items": {"$ref": "#/$defs/json_value"}},
+        {"type": "object", "additionalProperties": {"$ref": "#/$defs/json_value"}}
+      ]
+    },
+    "dag_ref": {"type": "string", "pattern": "^n[0-9]+$"},
+    "dag_node": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["id", "op", "value"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "integer"}, "value": {"type": "string", "pattern": "^[+-]?[0-9]+$"}}},
+        {"type": "object", "additionalProperties": false, "required": ["id", "op", "numerator", "denominator"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "rational"}, "numerator": {"type": "string", "pattern": "^[+-]?[0-9]+$"}, "denominator": {"type": "string", "pattern": "^\\+?(?:[1-9][0-9]*)$"}}},
+        {"type": "object", "additionalProperties": false, "required": ["id", "op", "value"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "symbol"}, "value": {"const": "z"}}},
+        {"type": "object", "additionalProperties": false, "required": ["id", "op", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"enum": ["add", "mul", "pow"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}},
+        {"type": "object", "additionalProperties": false, "required": ["id", "op", "name", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "function"}, "name": {"enum": ["Abs", "Max", "cos", "cosh", "exp", "log", "sin", "sinh"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}}
+      ]
+    },
+    "verification_check": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "checked", "expected", "observed", "status", "scope", "failure_reason", "required"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "checked": {"type": "string", "minLength": 1},
+        "expected": {"$ref": "#/$defs/json_value"},
+        "observed": {"$ref": "#/$defs/json_value"},
+        "status": {"enum": ["pass", "fail", "skip"]},
+        "scope": {"type": "string", "minLength": 1},
+        "failure_reason": {"type": ["string", "null"]},
+        "required": {"const": true}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}, "then": {"properties": {"failure_reason": {"type": "string", "minLength": 1}}}},
+        {"if": {"properties": {"status": {"enum": ["pass", "skip"]}}, "required": ["status"]}, "then": {"properties": {"failure_reason": {"type": "null"}}}}
+      ]
+    },
+    "verification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "success", "checks"],
+      "properties": {
+        "status": {"enum": ["passed", "failed", "skipped"]},
+        "success": {"type": "boolean"},
+        "checks": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/verification_check"}}
+      },
+      "allOf": [
+        {"if": {"properties": {"success": {"const": true}}, "required": ["success"]}, "then": {"properties": {"status": {"const": "passed"}, "checks": {"items": {"properties": {"status": {"const": "pass"}}}}}}},
+        {"if": {"properties": {"status": {"const": "passed"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": true}, "checks": {"items": {"properties": {"status": {"const": "pass"}}}}}}},
+        {"if": {"properties": {"status": {"const": "failed"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": false}, "checks": {"contains": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}}}}},
+        {"if": {"properties": {"status": {"const": "skipped"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": false}, "checks": {"not": {"contains": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}}, "contains": {"properties": {"status": {"const": "skip"}}, "required": ["status"]}}}}}
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"result_type": {"const": "generator_series"}}, "required": ["result_type"]},
+      "then": {
+        "required": ["generator", "generator_formula", "generator_citation", "order", "coefficients"],
+        "not": {"anyOf": [{"required": ["mu"]}, {"required": ["B1"]}, {"required": ["B2"]}, {"required": ["value_exact"]}, {"required": ["value_decimal"]}, {"required": ["theorem_reference"]}, {"required": ["property"]}, {"required": ["point"]}, {"required": ["interval"]}, {"required": ["threshold"]}, {"required": ["certified"]}, {"required": ["direction"]}]},
+        "properties": {
+          "method": {"const": "exact_symbolic_taylor_series"},
+          "canonical_inputs": {"required": ["generator", "order"], "maxProperties": 2},
+          "exact_expressions": {"required": ["generator", "coefficients"], "maxProperties": 2},
+          "exact_expression_dag": {"properties": {"roots": {"required": ["generator", "coefficients"], "maxProperties": 2, "properties": {"coefficients": {"minItems": 1}}}}},
+          "assumptions": {"contains": {"const": "phi(0) = 1"}, "minContains": 1, "allOf": [{"contains": {"const": "expression uses only the variable z"}, "minContains": 1}]},
+          "source_references": {"minItems": 1},
+          "verification": {
+            "properties": {
+              "checks": {
+                "minItems": 2, "maxItems": 2,
+                "allOf": [
+                  {"contains": {"properties": {"name": {"const": "generator_normalization"}}, "required": ["name"]}, "minContains": 1},
+                  {"contains": {"properties": {"name": {"const": "exact_taylor_coefficients"}}, "required": ["name"]}, "minContains": 1}
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"result_type": {"const": "fekete_szego"}}, "required": ["result_type"]},
+      "then": {
+        "required": ["generator", "generator_formula", "generator_citation", "mu", "B1", "B2", "value_exact", "value_decimal", "theorem_reference"],
+        "not": {"anyOf": [{"required": ["order"]}, {"required": ["coefficients"]}, {"required": ["property"]}, {"required": ["point"]}, {"required": ["interval"]}, {"required": ["threshold"]}, {"required": ["certified"]}, {"required": ["direction"]}]},
+        "properties": {
+          "method": {"const": "ma_minda_fekete_szego_closed_form"},
+          "canonical_inputs": {"required": ["generator", "mu"], "maxProperties": 2},
+          "exact_expressions": {"required": ["generator", "B1", "B2", "value"], "maxProperties": 4},
+          "exact_expression_dag": {"properties": {"roots": {"required": ["generator", "B1", "B2", "value"], "maxProperties": 4}}},
+          "assumptions": {"allOf": [{"contains": {"const": "phi is an admissible Ma-Minda generator"}, "minContains": 1}, {"contains": {"const": "phi has real Taylor coefficients"}, "minContains": 1}, {"contains": {"const": "B1 is positive"}, "minContains": 1}]},
+          "source_references": {"minItems": 1},
+          "verification": {
+            "properties": {
+              "checks": {
+                "minItems": 5, "maxItems": 5,
+                "allOf": [
+                  {"contains": {"properties": {"name": {"const": "generator_normalization"}}, "required": ["name"]}, "minContains": 1},
+                  {"contains": {"properties": {"name": {"const": "generator_taylor_coefficients"}}, "required": ["name"]}, "minContains": 1},
+                  {"contains": {"properties": {"name": {"const": "positive_real_first_coefficient"}}, "required": ["name"]}, "minContains": 1},
+                  {"contains": {"properties": {"name": {"const": "real_second_coefficient"}}, "required": ["name"]}, "minContains": 1},
+                  {"contains": {"properties": {"name": {"const": "exact_functional_value"}}, "required": ["name"]}, "minContains": 1}
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"result_type": {"const": "counterexample_verification"}}, "required": ["result_type"]},
+      "then": {
+        "required": ["property", "coefficients", "point", "interval", "threshold", "certified", "direction"],
+        "not": {"anyOf": [{"required": ["generator"]}, {"required": ["generator_formula"]}, {"required": ["generator_citation"]}, {"required": ["order"]}, {"required": ["mu"]}, {"required": ["B1"]}, {"required": ["B2"]}, {"required": ["value_exact"]}, {"required": ["value_decimal"]}, {"required": ["theorem_reference"]}]},
+        "properties": {
+          "method": {"const": "certified_point_interval_evaluation"},
+          "evidence_status": {"const": "certified_enclosure"},
+          "computational_status": {"const": "certified_enclosure"},
+          "failure_state": {"type": "null"},
+          "canonical_inputs": {"required": ["property", "coefficients", "point"], "maxProperties": 3},
+          "exact_expressions": {"required": ["coefficients", "point", "interval", "threshold"], "maxProperties": 4},
+          "exact_expression_dag": {"properties": {"roots": {"required": ["coefficients", "point", "interval", "threshold"], "maxProperties": 4}}},
+          "assumptions": {"allOf": [{"contains": {"const": "f(z) is the supplied normalized polynomial"}, "minContains": 1}, {"contains": {"const": "the witness point lies in the open unit disk"}, "minContains": 1}, {"contains": {"const": "inputs are interpreted as exact IEEE-754 binary64 values"}, "minContains": 1}]},
+          "verification": {
+            "properties": {
+              "status": {"const": "passed"},
+              "success": {"const": true},
+              "checks": {
+                "minItems": 2, "maxItems": 2,
+                "allOf": [
+                  {"contains": {"properties": {"name": {"const": "classification_matches_interval"}}, "required": ["name"]}, "minContains": 1},
+                  {"contains": {"properties": {"name": {"const": "interval_is_ordered"}}, "required": ["name"]}, "minContains": 1}
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"verification": {"properties": {"success": {"const": true}}}}, "required": ["verification"]},
+      "then": {"properties": {"failure_state": {"type": "null"}}},
+      "else": {"required": ["failure_state"], "properties": {"failure_state": {"type": "string"}}}
+    }
+  ]
+}

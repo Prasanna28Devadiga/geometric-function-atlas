@@ -31,7 +31,7 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Topic :: Scientific/Engineering :: Mathematics",
 ]
-dependencies = ["sympy>=1.12"]
+dependencies = ["mpmath>=1.3", "sympy>=1.12"]
 
 [project.urls]
 Homepage = "https://github.com/Prasanna28Devadiga/geometric-function-atlas"
@@ -39,11 +39,12 @@ Repository = "https://github.com/Prasanna28Devadiga/geometric-function-atlas"
 Issues = "https://github.com/Prasanna28Devadiga/geometric-function-atlas/issues"
 
 [project.optional-dependencies]
-test = ["mypy>=1.15", "pytest>=8", "ruff>=0.16"]
+test = ["jsonschema>=4.23", "mypy>=1.15", "pytest>=8", "ruff>=0.16"]
 build = ["build>=1.2", "twine>=5"]
 
 [project.scripts]
 geometric-function-atlas = "geometric_function_atlas.cli:main"
+gfa = "geometric_function_atlas.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
@@ -53,7 +54,7 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-geometric_function_atlas = ["py.typed"]
+geometric_function_atlas = ["py.typed", "schema/*.json"]
 
 [tool.setuptools.dynamic]
 version = { attr = "geometric_function_atlas.version.__version__" }

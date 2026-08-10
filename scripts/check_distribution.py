@@ -13,11 +13,32 @@ def _assert_common(names: list[str], *, archive: Path) -> None:
     assert not any("gft_registry" in name for name in names), (
         f"{archive.name} contains the old import package"
     )
-    assert not any(name.endswith(('.db', '.sqlite', '.env')) for name in names), (
-        f"{archive.name} contains a private/data artifact"
+    forbidden_suffixes = (
+        ".db",
+        ".sqlite",
+        ".sqlite-shm",
+        ".sqlite-wal",
+        ".env",
+        ".pem",
+        ".key",
+        ".secret",
+        ".audit",
+        ".log",
+    )
+    assert not any(name.lower().endswith(forbidden_suffixes) for name in names), (
+        f"{archive.name} contains a private/data/audit artifact"
+    )
+    assert not any("__pycache__" in name or name.endswith(".pyc") for name in names), (
+        f"{archive.name} contains a Python cache"
     )
     assert "geometric_function_atlas/py.typed" in joined, (
         f"{archive.name} is missing py.typed"
+    )
+    assert "geometric_function_atlas/schema/result.schema.json" in joined, (
+        f"{archive.name} is missing the result schema"
+    )
+    assert "geometric_function_atlas/schema/error.schema.json" in joined, (
+        f"{archive.name} is missing the error schema"
     )
 
 
@@ -37,6 +58,7 @@ def check_wheel(archive: Path) -> None:
     _assert_common(names, archive=archive)
     assert "Name: geometric-function-atlas" in metadata
     assert "geometric-function-atlas = geometric_function_atlas.cli:main" in entry_points
+    assert "gfa = geometric_function_atlas.cli:main" in entry_points
 
 
 def check_sdist(archive: Path) -> None:
@@ -44,6 +66,13 @@ def check_sdist(archive: Path) -> None:
         names = handle.getnames()
     _assert_common(names, archive=archive)
     assert any(name.endswith("/src/geometric_function_atlas/__init__.py") for name in names)
+    assert any(name.endswith("/scripts/install.sh") for name in names)
+    assert any(name.endswith("/scripts/install.ps1") for name in names)
+    assert any(name.endswith("/scripts/check_distribution.py") for name in names)
+    assert any(name.endswith("/scripts/check_clean_install.py") for name in names)
+    assert any(name.endswith("/.github/workflows/ci.yml") for name in names)
+    assert any(name.endswith("/CHANGELOG.md") for name in names)
+    assert not any(name.endswith("/docs/RELEASE_SCOPE.md") for name in names)
 
 
 def main() -> int:

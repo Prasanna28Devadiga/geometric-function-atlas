@@ -13,6 +13,10 @@ A returned number is not enough. Structured result objects and CLI records ident
 7. package and artifact versions;
 8. whether any literature-novelty claim is being made.
 
+The versioned schema and fail-closed check semantics are specified in
+`docs/RESULT_CONTRACT.md`; the shipped JSON schemas are under
+`src/geometric_function_atlas/schema/`.
+
 Low-level exact helpers may return bare SymPy expressions or tuples for use in
 other symbolic programs. Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
@@ -37,6 +41,9 @@ String expressions are rejected because SymPy's general string parser is
 eval-based; undeclared free symbols are rejected as well. For a custom generator,
 the package checks only the algebraic preconditions documented by the operation;
 it does not silently certify all analytic Ma–Minda admissibility hypotheses.
+Structured records mark this input as `provenance: "caller_supplied"` and retain
+the caller-supplied source/fixture identity explicitly; they never relabel it as
+the built-in catalog.
 
 CLI rational parameters use a bounded signed-integer or `integer/integer`
 grammar. Exponent notation is intentionally unsupported, and rational

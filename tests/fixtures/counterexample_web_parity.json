@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository": "gft-registry research and web artifact",
+    "commit": "acee553e03f9",
+    "operation": "gft.pointwise.{re_zfpf_at,becker_at,nehari_at}",
+    "audit_date": "2026-08-10"
+  },
+  "cases": [
+    {
+      "id": "starlike-quadratic",
+      "property": "starlike",
+      "coefficients": [1.0, 0.0],
+      "point": [-0.75, 0.0],
+      "interval": [-2.0, -2.0],
+      "certified": true
+    },
+    {
+      "id": "becker-quadratic",
+      "property": "becker_univalent",
+      "coefficients": [1.0, 0.0],
+      "point": [-0.4, 0.0],
+      "interval": [8.4, 8.400000000000004],
+      "certified": true
+    },
+    {
+      "id": "nehari-quadratic-with-zero-cubic-term",
+      "property": "nehari_univalent",
+      "coefficients": [1.0, 0.0],
+      "point": [-0.4, 0.0],
+      "interval": [105.84, 105.84000000000012],
+      "certified": true
+    },
+    {
+      "id": "starlike-complex-cubic",
+      "property": "starlike",
+      "coefficients": [0.25, -0.125],
+      "point": [0.2, 0.3],
+      "interval": [1.0613935775321106, 1.0613935775321128],
+      "certified": false
+    },
+    {
+      "id": "becker-complex-cubic",
+      "property": "becker_univalent",
+      "coefficients": [0.25, -0.125],
+      "point": [0.2, 0.3],
+      "interval": [0.322152632849243, 0.32215263284924345],
+      "certified": false
+    },
+    {
+      "id": "nehari-complex-nonzero-cubic",
+      "property": "nehari_univalent",
+      "coefficients": [0.25, -0.125],
+      "point": [0.2, 0.3],
+      "interval": [0.5754169150548023, 0.5754169150548037],
+      "certified": false
+    }
+  ]
+}

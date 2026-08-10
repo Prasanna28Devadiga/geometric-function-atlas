@@ -1,65 +1,70 @@
 # Releasing `geometric-function-atlas`
 
-This document describes the release path. Creating the public source repository
-and preparing release automation are separate from publishing a package or a
-registry snapshot. Do not publish either artifact until the scientific scope,
-provenance records, and clean-install checks are ready.
+This is the maintained release procedure. The first GitHub software release is
+separate from PyPI publication and from versioned registry-data snapshots.
+
+## Free-tier GitHub policy
+
+The repository is public. CI uses only standard `ubuntu-latest` and
+`windows-latest` GitHub-hosted runners, which GitHub documents as free for public
+repositories. The workflow does not use larger runners, Actions artifact uploads,
+or persistent Actions caches. Release files are attached directly to the GitHub
+release; GitHub documents no total release-size or bandwidth limit, subject to a
+2 GiB limit per asset.
+
+Do not add larger runners, paid products, or persistent Actions storage without
+explicit approval from the repository owner.
 
 ## Software release
 
-1. Start from a clean `main` checkout and inspect the complete staged diff.
-2. Update `src/geometric_function_atlas/version.py`, `CITATION.cff`, and the
-   changelog/release notes together. The package version and registry snapshot
-   version are independent.
+1. Start from a clean `main` checkout.
+2. Update `src/geometric_function_atlas/version.py`, `CITATION.cff`, and
+   `CHANGELOG.md` together.
 3. Run the local gate:
 
    ```bash
-   python -m pip install -e '.[test,build]'
-   python -m ruff check src tests scripts
-   python -m mypy src --ignore-missing-imports
-   python -W error -m pytest -q
+   uv sync --extra test --extra build --locked
+   uv run --extra test python -m ruff check src tests scripts
+   uv run --extra test python -m mypy src --ignore-missing-imports
+   uv run --extra test python -W error -m pytest -q
    rm -rf dist build
-   python -m build
-   python -m twine check dist/*
-   python scripts/check_distribution.py dist
+   uv run --extra build python -m build
+   uv run --extra build python -m twine check dist/*
+   uv run python scripts/check_distribution.py dist
+   uv run python scripts/check_clean_install.py \
+     dist/geometric_function_atlas-0.1.0-py3-none-any.whl
+   uv run python scripts/check_uv_tool_install.py \
+     dist/geometric_function_atlas-0.1.0-py3-none-any.whl --python 3.12
    ```
 
-4. Install both the wheel and sdist in fresh virtual environments from a
-   directory outside the repository. Exercise the Python API, `python -m
-   geometric_function_atlas`, and the `geometric-function-atlas` console entry
-   point.
-5. Commit the verified version change and create a signed/tagged `vX.Y.Z`
-   release only after CI is green.
-6. GitHub Actions publishes to PyPI through Trusted Publishing. Configure the
-   PyPI project and its `pypi` environment/trusted publisher once; do not store
-   a PyPI token in the repository.
-7. Create the GitHub release from the tag and attach human-readable notes. The
-   DOI/archive record should be made through the connected Zenodo integration.
+4. Obtain an independent review of the exact diff.
+5. Push a branch, open a pull request, and wait for every Linux and Windows CI
+   job to pass.
+6. Merge to `main` and verify the merge commit is green.
+7. Build once more from the clean merge commit. Record SHA-256 sums.
+8. Create tag `vX.Y.Z` and a GitHub release with the wheel, sdist, checksums, and
+   notes from `CHANGELOG.md`.
+9. Download the published assets and rerun the clean-install check against the
+   downloaded wheel.
+10. Run both public installer commands and verify `gfa --version`.
 
-## Registry-data release
+There is deliberately no tag-triggered PyPI workflow. PyPI Trusted Publishing
+will be configured and reviewed as a separate future step. No PyPI token belongs
+in this repository.
 
-Registry snapshots are not bundled into the Python wheel. Each snapshot gets an
-independent tag such as `registry-YYYY.MM.DD` and must include:
+## Maintained scripts
 
-- a transactionally consistent SQLite file;
-- a schema dump;
-- a machine-readable manifest with source commit, snapshot date, row counts,
-  checksums, and population definitions;
-- SHA-256 sums for every asset;
-- `PRAGMA quick_check` and `PRAGMA integrity_check` results.
+The `scripts/` directory contains only permanent entry points:
 
-The manifest must identify the exact package version and source snapshot used by
-paper tables or figures. A changing living-atlas count is expected across
-releases; reproducibility means naming and checksumming the snapshot used, not
-freezing all future counts.
+- `install.sh` and `install.ps1`: supported end-user installers;
+- `check_distribution.py`: wheel/sdist content contract;
+- `check_clean_install.py`: clean wheel API/CLI test;
+- `check_uv_tool_install.py`: fresh uv-managed-Python installation test.
 
-## Before the first public release
+Do not commit ad hoc migration, profiling, review, or release-upload scripts.
 
-- [ ] Complete the radius and coefficient certificate-replay APIs.
-- [ ] Add immutable paper-reproduction fixtures and their provenance records.
-- [ ] Decide which registry data can be redistributed and document its license.
-- [ ] Configure GitHub branch protection, issue templates, and CI status checks.
-- [ ] Configure PyPI Trusted Publishing and Zenodo only after the source tree is
-      public and the release candidate has passed clean-install verification.
-- [ ] Have an independent reviewer inspect the final staged diff and archive
-      contents.
+## Registry-data releases
+
+Registry snapshots are not bundled into the wheel. Each snapshot is versioned
+independently and needs a consistent SQLite file, schema dump, manifest,
+checksums, population definitions, and successful SQLite integrity checks.

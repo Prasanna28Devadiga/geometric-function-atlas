@@ -56,3 +56,33 @@ def test_generator_rejects_undeclared_free_symbols() -> None:
             expression=1 + parameter * z,
             citation="User supplied",
         )
+
+
+def test_same_as_catalog_value_is_still_caller_supplied() -> None:
+    from geometric_function_atlas.catalog import generator_artifact_version
+
+    built_in = get_generator("sine")
+    clone = Generator(
+        key=built_in.key,
+        name=built_in.name,
+        expression=built_in.expression,
+        citation=built_in.citation,
+    )
+
+    assert generator_artifact_version(built_in) != "user-supplied"
+    assert generator_artifact_version(clone) == "user-supplied"
+
+
+def test_generator_rejects_evaluate_false_huge_integer_exponent() -> None:
+    expression = sp.Add(
+        1,
+        sp.Mul(
+            sp.Pow(sp.Integer(10), sp.Integer(1_000_000_000), evaluate=False),
+            z,
+            evaluate=False,
+        ),
+        evaluate=False,
+    )
+
+    with pytest.raises(ValueError, match="exponents.*256"):
+        Generator(key="huge", name="Huge", expression=expression, citation="Test")

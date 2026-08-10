@@ -4,7 +4,7 @@
 
 Source repository: <https://github.com/Prasanna28Devadiga/geometric-function-atlas>
 
-This repository is intentionally separate from the registry website and its research workspace. It contains only researcher-facing mathematical APIs, compact reference data, machine-readable provenance, tests, and command-line workflows. It does not contain the Flask application, OCR pipeline, deployment configuration, private review state, or mutable registry database.
+This repository is intentionally separate from the registry website and its research workspace. It provides local commands and Python functions for reproducing the website's mathematical computations. It does not contain the Flask application, deployment configuration, private review state, or mutable registry database.
 
 ## Phase 1
 
@@ -13,9 +13,37 @@ The first release provides:
 - a typed catalog of the Ma–Minda generators used by the paper’s exact-radius portfolio;
 - exact Taylor coefficients of a generator using SymPy;
 - exact Ma–Minda Fekete–Szegő constants and their derivation metadata;
+- certified re-evaluation of supplied counterexample witnesses;
+- versioned structured result and fail-closed verification reports;
 - JSON-capable command-line output suitable for independent checks.
 
-Later phases will add sharp-radius certificate replay, general coefficient-certificate replay, registry snapshot validation, and literature-reconciliation audit tools.
+Later phases will expose the remaining plots, certificates, registry queries, and application labs already available on the website.
+
+## Install — Python is not required
+
+The supported user installation uses `uv` as an isolated tool manager. It
+downloads Python 3.12 and every runtime dependency automatically.
+
+macOS and Linux:
+
+```bash
+curl -LsSf https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.sh | sh
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
+```
+
+After restarting the terminal, run `gfa --version`. Existing `uv` users can
+install the GitHub release wheel directly:
+
+```bash
+uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.0/geometric_function_atlas-0.1.0-py3-none-any.whl
+```
+
+See `docs/INSTALL.md` for removal and maintainer installation from a local wheel.
 
 ## Python API
 
@@ -54,23 +82,32 @@ symbols are rejected.
 ## Command line
 
 ```bash
-geometric-function-atlas generators --json
-geometric-function-atlas coefficients sine --order 5 --json
-geometric-function-atlas fekete-szego exponential --mu 1/2 --precision 40 --json
+gfa generators
+gfa coefficients sine --order 5
+gfa fekete-szego exponential --mu 1/2
+
+# Re-check the witness z=-3/4 for f(z)=z+z².
+gfa verify-counterexample --coefficients "1" --point=-0.75,0
 ```
+
+The longer command name, `geometric-function-atlas`, is also supported. Add
+`--json` to any command when machine-readable output is useful.
 
 `--mu` accepts an exact signed integer or `integer/integer` fraction. Decimal
 and scientific notation are rejected so untrusted short inputs cannot trigger
 unbounded symbolic integer construction.
 
-See `docs/PROVENANCE.md` for claim semantics and `docs/ROADMAP.md` for the
-incremental path to full registry and paper reproduction.
+See `docs/WEB_PARITY.md` for the website-to-package checklist,
+`docs/PROVENANCE.md` for claim semantics, and `docs/ROADMAP.md` for the
+incremental implementation path.
+The versioned result envelope, verification checks, failure states, and CLI
+exit codes are specified in `docs/RESULT_CONTRACT.md`.
 
 ## Development
 
 ```bash
-python -m pip install -e '.[test]'
-pytest
+uv sync --extra test
+uv run pytest
 ```
 
 ## Scientific status
