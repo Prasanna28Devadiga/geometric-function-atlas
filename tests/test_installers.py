@@ -88,3 +88,4 @@ def test_ci_uses_only_free_public_standard_runners_without_persistent_storage() 
     assert "larger-runner" not in workflow
     assert "upload-artifact" not in workflow
     assert "enable-cache: true" not in workflow
+    assert 'branches: [main, "release/**"]' not in workflow
