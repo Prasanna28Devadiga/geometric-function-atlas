@@ -34,7 +34,7 @@ gfa verify-counterexample --coefficients "1" --point=-0.75,0
 Until the package is published on PyPI, install the GitHub release wheel directly:
 
 ```bash
-uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.0/geometric_function_atlas-0.1.0-py3-none-any.whl
+uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.1/geometric_function_atlas-0.1.1-py3-none-any.whl
 ```
 
 ## Remove
@@ -53,13 +53,13 @@ not release-time helper scripts. Maintainers can exercise the same path against 
 local wheel:
 
 ```bash
-GFA_PACKAGE_SPEC=dist/geometric_function_atlas-0.1.0-py3-none-any.whl sh scripts/install.sh
+GFA_PACKAGE_SPEC=dist/geometric_function_atlas-0.1.1-py3-none-any.whl sh scripts/install.sh
 ```
 
 PowerShell:
 
 ```powershell
-$env:GFA_PACKAGE_SPEC = "dist/geometric_function_atlas-0.1.0-py3-none-any.whl"
+$env:GFA_PACKAGE_SPEC = "dist/geometric_function_atlas-0.1.1-py3-none-any.whl"
 .\scripts\install.ps1
 ```
 

@@ -162,6 +162,10 @@ def _complex_interval_contains_zero(value: Any) -> bool:
 
 
 def _validated_coefficients(coefficients: Sequence[float]) -> tuple[float, ...]:
+    if not isinstance(coefficients, Sequence) or isinstance(
+        coefficients, (str, bytes, bytearray)
+    ):
+        raise TypeError("coefficients must be a sequence of real numbers")
     try:
         values = tuple(float(value) for value in coefficients)
     except (TypeError, ValueError) as exc:

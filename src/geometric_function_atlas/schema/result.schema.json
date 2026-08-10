@@ -148,6 +148,31 @@
         {"if": {"properties": {"status": {"const": "failed"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": false}, "checks": {"contains": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}}}}},
         {"if": {"properties": {"status": {"const": "skipped"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": false}, "checks": {"not": {"contains": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}}, "contains": {"properties": {"status": {"const": "skip"}}, "required": ["status"]}}}}}
       ]
+    },
+    "failed_result_status": {
+      "oneOf": [
+        {"properties": {"failure_state": {"const": "unsupported"}, "evidence_status": {"const": "unsupported"}, "computational_status": {"const": "unsupported"}}},
+        {"properties": {"failure_state": {"const": "unresolved"}, "evidence_status": {"const": "unresolved"}, "computational_status": {"const": "unresolved"}}},
+        {"properties": {"failure_state": {"const": "invalid_input"}, "evidence_status": {"const": "invalid_input"}, "computational_status": {"const": "invalid_input"}}},
+        {"properties": {"failure_state": {"const": "resource_limit"}, "evidence_status": {"const": "resource_limit"}, "computational_status": {"const": "resource_limit"}}},
+        {"properties": {"failure_state": {"const": "corrupt_artifact"}, "evidence_status": {"const": "corrupt_artifact"}, "computational_status": {"const": "corrupt_artifact"}}}
+      ]
+    },
+    "exact_result_status": {
+      "oneOf": [
+        {
+          "properties": {
+            "verification": {"properties": {"success": {"const": true}}},
+            "failure_state": {"type": "null"},
+            "evidence_status": {"const": "proven_exact_under_declared_assumptions"},
+            "computational_status": {"const": "proven_exact_under_declared_assumptions"}
+          }
+        },
+        {
+          "$ref": "#/$defs/failed_result_status",
+          "properties": {"verification": {"properties": {"success": {"const": false}}}}
+        }
+      ]
     }
   },
   "allOf": [
@@ -155,6 +180,7 @@
       "if": {"properties": {"result_type": {"const": "generator_series"}}, "required": ["result_type"]},
       "then": {
         "required": ["generator", "generator_formula", "generator_citation", "order", "coefficients"],
+        "allOf": [{"$ref": "#/$defs/exact_result_status"}],
         "not": {"anyOf": [{"required": ["mu"]}, {"required": ["B1"]}, {"required": ["B2"]}, {"required": ["value_exact"]}, {"required": ["value_decimal"]}, {"required": ["theorem_reference"]}, {"required": ["property"]}, {"required": ["point"]}, {"required": ["interval"]}, {"required": ["threshold"]}, {"required": ["certified"]}, {"required": ["direction"]}]},
         "properties": {
           "method": {"const": "exact_symbolic_taylor_series"},
@@ -181,6 +207,7 @@
       "if": {"properties": {"result_type": {"const": "fekete_szego"}}, "required": ["result_type"]},
       "then": {
         "required": ["generator", "generator_formula", "generator_citation", "mu", "B1", "B2", "value_exact", "value_decimal", "theorem_reference"],
+        "allOf": [{"$ref": "#/$defs/exact_result_status"}],
         "not": {"anyOf": [{"required": ["order"]}, {"required": ["coefficients"]}, {"required": ["property"]}, {"required": ["point"]}, {"required": ["interval"]}, {"required": ["threshold"]}, {"required": ["certified"]}, {"required": ["direction"]}]},
         "properties": {
           "method": {"const": "ma_minda_fekete_szego_closed_form"},

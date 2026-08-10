@@ -42,8 +42,8 @@ jobs:
       - run: uv run --extra build python -m build
       - run: uv run --extra build python -m twine check dist/*
       - run: uv run python scripts/check_distribution.py dist
-      - run: uv run python scripts/check_clean_install.py dist/geometric_function_atlas-0.1.0-py3-none-any.whl
-      - run: uv run python scripts/check_uv_tool_install.py dist/geometric_function_atlas-0.1.0-py3-none-any.whl --python 3.12
+      - run: uv run python scripts/check_clean_install.py dist/geometric_function_atlas-0.1.1-py3-none-any.whl
+      - run: uv run python scripts/check_uv_tool_install.py dist/geometric_function_atlas-0.1.1-py3-none-any.whl --python 3.12
 
   windows-installer:
     name: Windows PowerShell installer smoke

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import copy
 import json
 import math
+from itertools import product
+from typing import Any
 
 import pytest
 import sympy as sp
@@ -326,6 +329,118 @@ def test_shipped_schema_rejects_false_success_under_passed_envelope(
         Draft202012Validator(load_result_schema()).validate(payload)
     with pytest.raises(ValueError, match="verification aggregate"):
         validate_result_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        generator_series("sine", order=2).to_dict(),
+        fekete_szego("sine", mu=0).to_dict(),
+    ],
+)
+def test_shipped_schema_rejects_mismatched_success_statuses(
+    payload: dict[str, object],
+) -> None:
+    payload["evidence_status"] = "screened"
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(load_result_schema()).validate(payload)
+    with pytest.raises(ValueError, match="must match evidence_status"):
+        validate_result_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        generator_series("sine", order=2).to_dict(),
+        fekete_szego("sine", mu=0).to_dict(),
+    ],
+)
+def test_shipped_schema_rejects_failed_result_retaining_exact_status(
+    payload: dict[str, object],
+) -> None:
+    payload["failure_state"] = "unresolved"
+    verification = payload["verification"]
+    assert isinstance(verification, dict)
+    verification["success"] = False
+    verification["status"] = "failed"
+    checks = verification["checks"]
+    assert isinstance(checks, list)
+    checks[0]["status"] = "fail"
+    checks[0]["failure_reason"] = "forged unresolved result"
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(load_result_schema()).validate(payload)
+    with pytest.raises(ValueError, match="failed evidence status"):
+        validate_result_payload(payload)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        generator_series("sine", order=2).to_dict(),
+        fekete_szego("sine", mu=0).to_dict(),
+    ],
+)
+def test_schema_valid_exact_status_combinations_pass_python_validator(
+    payload: dict[str, object],
+) -> None:
+    schema = load_result_schema()
+    validator = Draft202012Validator(schema)
+    statuses = schema["properties"]["evidence_status"]["enum"]
+    failure_states = [
+        state for state in schema["properties"]["failure_state"]["enum"] if state
+    ]
+
+    accepted_success: set[tuple[str, str]] = set()
+    for evidence_status, computational_status in product(statuses, repeat=2):
+        candidate: Any = copy.deepcopy(payload)
+        candidate["evidence_status"] = evidence_status
+        candidate["computational_status"] = computational_status
+        if validator.is_valid(candidate):
+            validate_result_payload(candidate)
+            accepted_success.add((evidence_status, computational_status))
+    assert accepted_success == {
+        (
+            "proven_exact_under_declared_assumptions",
+            "proven_exact_under_declared_assumptions",
+        )
+    }
+
+    accepted_failure: set[tuple[str, str, str, str]] = set()
+    for verification_status, failure_state, evidence_status, computational_status in product(
+        ("failed", "skipped"), failure_states, statuses, statuses
+    ):
+        candidate = copy.deepcopy(payload)
+        candidate["failure_state"] = failure_state
+        candidate["evidence_status"] = evidence_status
+        candidate["computational_status"] = computational_status
+        verification = candidate["verification"]
+        assert isinstance(verification, dict)
+        verification["success"] = False
+        verification["status"] = verification_status
+        checks = verification["checks"]
+        assert isinstance(checks, list)
+        checks[0]["status"] = "fail" if verification_status == "failed" else "skip"
+        checks[0]["failure_reason"] = (
+            "differential status test" if verification_status == "failed" else None
+        )
+        if validator.is_valid(candidate):
+            validate_result_payload(candidate)
+            accepted_failure.add(
+                (
+                    verification_status,
+                    failure_state,
+                    evidence_status,
+                    computational_status,
+                )
+            )
+    assert accepted_failure == {
+        (verification_status, state, state, state)
+        for verification_status, state in product(
+            ("failed", "skipped"), failure_states
+        )
+    }
 
 
 def test_counterexample_contract_revalidates_open_unit_disk_precondition() -> None:

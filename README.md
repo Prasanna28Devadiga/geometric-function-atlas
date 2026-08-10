@@ -40,7 +40,7 @@ After restarting the terminal, run `gfa --version`. Existing `uv` users can
 install the GitHub release wheel directly:
 
 ```bash
-uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.0/geometric_function_atlas-0.1.0-py3-none-any.whl
+uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.1/geometric_function_atlas-0.1.1-py3-none-any.whl
 ```
 
 See `docs/INSTALL.md` for removal and maintainer installation from a local wheel.

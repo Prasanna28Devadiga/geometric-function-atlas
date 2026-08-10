@@ -2,7 +2,7 @@ cff-version: 1.2.0
 title: geometric-function-atlas
 message: "If you use this software, please cite the software release and the associated paper."
 type: software
-version: 0.1.0
+version: 0.1.1
 date-released: 2026-08-10
 authors:
   - family-names: Devadiga
