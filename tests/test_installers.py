@@ -62,3 +62,29 @@ def test_windows_installer_has_the_same_managed_python_contract() -> None:
     assert "tool update-shell" in script
     assert "gfa.exe" in script
     assert "--version" in script
+
+
+def test_installers_default_to_the_first_github_release_wheel() -> None:
+    release_wheel = (
+        "https://github.com/Prasanna28Devadiga/geometric-function-atlas/"
+        "releases/download/v0.1.0/"
+        "geometric_function_atlas-0.1.0-py3-none-any.whl"
+    )
+
+    posix = (ROOT / "scripts" / "install.sh").read_text(encoding="utf-8")
+    windows = (ROOT / "scripts" / "install.ps1").read_text(encoding="utf-8")
+
+    assert release_wheel in posix
+    assert release_wheel in windows
+
+
+def test_ci_uses_only_free_public_standard_runners_without_persistent_storage() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert "runs-on: ubuntu-latest" in workflow
+    assert "runs-on: windows-latest" in workflow
+    assert "larger-runner" not in workflow
+    assert "upload-artifact" not in workflow
+    assert "enable-cache: true" not in workflow

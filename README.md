@@ -37,15 +37,13 @@ irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atla
 ```
 
 After restarting the terminal, run `gfa --version`. Existing `uv` users can
-instead run:
+install the GitHub release wheel directly:
 
 ```bash
-uv tool install --managed-python --python 3.12 geometric-function-atlas
+uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.0/geometric_function_atlas-0.1.0-py3-none-any.whl
 ```
 
-See `docs/INSTALL.md` for upgrades, removal, pre-release wheel installation,
-and the website “Run locally” pattern. The public installer URLs become active
-with the first published release.
+See `docs/INSTALL.md` for removal and maintainer installation from a local wheel.
 
 ## Python API
 

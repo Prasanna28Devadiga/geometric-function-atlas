@@ -1,12 +1,7 @@
-# Installation without Python
+# Install Geometric Function Atlas
 
-Geometric Function Atlas is installed as an isolated command-line tool. You do
-**not** need to install Python, create a virtual environment, or manage package
-dependencies. [`uv`](https://docs.astral.sh/uv/) downloads a managed Python and
-installs all dependencies for `gfa`.
-
-> These public URLs become active when the first package release is published.
-> Before then, contributors should use the local-wheel command below.
+You do **not** need Python. The installer obtains `uv`, Python 3.12, and all
+package dependencies, then installs the `gfa` command in an isolated environment.
 
 ## macOS and Linux
 
@@ -20,41 +15,42 @@ curl -LsSf https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-functi
 irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
 ```
 
-Restart the terminal once, then verify the installation:
+Restart the terminal once, then check the installation:
 
 ```text
 gfa --version
 ```
 
-The installers:
+Try a calculation:
 
-1. install `uv` from Astral's official installer if it is absent;
-2. ask `uv` for a managed Python 3.12;
-3. install `geometric-function-atlas`, SymPy, mpmath, and future runtime
-   dependencies into an isolated tool environment;
-4. add the tool directory to the user's shell path;
-5. execute `gfa --version` as a smoke test.
-
-The project does not modify or depend on an existing Python installation.
+```bash
+gfa coefficients sine --order 5
+gfa fekete-szego exponential --mu 1/2
+gfa verify-counterexample --coefficients "1" --point=-0.75,0
+```
 
 ## Already have uv?
 
+Until the package is published on PyPI, install the GitHub release wheel directly:
+
 ```bash
-uv tool install --managed-python --python 3.12 geometric-function-atlas
+uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.0/geometric_function_atlas-0.1.0-py3-none-any.whl
 ```
 
-No `pip`, environment activation, or administrator privileges are required.
-
-## Upgrade or remove
+## Remove
 
 ```bash
-uv tool upgrade geometric-function-atlas
 uv tool uninstall geometric-function-atlas
 ```
 
-## Install a release wheel before PyPI publication
+To upgrade after a later GitHub release, rerun the installer shown above. The
+installer always performs a forced replacement and verifies `gfa --version`.
 
-From a checkout containing the built wheel:
+## Maintainer and local-wheel installation
+
+The checked-in installers are permanent user-facing installation entry points,
+not release-time helper scripts. Maintainers can exercise the same path against a
+local wheel:
 
 ```bash
 GFA_PACKAGE_SPEC=dist/geometric_function_atlas-0.1.0-py3-none-any.whl sh scripts/install.sh
@@ -67,21 +63,6 @@ $env:GFA_PACKAGE_SPEC = "dist/geometric_function_atlas-0.1.0-py3-none-any.whl"
 .\scripts\install.ps1
 ```
 
-## Website “Run locally” pattern
-
-Every reproducible website item should use the same compact panel:
-
-```text
-Run locally
-1. Install once: [platform installer]
-2. Reproduce:    gfa <task-oriented command>
-```
-
-For example:
-
-```bash
-gfa verify-counterexample --coefficients "1" --point=-0.75,0
-```
-
-JSON, snapshots, provenance identifiers, and diagnostic controls remain optional
-advanced features rather than installation requirements.
+The project does not modify or depend on an existing Python installation. No
+administrator privileges, `pip`, virtual-environment activation, snapshot hash,
+or internal database path is required.

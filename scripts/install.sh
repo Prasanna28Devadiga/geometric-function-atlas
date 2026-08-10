@@ -1,7 +1,8 @@
 #!/bin/sh
 set -eu
 
-package_spec=${GFA_PACKAGE_SPEC:-geometric-function-atlas}
+release_wheel=https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.0/geometric_function_atlas-0.1.0-py3-none-any.whl
+package_spec=${GFA_PACKAGE_SPEC:-$release_wheel}
 python_version=${GFA_PYTHON_VERSION:-3.12}
 uv_install_dir=${UV_INSTALL_DIR:-"$HOME/.local/bin"}
 
@@ -15,7 +16,7 @@ else
     elif command -v wget >/dev/null 2>&1; then
         wget -q https://astral.sh/uv/install.sh -O "$installer"
     else
-        printf '%s\n' "Geometric Function Atlas requires curl or wget for its one-time installer." >&2
+        printf '%s\n' "Geometric Function Atlas requires curl or wget to install uv." >&2
         exit 1
     fi
     UV_INSTALL_DIR=$uv_install_dir UV_NO_MODIFY_PATH=1 sh "$installer"

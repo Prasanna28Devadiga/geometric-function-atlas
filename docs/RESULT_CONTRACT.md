@@ -1,6 +1,6 @@
 # Structured result and verification contract
 
-The `v0.2.0rc1` result contract is schema version `1`. It is shared by the
+The `v0.1.0` result contract is schema version `1`. It is shared by the
 Phase 1 structured results and is the envelope intended for future certificate
 replay and snapshot operations. It is deliberately separate from the live
 registry website and from any mutable database.
