@@ -45,6 +45,65 @@ def test_fekete_szego_command_emits_evidence_typed_result() -> None:
     assert payload["novelty_claim"] is False
 
 
+def test_verify_counterexample_command_certifies_supplied_witness() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--point=-0.75,0",
+        "--json",
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["property"] == "starlike"
+    assert payload["certified"] is True
+    assert payload["direction"] == "disproves"
+    assert float(payload["interval"][1]) < 0
+    assert payload["schema_version"] == 1
+    assert payload["result_type"] == "counterexample_verification"
+
+
+def test_verify_counterexample_json_reports_singularity_as_unresolved() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--point=-0.5,0",
+        "--property",
+        "becker_univalent",
+        "--json",
+    )
+
+    assert completed.returncode == 4
+    payload = json.loads(completed.stdout)
+    assert payload["failure_state"] == "unresolved"
+    assert "denominator" in payload["error"] or "singular" in payload["error"]
+    assert completed.stderr == ""
+
+
+def test_verify_counterexample_command_has_plain_language_output() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--point=-0.75,0",
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert "CERTIFIED COUNTEREXAMPLE" in completed.stdout
+    assert "starlike" in completed.stdout
+    assert "Traceback" not in completed.stderr
+
+
+def test_version_command_is_an_installation_smoke_check() -> None:
+    completed = run_cli("--version")
+
+    assert completed.returncode == 0
+    assert completed.stdout.strip() == "geometric-function-atlas 0.1.0"
+    assert completed.stderr == ""
+
+
 def test_cli_reports_unknown_generator_without_traceback() -> None:
     completed = run_cli("coefficients", "missing", "--order", "2")
 

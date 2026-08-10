@@ -58,6 +58,7 @@ def check_wheel(archive: Path) -> None:
     _assert_common(names, archive=archive)
     assert "Name: geometric-function-atlas" in metadata
     assert "geometric-function-atlas = geometric_function_atlas.cli:main" in entry_points
+    assert "gfa = geometric_function_atlas.cli:main" in entry_points
 
 
 def check_sdist(archive: Path) -> None:
@@ -65,6 +66,8 @@ def check_sdist(archive: Path) -> None:
         names = handle.getnames()
     _assert_common(names, archive=archive)
     assert any(name.endswith("/src/geometric_function_atlas/__init__.py") for name in names)
+    assert any(name.endswith("/scripts/install.sh") for name in names)
+    assert any(name.endswith("/scripts/install.ps1") for name in names)
 
 
 def main() -> int:

@@ -5,6 +5,7 @@ import math
 
 import pytest
 import sympy as sp
+from jsonschema import Draft202012Validator, ValidationError
 
 from geometric_function_atlas import (
     RESULT_SCHEMA_VERSION,
@@ -21,8 +22,10 @@ from geometric_function_atlas import (
     load_result_schema,
     validate_error_payload,
     validate_result_payload,
+    verify_counterexample,
     z,
 )
+from geometric_function_atlas.models import canonical_expression_dag
 
 
 def test_phase_one_result_has_closed_versioned_contract() -> None:
@@ -50,6 +53,29 @@ def test_fekete_result_contract_keeps_exact_inputs_and_verification() -> None:
     assert payload["exact_expressions"]["value"] == "1/2"
     assert payload["verification"]["success"] is True
     validate_result_payload(payload)
+
+
+def test_counterexample_result_uses_the_closed_versioned_contract() -> None:
+    payload = verify_counterexample(
+        [1], point=(-0.75, 0.0), property="starlike"
+    ).to_dict()
+
+    assert payload["schema_version"] == RESULT_SCHEMA_VERSION
+    assert payload["result_type"] == "counterexample_verification"
+    assert payload["method"] == "certified_point_interval_evaluation"
+    assert payload["evidence_status"] == "certified_enclosure"
+    assert payload["verification"]["success"] is True
+    assert payload["direction"] == "disproves"
+    validate_result_payload(payload)
+
+
+def test_expression_dag_supports_empty_sequence_roots() -> None:
+    dag = canonical_expression_dag(
+        {"coefficients": (), "threshold": sp.Integer(0)}
+    )
+
+    assert dag["roots"]["coefficients"] == []
+    assert dag["roots"]["threshold"]
 
 
 def test_result_contract_requires_operation_specific_fields_and_consistency() -> None:
@@ -204,6 +230,8 @@ def test_shipped_schemas_are_closed_and_failure_records_validate() -> None:
 
     assert result_schema["$id"].endswith("result-1.json")
     assert result_schema["additionalProperties"] is False
+    assert "counterexample_verification" in result_schema["properties"]["result_type"]["enum"]
+    assert "certified_point_interval_evaluation" in result_schema["properties"]["method"]["enum"]
     assert error_schema["additionalProperties"] is False
     error = failure_payload(FailureState.CORRUPT_ARTIFACT, "checksum mismatch")
     validate_error_payload(error)
@@ -215,6 +243,113 @@ def test_shipped_schemas_are_closed_and_failure_records_validate() -> None:
         validate_error_payload({**error, "schema_version": "1"})
     with pytest.raises(TypeError, match="package_version"):
         validate_error_payload({**error, "package_version": 1})
+
+
+def test_shipped_result_schema_rejects_cross_variant_fields() -> None:
+    payload = generator_series("sine", order=2).to_dict()
+    payload.update(
+        {
+            "property": "starlike",
+            "point": ["0.0", "0.0"],
+            "interval": ["-1.0", "-1.0"],
+            "threshold": "0.0",
+            "certified": True,
+            "direction": "disproves",
+        }
+    )
+    validator = Draft202012Validator(load_result_schema())
+
+    with pytest.raises(ValidationError):
+        validator.validate(payload)
+    with pytest.raises(ValueError, match="fields do not belong"):
+        validate_result_payload(payload)
+
+
+def test_counterexample_contract_recomputes_and_rejects_forged_enclosure() -> None:
+    payload = verify_counterexample(
+        [1], point=(0.5, 0.0), property="starlike"
+    ).to_dict()
+    forged_interval = [sp.Integer(-100), sp.Integer(-99)]
+    payload["interval"] = ["-100.0", "-99.0"]
+    payload["certified"] = True
+    payload["direction"] = "disproves"
+    payload["exact_expressions"]["interval"] = ["-100", "-99"]
+    payload["exact_expression_dag"] = canonical_expression_dag(
+        {
+            "coefficients": [sp.Integer(1)],
+            "point": [sp.Rational(1, 2), sp.Integer(0)],
+            "interval": forged_interval,
+            "threshold": sp.Integer(0),
+        }
+    )
+
+    with pytest.raises(ValueError, match="recomputed enclosure"):
+        validate_result_payload(payload)
+
+
+def test_counterexample_contract_rejects_failed_envelope_with_certified_result() -> None:
+    payload = verify_counterexample(
+        [1], point=(-0.75, 0.0), property="starlike"
+    ).to_dict()
+    payload["evidence_status"] = "unresolved"
+    payload["computational_status"] = "unresolved"
+    payload["failure_state"] = "unresolved"
+    payload["verification"]["success"] = False
+    payload["verification"]["status"] = "failed"
+    payload["verification"]["checks"][0]["status"] = "fail"
+    payload["verification"]["checks"][0]["failure_reason"] = "forged failure"
+
+    with pytest.raises(ValueError, match="successful verification envelope"):
+        validate_result_payload(payload)
+    with pytest.raises(ValidationError):
+        Draft202012Validator(load_result_schema()).validate(payload)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        generator_series("sine", order=2).to_dict(),
+        fekete_szego("sine", mu=0).to_dict(),
+    ],
+)
+def test_shipped_schema_rejects_false_success_under_passed_envelope(
+    payload: dict[str, object],
+) -> None:
+    payload["evidence_status"] = "unresolved"
+    payload["computational_status"] = "unresolved"
+    payload["failure_state"] = "unresolved"
+    verification = payload["verification"]
+    assert isinstance(verification, dict)
+    verification["success"] = False
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(load_result_schema()).validate(payload)
+    with pytest.raises(ValueError, match="verification aggregate"):
+        validate_result_payload(payload)
+
+
+def test_counterexample_contract_revalidates_open_unit_disk_precondition() -> None:
+    payload = verify_counterexample(
+        [0.25], point=(-0.75, 0.0), property="starlike"
+    ).to_dict()
+    payload["canonical_inputs"]["point"] = [float.hex(-3.0), float.hex(0.0)]
+    payload["point"] = ["-3.0", "0.0"]
+    payload["interval"] = ["-2.0", "-2.0"]
+    payload["certified"] = True
+    payload["direction"] = "disproves"
+    payload["exact_expressions"]["point"] = ["-3", "0"]
+    payload["exact_expressions"]["interval"] = ["-2", "-2"]
+    payload["exact_expression_dag"] = canonical_expression_dag(
+        {
+            "coefficients": [sp.Rational(1, 4)],
+            "point": [sp.Integer(-3), sp.Integer(0)],
+            "interval": [sp.Integer(-2), sp.Integer(-2)],
+            "threshold": sp.Integer(0),
+        }
+    )
+
+    with pytest.raises(ValueError, match="inside the open unit disk"):
+        validate_result_payload(payload)
 
 
 def test_verification_values_reject_non_finite_json_numbers() -> None:

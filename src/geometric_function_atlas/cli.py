@@ -22,7 +22,9 @@ from .contracts import (
     failure_payload,
     validate_error_payload,
 )
+from .counterexamples import verify_counterexample
 from .fekete_szego import fekete_szego
+from .version import __version__
 
 EXIT_SUCCESS = 0
 EXIT_INVALID_INPUT = 2
@@ -95,10 +97,74 @@ def _fekete_szego(args: argparse.Namespace) -> None:
     _write(result.to_dict(precision=args.precision), as_json=args.json)
 
 
+def _comma_separated_numbers(value: str, *, label: str) -> list[float]:
+    if len(value) > 4096:
+        raise ResourceLimitError(f"{label} input is too long")
+    parts = [part.strip() for part in value.split(",")]
+    if not parts or any(not part for part in parts):
+        raise InvalidInputError(f"{label} must be comma-separated real numbers")
+    try:
+        return [float(part) for part in parts]
+    except ValueError as exc:
+        raise InvalidInputError(
+            f"{label} must be comma-separated real numbers"
+        ) from exc
+
+
+def _verify_counterexample(args: argparse.Namespace) -> None:
+    coefficients = _comma_separated_numbers(
+        args.coefficients, label="coefficients"
+    )
+    point = _comma_separated_numbers(args.point, label="point")
+    if len(point) != 2:
+        raise InvalidInputError("point must have the form real,imaginary")
+    result = verify_counterexample(
+        coefficients,
+        point=(point[0], point[1]),
+        property=args.property,
+    )
+    if args.json:
+        _write(result.to_dict(), as_json=True)
+        return
+
+    if result.certified and result.property == "starlike":
+        verdict = "CERTIFIED COUNTEREXAMPLE"
+    elif result.certified:
+        verdict = "CERTIFIED CRITERION VIOLATION"
+    elif result.property == "starlike":
+        verdict = "NO COUNTEREXAMPLE CERTIFIED AT THIS POINT"
+    else:
+        verdict = "NO CRITERION VIOLATION CERTIFIED AT THIS POINT"
+    criterion_names = {
+        "starlike": "starlikeness",
+        "becker_univalent": "Becker criterion",
+        "nehari_univalent": "Nehari criterion",
+    }
+    real, imaginary = result.point
+    sign = "+" if imaginary >= 0 else "-"
+    comparison = "<=" if result.property == "starlike" else ">"
+    lines = [
+        verdict,
+        f"Criterion: {criterion_names[result.property]}",
+        f"Witness: z = {real:g} {sign} {abs(imaginary):g}i",
+        (
+            "Certified value: "
+            f"[{result.interval_lower:g}, {result.interval_upper:g}]"
+        ),
+        f"Counterexample condition: value {comparison} {result.threshold:g}",
+    ]
+    _write_utf8("\n".join(lines))
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="geometric-function-atlas",
         description="Reproduce and review Geometric Function Atlas computations.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -122,6 +188,24 @@ def _parser() -> argparse.ArgumentParser:
     fs.add_argument("--precision", type=int, default=16)
     fs.add_argument("--json", action="store_true", help="emit JSON")
     fs.set_defaults(handler=_fekete_szego)
+
+    counterexample = subparsers.add_parser(
+        "verify-counterexample",
+        help="rigorously check a supplied counterexample witness",
+    )
+    counterexample.add_argument(
+        "--coefficients",
+        required=True,
+        help="comma-separated a2,a3,... for f(z)=z+a2*z^2+...",
+    )
+    counterexample.add_argument(
+        "--point",
+        required=True,
+        help="witness point as real,imaginary; use --point=-0.75,0 for negatives",
+    )
+    counterexample.add_argument("--property", default="starlike")
+    counterexample.add_argument("--json", action="store_true", help="emit JSON")
+    counterexample.set_defaults(handler=_verify_counterexample)
 
     return parser
 

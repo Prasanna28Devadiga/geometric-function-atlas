@@ -14,20 +14,24 @@ provenance records, and clean-install checks are ready.
 3. Run the local gate:
 
    ```bash
-   python -m pip install -e '.[test,build]'
-   python -m ruff check src tests scripts
-   python -m mypy src --ignore-missing-imports
-   python -W error -m pytest -q
+   uv sync --extra test --extra build --locked
+   uv run --extra test python -m ruff check src tests scripts
+   uv run --extra test python -m mypy src --ignore-missing-imports
+   uv run --extra test python -W error -m pytest -q
    rm -rf dist build
-   python -m build
-   python -m twine check dist/*
-   python scripts/check_distribution.py dist
+   uv run --extra build python -m build
+   uv run --extra build python -m twine check dist/*
+   uv run python scripts/check_distribution.py dist
+   uv run python scripts/check_clean_install.py \
+     dist/geometric_function_atlas-0.1.0-py3-none-any.whl
+   uv run python scripts/check_uv_tool_install.py \
+     dist/geometric_function_atlas-0.1.0-py3-none-any.whl --python 3.12
    ```
 
 4. Install both the wheel and sdist in fresh virtual environments from a
    directory outside the repository. Exercise the Python API, `python -m
-   geometric_function_atlas`, and the `geometric-function-atlas` console entry
-   point.
+   geometric_function_atlas`, and both `geometric-function-atlas` and `gfa`
+   console entry points.
 5. Commit the verified version change and create a signed/tagged `vX.Y.Z`
    release only after CI is green.
 6. GitHub Actions publishes to PyPI through Trusted Publishing. Configure the

@@ -40,6 +40,16 @@ except KeyError:
     pass
 else:
     raise AssertionError("untrusted implementation unexpectedly resolved")
+
+counterexample = gfa.verify_counterexample(
+    [1], point=(-0.75, 0.0), property="starlike"
+)
+assert counterexample.certified is True
+counterexample_payload = counterexample.to_dict()
+assert counterexample_payload["schema_version"] == 1
+assert counterexample_payload["result_type"] == "counterexample_verification"
+assert counterexample_payload["verification"]["success"] is True
+gfa.validate_result_payload(counterexample_payload)
 """
 
 
@@ -86,6 +96,34 @@ def main(argv: list[str] | None = None) -> int:
             check=True,
             env={**os.environ, "PYTHONPATH": ""},
         )
+        script = venv / ("Scripts/gfa.exe" if os.name == "nt" else "bin/gfa")
+        version = subprocess.run(
+            [str(script), "--version"],
+            cwd=neutral,
+            check=True,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "PYTHONPATH": ""},
+        )
+        if not version.stdout.startswith("geometric-function-atlas "):
+            raise AssertionError(f"unexpected installed version: {version.stdout!r}")
+        counterexample = subprocess.run(
+            [
+                str(script),
+                "verify-counterexample",
+                "--coefficients",
+                "1",
+                "--point=-0.75,0",
+                "--json",
+            ],
+            cwd=neutral,
+            check=True,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "PYTHONPATH": ""},
+        )
+        if not json.loads(counterexample.stdout)["certified"]:
+            raise AssertionError("installed gfa command did not certify the witness")
         try:
             invalid = subprocess.run(
                 [

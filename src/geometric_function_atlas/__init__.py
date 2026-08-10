@@ -20,6 +20,7 @@ from .contracts import (  # noqa: F401
     validate_error_payload,
     validate_result_payload,
 )
+from .counterexamples import CounterexampleResult, verify_counterexample
 from .fekete_szego import FeketeSzegoResult, fekete_szego
 from .implementation_registry import (  # noqa: F401
     get_trusted_implementation,
@@ -30,6 +31,7 @@ from .models import Z as z
 from .version import __version__
 
 __all__ = [
+    "CounterexampleResult",
     "FeketeSzegoResult",
     "Generator",
     "GeneratorSeriesResult",
@@ -39,5 +41,6 @@ __all__ = [
     "get_generator",
     "list_generators",
     "taylor_coefficients",
+    "verify_counterexample",
     "z",
 ]

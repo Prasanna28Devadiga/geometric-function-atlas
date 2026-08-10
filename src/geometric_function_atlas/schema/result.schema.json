@@ -12,7 +12,7 @@
   ],
   "properties": {
     "schema_version": {"const": 1},
-    "result_type": {"enum": ["generator_series", "fekete_szego"]},
+    "result_type": {"enum": ["generator_series", "fekete_szego", "counterexample_verification"]},
     "canonical_inputs": {
       "type": "object", "additionalProperties": false,
       "properties": {
@@ -20,7 +20,10 @@
         "order": {"type": "integer", "minimum": 1},
         "mu": {"type": "string", "minLength": 1},
         "inner": {"type": "string", "minLength": 1},
-        "target": {"type": "string", "minLength": 1}
+        "target": {"type": "string", "minLength": 1},
+        "property": {"type": "string", "minLength": 1},
+        "coefficients": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}}
       }
     },
     "exact_expressions": {
@@ -30,7 +33,10 @@
         "coefficients": {"type": "array", "items": {"type": "string", "minLength": 1}},
         "B1": {"type": "string", "minLength": 1},
         "B2": {"type": "string", "minLength": 1},
-        "value": {"type": "string", "minLength": 1}
+        "value": {"type": "string", "minLength": 1},
+        "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+        "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+        "threshold": {"type": "string", "minLength": 1}
       }
     },
     "exact_expression_dag": {
@@ -46,15 +52,18 @@
           "type": "object", "additionalProperties": false,
           "properties": {
             "generator": {"type": "string", "pattern": "^n[0-9]+$"},
-            "coefficients": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^n[0-9]+$"}},
+            "coefficients": {"type": "array", "items": {"type": "string", "pattern": "^n[0-9]+$"}},
             "B1": {"type": "string", "pattern": "^n[0-9]+$"},
             "B2": {"type": "string", "pattern": "^n[0-9]+$"},
-            "value": {"type": "string", "pattern": "^n[0-9]+$"}
+            "value": {"type": "string", "pattern": "^n[0-9]+$"},
+            "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^n[0-9]+$"}},
+            "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^n[0-9]+$"}},
+            "threshold": {"type": "string", "pattern": "^n[0-9]+$"}
           }
         }
       }
     },
-    "method": {"enum": ["exact_symbolic_taylor_series", "ma_minda_fekete_szego_closed_form"]},
+    "method": {"enum": ["exact_symbolic_taylor_series", "ma_minda_fekete_szego_closed_form", "certified_point_interval_evaluation"]},
     "evidence_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
     "computational_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
     "assumptions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
@@ -80,7 +89,13 @@
     "B2": {"type": "string", "minLength": 1},
     "value_exact": {"type": "string", "minLength": 1},
     "value_decimal": {"type": "string", "minLength": 1},
-    "theorem_reference": {"type": "string", "minLength": 1}
+    "theorem_reference": {"type": "string", "minLength": 1},
+    "property": {"enum": ["starlike", "becker_univalent", "nehari_univalent"]},
+    "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+    "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+    "threshold": {"type": "string", "minLength": 1},
+    "certified": {"type": "boolean"},
+    "direction": {"enum": ["disproves", "not_disproved", "violates_criterion", "not_violated"]}
   },
   "$defs": {
     "json_value": {
@@ -129,6 +144,7 @@
       },
       "allOf": [
         {"if": {"properties": {"success": {"const": true}}, "required": ["success"]}, "then": {"properties": {"status": {"const": "passed"}, "checks": {"items": {"properties": {"status": {"const": "pass"}}}}}}},
+        {"if": {"properties": {"status": {"const": "passed"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": true}, "checks": {"items": {"properties": {"status": {"const": "pass"}}}}}}},
         {"if": {"properties": {"status": {"const": "failed"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": false}, "checks": {"contains": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}}}}},
         {"if": {"properties": {"status": {"const": "skipped"}}, "required": ["status"]}, "then": {"properties": {"success": {"const": false}, "checks": {"not": {"contains": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}}, "contains": {"properties": {"status": {"const": "skip"}}, "required": ["status"]}}}}}
       ]
@@ -139,10 +155,12 @@
       "if": {"properties": {"result_type": {"const": "generator_series"}}, "required": ["result_type"]},
       "then": {
         "required": ["generator", "generator_formula", "generator_citation", "order", "coefficients"],
+        "not": {"anyOf": [{"required": ["mu"]}, {"required": ["B1"]}, {"required": ["B2"]}, {"required": ["value_exact"]}, {"required": ["value_decimal"]}, {"required": ["theorem_reference"]}, {"required": ["property"]}, {"required": ["point"]}, {"required": ["interval"]}, {"required": ["threshold"]}, {"required": ["certified"]}, {"required": ["direction"]}]},
         "properties": {
+          "method": {"const": "exact_symbolic_taylor_series"},
           "canonical_inputs": {"required": ["generator", "order"], "maxProperties": 2},
           "exact_expressions": {"required": ["generator", "coefficients"], "maxProperties": 2},
-          "exact_expression_dag": {"properties": {"roots": {"required": ["generator", "coefficients"], "maxProperties": 2}}},
+          "exact_expression_dag": {"properties": {"roots": {"required": ["generator", "coefficients"], "maxProperties": 2, "properties": {"coefficients": {"minItems": 1}}}}},
           "assumptions": {"contains": {"const": "phi(0) = 1"}, "minContains": 1, "allOf": [{"contains": {"const": "expression uses only the variable z"}, "minContains": 1}]},
           "source_references": {"minItems": 1},
           "verification": {
@@ -163,7 +181,9 @@
       "if": {"properties": {"result_type": {"const": "fekete_szego"}}, "required": ["result_type"]},
       "then": {
         "required": ["generator", "generator_formula", "generator_citation", "mu", "B1", "B2", "value_exact", "value_decimal", "theorem_reference"],
+        "not": {"anyOf": [{"required": ["order"]}, {"required": ["coefficients"]}, {"required": ["property"]}, {"required": ["point"]}, {"required": ["interval"]}, {"required": ["threshold"]}, {"required": ["certified"]}, {"required": ["direction"]}]},
         "properties": {
+          "method": {"const": "ma_minda_fekete_szego_closed_form"},
           "canonical_inputs": {"required": ["generator", "mu"], "maxProperties": 2},
           "exact_expressions": {"required": ["generator", "B1", "B2", "value"], "maxProperties": 4},
           "exact_expression_dag": {"properties": {"roots": {"required": ["generator", "B1", "B2", "value"], "maxProperties": 4}}},
@@ -179,6 +199,36 @@
                   {"contains": {"properties": {"name": {"const": "positive_real_first_coefficient"}}, "required": ["name"]}, "minContains": 1},
                   {"contains": {"properties": {"name": {"const": "real_second_coefficient"}}, "required": ["name"]}, "minContains": 1},
                   {"contains": {"properties": {"name": {"const": "exact_functional_value"}}, "required": ["name"]}, "minContains": 1}
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"result_type": {"const": "counterexample_verification"}}, "required": ["result_type"]},
+      "then": {
+        "required": ["property", "coefficients", "point", "interval", "threshold", "certified", "direction"],
+        "not": {"anyOf": [{"required": ["generator"]}, {"required": ["generator_formula"]}, {"required": ["generator_citation"]}, {"required": ["order"]}, {"required": ["mu"]}, {"required": ["B1"]}, {"required": ["B2"]}, {"required": ["value_exact"]}, {"required": ["value_decimal"]}, {"required": ["theorem_reference"]}]},
+        "properties": {
+          "method": {"const": "certified_point_interval_evaluation"},
+          "evidence_status": {"const": "certified_enclosure"},
+          "computational_status": {"const": "certified_enclosure"},
+          "failure_state": {"type": "null"},
+          "canonical_inputs": {"required": ["property", "coefficients", "point"], "maxProperties": 3},
+          "exact_expressions": {"required": ["coefficients", "point", "interval", "threshold"], "maxProperties": 4},
+          "exact_expression_dag": {"properties": {"roots": {"required": ["coefficients", "point", "interval", "threshold"], "maxProperties": 4}}},
+          "assumptions": {"allOf": [{"contains": {"const": "f(z) is the supplied normalized polynomial"}, "minContains": 1}, {"contains": {"const": "the witness point lies in the open unit disk"}, "minContains": 1}, {"contains": {"const": "inputs are interpreted as exact IEEE-754 binary64 values"}, "minContains": 1}]},
+          "verification": {
+            "properties": {
+              "status": {"const": "passed"},
+              "success": {"const": true},
+              "checks": {
+                "minItems": 2, "maxItems": 2,
+                "allOf": [
+                  {"contains": {"properties": {"name": {"const": "classification_matches_interval"}}, "required": ["name"]}, "minContains": 1},
+                  {"contains": {"properties": {"name": {"const": "interval_is_ordered"}}, "required": ["name"]}, "minContains": 1}
                 ]
               }
             }

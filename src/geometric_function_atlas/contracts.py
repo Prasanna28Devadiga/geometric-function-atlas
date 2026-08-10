@@ -19,6 +19,7 @@ import sympy as sp
 
 from .models import Z, canonical_expression_dag, validate_exact_expression
 from .version import (
+    COUNTEREXAMPLE_FIXTURE_ID,
     FEKETE_FIXTURE_ID,
     GENERATOR_CATALOG_VERSION,
     GENERATOR_FIXTURE_ID,
@@ -29,7 +30,11 @@ from .version import (
 RESULT_SCHEMA_VERSION = 1
 MAX_JSON_DEPTH = 128
 MAX_JSON_NODES = 10_000
-_RESULT_TYPES = {"generator_series", "fekete_szego"}
+_RESULT_TYPES = {
+    "counterexample_verification",
+    "generator_series",
+    "fekete_szego",
+}
 _PROVENANCE_STATES = {"built_in", "caller_supplied"}
 _REQUIRED_ARTIFACT_KEYS = {"generator_catalog", "source_commit", "fixture_or_proof"}
 _OPERATION_ASSUMPTIONS = {
@@ -42,6 +47,11 @@ _OPERATION_ASSUMPTIONS = {
         "phi has real Taylor coefficients",
         "B1 is positive",
     },
+    "counterexample_verification": {
+        "f(z) is the supplied normalized polynomial",
+        "the witness point lies in the open unit disk",
+        "inputs are interpreted as exact IEEE-754 binary64 values",
+    },
 }
 _OPERATION_CHECKS = {
     "generator_series": {"generator_normalization", "exact_taylor_coefficients"},
@@ -51,6 +61,10 @@ _OPERATION_CHECKS = {
         "positive_real_first_coefficient",
         "real_second_coefficient",
         "exact_functional_value",
+    },
+    "counterexample_verification": {
+        "classification_matches_interval",
+        "interval_is_ordered",
     },
 }
 _DAG_OPS = {"integer", "rational", "symbol", "add", "mul", "pow", "function"}
@@ -419,6 +433,12 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
         "value_exact",
         "value_decimal",
         "theorem_reference",
+        "property",
+        "point",
+        "interval",
+        "threshold",
+        "certified",
+        "direction",
     }
     _check_mapping_keys(payload, allowed, "result")
     missing = required - payload.keys()
@@ -442,12 +462,30 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
         raise TypeError("exact_expressions must be an object")
     _check_mapping_keys(
         payload["canonical_inputs"],
-        {"generator", "order", "mu", "inner", "target"},
+        {
+            "generator",
+            "order",
+            "mu",
+            "inner",
+            "target",
+            "property",
+            "coefficients",
+            "point",
+        },
         "canonical_inputs",
     )
     _check_mapping_keys(
         payload["exact_expressions"],
-        {"generator", "coefficients", "B1", "B2", "value"},
+        {
+            "generator",
+            "coefficients",
+            "B1",
+            "B2",
+            "value",
+            "point",
+            "interval",
+            "threshold",
+        },
         "exact_expressions",
     )
     for key in (
@@ -489,6 +527,9 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
         "value_exact",
         "value_decimal",
         "theorem_reference",
+        "property",
+        "threshold",
+        "direction",
     }
     for key in string_fields & payload.keys():
         if not isinstance(payload[key], str) or not payload[key]:
@@ -504,19 +545,33 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
         or not all(isinstance(value, str) for value in payload["coefficients"])
     ):
         raise TypeError("coefficients must be a list of strings")
+    for key in ("point", "interval"):
+        if key in payload and (
+            not isinstance(payload[key], list)
+            or len(payload[key]) != 2
+            or not all(isinstance(value, str) and value for value in payload[key])
+        ):
+            raise TypeError(f"{key} must be a two-item list of strings")
+    if "certified" in payload and not isinstance(payload["certified"], bool):
+        raise TypeError("certified must be a bool")
     if not isinstance(payload["literature_status"], str):
         raise TypeError("literature_status must be a string")
     if payload["literature_status"] not in {status.value for status in LiteratureStatus}:
         raise ValueError("unknown literature_status")
     if payload["novelty_claim"] is not False:
         raise ValueError("novelty_claim must be false")
-    _validate_expression_dag(
-        payload["exact_expression_dag"],
-        required_roots=(
-            ("generator", "coefficients")
-            if payload["result_type"] == "generator_series"
-            else ("generator", "B1", "B2", "value")
+    required_roots = {
+        "generator_series": ("generator", "coefficients"),
+        "fekete_szego": ("generator", "B1", "B2", "value"),
+        "counterexample_verification": (
+            "coefficients",
+            "point",
+            "interval",
+            "threshold",
         ),
+    }[payload["result_type"]]
+    _validate_expression_dag(
+        payload["exact_expression_dag"], required_roots=required_roots
     )
     _validate_report(payload["verification"])
     _validate_operation_contract(payload)
@@ -593,6 +648,48 @@ def _validate_operation_contract(payload: Mapping[str, Any]) -> None:
     """Require operation-specific inputs and preserve legacy-field consistency."""
 
     result_type = payload["result_type"]
+    operation_fields = {
+        "generator_series": {
+            "generator",
+            "generator_formula",
+            "generator_citation",
+            "order",
+            "coefficients",
+        },
+        "fekete_szego": {
+            "generator",
+            "generator_formula",
+            "generator_citation",
+            "mu",
+            "B1",
+            "B2",
+            "value_exact",
+            "value_decimal",
+            "theorem_reference",
+        },
+        "counterexample_verification": {
+            "property",
+            "coefficients",
+            "point",
+            "interval",
+            "threshold",
+            "certified",
+            "direction",
+        },
+    }
+    all_operation_fields = set().union(*operation_fields.values())
+    misplaced = (set(payload) & all_operation_fields) - operation_fields[result_type]
+    if misplaced:
+        raise ValueError(
+            f"fields do not belong to {result_type}: {sorted(misplaced)}"
+        )
+    if (
+        result_type == "counterexample_verification"
+        and not payload["verification"]["success"]
+    ):
+        raise ValueError(
+            "counterexample results require a successful verification envelope"
+        )
     canonical_inputs = payload["canonical_inputs"]
     exact_expressions = payload["exact_expressions"]
     if set(payload["assumptions"]) < _OPERATION_ASSUMPTIONS[result_type]:
@@ -602,6 +699,7 @@ def _validate_operation_contract(payload: Mapping[str, Any]) -> None:
     expected_method = {
         "generator_series": "exact_symbolic_taylor_series",
         "fekete_szego": "ma_minda_fekete_szego_closed_form",
+        "counterexample_verification": "certified_point_interval_evaluation",
     }[result_type]
     if payload["method"] != expected_method:
         raise ValueError(f"{result_type} method is not package-owned")
@@ -610,6 +708,7 @@ def _validate_operation_contract(payload: Mapping[str, Any]) -> None:
     expected_evidence = {
         "generator_series": "proven_exact_under_declared_assumptions",
         "fekete_szego": "proven_exact_under_declared_assumptions",
+        "counterexample_verification": "certified_enclosure",
     }[result_type]
     if payload["verification"]["success"] and payload["evidence_status"] != expected_evidence:
         raise ValueError(f"{result_type} evidence status is not package-owned")
@@ -632,6 +731,7 @@ def _validate_operation_contract(payload: Mapping[str, Any]) -> None:
     expected_fixture = {
         "generator_series": GENERATOR_FIXTURE_ID,
         "fekete_szego": FEKETE_FIXTURE_ID,
+        "counterexample_verification": COUNTEREXAMPLE_FIXTURE_ID,
     }[result_type]
     expected_source = (
         "caller-supplied"
@@ -707,6 +807,64 @@ def _validate_operation_contract(payload: Mapping[str, Any]) -> None:
                 raise ValueError(
                     f"{legacy_key} does not match exact_expressions.{exact_key}"
                 )
+    else:
+        canonical_required = {"property", "coefficients", "point"}
+        exact_required = {"coefficients", "point", "interval", "threshold"}
+        if set(canonical_inputs) != canonical_required:
+            raise ValueError(
+                "canonical_inputs must contain exactly property, coefficients, and point"
+            )
+        if set(exact_expressions) != exact_required:
+            raise ValueError(
+                "exact_expressions must contain exactly coefficients, point, interval, and threshold"
+            )
+        _require_non_empty_string(
+            canonical_inputs["property"], "canonical_inputs.property"
+        )
+        for label, value, length in (
+            ("canonical_inputs.coefficients", canonical_inputs["coefficients"], None),
+            ("canonical_inputs.point", canonical_inputs["point"], 2),
+            ("exact_expressions.coefficients", exact_expressions["coefficients"], None),
+            ("exact_expressions.point", exact_expressions["point"], 2),
+            ("exact_expressions.interval", exact_expressions["interval"], 2),
+        ):
+            if (
+                not isinstance(value, list)
+                or not all(isinstance(item, str) and item for item in value)
+                or (length is not None and len(value) != length)
+            ):
+                raise TypeError(f"{label} must be a valid list of strings")
+        _require_non_empty_string(
+            exact_expressions["threshold"], "exact_expressions.threshold"
+        )
+        if payload.get("property") != canonical_inputs["property"]:
+            raise ValueError("property does not match canonical_inputs.property")
+        try:
+            canonical_coefficients = [
+                float.fromhex(value) for value in canonical_inputs["coefficients"]
+            ]
+            canonical_point = [
+                float.fromhex(value) for value in canonical_inputs["point"]
+            ]
+            exact_interval = [
+                float(sp.Rational(value)) for value in exact_expressions["interval"]
+            ]
+            exact_threshold = float(sp.Rational(exact_expressions["threshold"]))
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError("counterexample numeric fields are not canonical") from exc
+        if not all(
+            math.isfinite(value)
+            for value in [*canonical_coefficients, *canonical_point, *exact_interval, exact_threshold]
+        ):
+            raise ValueError("counterexample numeric fields must be finite")
+        if payload.get("coefficients") != [repr(value) for value in canonical_coefficients]:
+            raise ValueError("coefficients do not match canonical_inputs.coefficients")
+        if payload.get("point") != [repr(value) for value in canonical_point]:
+            raise ValueError("point does not match canonical_inputs.point")
+        if payload.get("interval") != [repr(value) for value in exact_interval]:
+            raise ValueError("interval does not match exact_expressions.interval")
+        if payload.get("threshold") != repr(exact_threshold):
+            raise ValueError("threshold does not match exact_expressions.threshold")
 
 
 def _require_non_empty_string(value: Any, label: str) -> None:
@@ -884,9 +1042,9 @@ def _validate_expression_dag(dag: Any, *, required_roots: tuple[str, ...]) -> No
     root_ids: list[str] = []
     for name in required_roots:
         root = roots[name]
-        if name == "coefficients":
-            if not isinstance(root, list) or not root:
-                raise ValueError("expression DAG coefficient roots must be non-empty")
+        if name in {"coefficients", "point", "interval"}:
+            if not isinstance(root, list):
+                raise ValueError(f"expression DAG {name} roots must be a list")
             values = root
         else:
             if not isinstance(root, str):
@@ -991,13 +1149,19 @@ def _validate_authoritative_operation(payload: Mapping[str, Any]) -> None:
     """Recompute successful Phase-1 values from the exact DAG, never its printer."""
 
     result_type = payload["result_type"]
+    required_roots = {
+        "generator_series": ("generator", "coefficients"),
+        "fekete_szego": ("generator", "B1", "B2", "value"),
+        "counterexample_verification": (
+            "coefficients",
+            "point",
+            "interval",
+            "threshold",
+        ),
+    }[result_type]
     roots = _decode_expression_dag(
         payload["exact_expression_dag"],
-        required_roots=(
-            ("generator", "coefficients")
-            if result_type == "generator_series"
-            else ("generator", "B1", "B2", "value")
-        ),
+        required_roots=required_roots,
     )
     expressions: dict[str, sp.Expr | list[sp.Expr]] = {
         key: value for key, value in roots.items()
@@ -1007,9 +1171,96 @@ def _validate_authoritative_operation(payload: Mapping[str, Any]) -> None:
     if not payload["verification"]["success"]:
         return
 
+    exact_expressions = payload["exact_expressions"]
+    if result_type == "counterexample_verification":
+        coefficients = roots["coefficients"]
+        point = roots["point"]
+        interval = roots["interval"]
+        threshold = roots["threshold"]
+        assert isinstance(coefficients, list)
+        assert isinstance(point, list)
+        assert isinstance(interval, list)
+        assert isinstance(threshold, sp.Expr)
+        displays = {
+            "coefficients": [sp.sstr(value) for value in coefficients],
+            "point": [sp.sstr(value) for value in point],
+            "interval": [sp.sstr(value) for value in interval],
+            "threshold": sp.sstr(threshold),
+        }
+        if displays != exact_expressions:
+            raise ValueError(
+                "exact counterexample display does not match the authoritative DAG"
+            )
+
+        def exact_binary64(text: str) -> sp.Rational:
+            value = float.fromhex(text)
+            numerator, denominator = value.as_integer_ratio()
+            return sp.Rational(numerator, denominator)
+
+        if coefficients != [
+            exact_binary64(value)
+            for value in payload["canonical_inputs"]["coefficients"]
+        ]:
+            raise ValueError("authoritative coefficients do not match canonical inputs")
+        if point != [
+            exact_binary64(value) for value in payload["canonical_inputs"]["point"]
+        ]:
+            raise ValueError("authoritative point does not match canonical inputs")
+        if len(point) != 2 or len(interval) != 2 or interval[0] > interval[1]:
+            raise ValueError("authoritative point or interval shape is invalid")
+        property_name = payload["property"]
+        from .counterexamples import verify_counterexample
+
+        canonical_coefficients = tuple(
+            float.fromhex(value)
+            for value in payload["canonical_inputs"]["coefficients"]
+        )
+        canonical_point = tuple(
+            float.fromhex(value) for value in payload["canonical_inputs"]["point"]
+        )
+        recomputed = verify_counterexample(
+            canonical_coefficients,
+            point=(canonical_point[0], canonical_point[1]),
+            property=property_name,
+        )
+        recomputed_lower = recomputed.interval_lower
+        recomputed_upper = recomputed.interval_upper
+        recomputed_threshold = recomputed.threshold
+        recomputed_certified = recomputed.certified
+
+        def rational_from_float(value: float) -> sp.Rational:
+            numerator, denominator = value.as_integer_ratio()
+            return sp.Rational(numerator, denominator)
+
+        recomputed_interval = [
+            rational_from_float(recomputed_lower),
+            rational_from_float(recomputed_upper),
+        ]
+        if interval != recomputed_interval or threshold != rational_from_float(
+            recomputed_threshold
+        ):
+            raise ValueError(
+                "counterexample interval does not match the recomputed enclosure"
+            )
+        if payload["certified"] != bool(recomputed_certified):
+            raise ValueError(
+                "counterexample classification does not match the recomputed enclosure"
+            )
+        if property_name == "starlike":
+            certified = interval[1] <= threshold
+            direction = "disproves" if certified else "not_disproved"
+        elif property_name in {"becker_univalent", "nehari_univalent"}:
+            certified = interval[0] > threshold
+            direction = "violates_criterion" if certified else "not_violated"
+        else:
+            raise ValueError("authoritative counterexample property is unsupported")
+        certified_bool = bool(certified)
+        if payload["certified"] != certified_bool or payload["direction"] != direction:
+            raise ValueError("counterexample classification does not match its interval")
+        return
+
     generator = roots["generator"]
     assert isinstance(generator, sp.Expr)
-    exact_expressions = payload["exact_expressions"]
     if exact_expressions["generator"] != sp.sstr(generator):
         raise ValueError("exact generator display does not match the authoritative DAG")
     if payload["provenance"] == "built_in":

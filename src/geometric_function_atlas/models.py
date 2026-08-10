@@ -169,9 +169,11 @@ def canonical_expression_dag(
     if not isinstance(expressions, Mapping) or not expressions:
         raise ValueError("expression DAG requires named expressions")
     keys: dict[str, tuple[Any, ...] | tuple[tuple[Any, ...], ...]] = {}
+    sequence_roots: set[str] = set()
     for name, expression in expressions.items():
         if isinstance(expression, Sequence) and not isinstance(expression, (str, bytes)):
             keys[name] = tuple(_dag_key(item) for item in expression)
+            sequence_roots.add(name)
         else:
             keys[name] = _dag_key(expression)  # type: ignore[arg-type]
     all_keys: set[tuple[Any, ...]] = set()
@@ -190,8 +192,8 @@ def canonical_expression_dag(
             for child in key[2]:
                 collect(child)
 
-    for key in keys.values():
-        if key and isinstance(key[0], tuple):
+    for name, key in keys.items():
+        if name in sequence_roots:
             for item in key:
                 collect(item)
         else:
@@ -204,11 +206,11 @@ def canonical_expression_dag(
         "version": 1,
         "nodes": [_dag_node(key, identifiers) for key in ordered],
         "roots": {
-            name: (
-                [identifiers[item] for item in key]
-                if key and isinstance(key[0], tuple)
-                else identifiers[key]  # type: ignore[index]
-            )
+        name: (
+            [identifiers[item] for item in key]
+            if name in sequence_roots
+            else identifiers[key]  # type: ignore[index]
+        )
             for name, key in sorted(keys.items())
         },
     }
