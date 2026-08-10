@@ -1,0 +1,138 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify frozen release manifest and assets
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.manifest.outputs.tag }}
+      commit: ${{ steps.manifest.outputs.commit }}
+      wheel_name: ${{ steps.manifest.outputs.wheel_name }}
+      wheel_sha: ${{ steps.manifest.outputs.wheel_sha }}
+      sdist_name: ${{ steps.manifest.outputs.sdist_name }}
+      sdist_sha: ${{ steps.manifest.outputs.sdist_sha }}
+      checksums_name: ${{ steps.manifest.outputs.checksums_name }}
+      checksums_sha: ${{ steps.manifest.outputs.checksums_sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12.13"
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.3"
+          enable-cache: false
+      - name: Validate frozen publication manifest
+        id: manifest
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          data = json.loads(Path(".github/pypi-publish.json").read_text())
+          assert data["schema_version"] == 1
+          assert data["project"] == "geometric-function-atlas"
+          assert re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", data["tag"])
+          assert re.fullmatch(r"[0-9a-f]{40}", data["commit"])
+          assert set(data["assets"]) == {"wheel", "sdist", "checksums"}
+          for asset in data["assets"].values():
+              assert re.fullmatch(r"[A-Za-z0-9_.-]+", asset["name"])
+              assert re.fullmatch(r"[0-9a-f]{64}", asset["sha256"])
+
+          outputs = {
+              "tag": data["tag"],
+              "commit": data["commit"],
+              "wheel_name": data["assets"]["wheel"]["name"],
+              "wheel_sha": data["assets"]["wheel"]["sha256"],
+              "sdist_name": data["assets"]["sdist"]["name"],
+              "sdist_sha": data["assets"]["sdist"]["sha256"],
+              "checksums_name": data["assets"]["checksums"]["name"],
+              "checksums_sha": data["assets"]["checksums"]["sha256"],
+          }
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+              for key, value in outputs.items():
+                  handle.write(f"{key}={value}\n")
+          PY
+      - name: Verify tag and published GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.manifest.outputs.tag }}
+          RELEASE_COMMIT: ${{ steps.manifest.outputs.commit }}
+        run: |
+          test "$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | cut -f1)" = "$RELEASE_COMMIT"
+          test "$(gh release view "$RELEASE_TAG" --json isDraft,isPrerelease --jq '.isDraft or .isPrerelease')" = "false"
+      - name: Download exact GitHub release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.manifest.outputs.tag }}
+          WHEEL_NAME: ${{ steps.manifest.outputs.wheel_name }}
+          SDIST_NAME: ${{ steps.manifest.outputs.sdist_name }}
+          CHECKSUMS_NAME: ${{ steps.manifest.outputs.checksums_name }}
+        run: |
+          mkdir dist
+          gh release download "$RELEASE_TAG" --dir dist \
+            --pattern "$WHEEL_NAME" \
+            --pattern "$SDIST_NAME" \
+            --pattern "$CHECKSUMS_NAME"
+      - name: Verify pinned digests and package metadata
+        env:
+          WHEEL_NAME: ${{ steps.manifest.outputs.wheel_name }}
+          WHEEL_SHA: ${{ steps.manifest.outputs.wheel_sha }}
+          SDIST_NAME: ${{ steps.manifest.outputs.sdist_name }}
+          SDIST_SHA: ${{ steps.manifest.outputs.sdist_sha }}
+          CHECKSUMS_NAME: ${{ steps.manifest.outputs.checksums_name }}
+          CHECKSUMS_SHA: ${{ steps.manifest.outputs.checksums_sha }}
+        run: |
+          printf '%s  %s\n' "$WHEEL_SHA" "dist/$WHEEL_NAME" | sha256sum -c -
+          printf '%s  %s\n' "$SDIST_SHA" "dist/$SDIST_NAME" | sha256sum -c -
+          printf '%s  %s\n' "$CHECKSUMS_SHA" "dist/$CHECKSUMS_NAME" | sha256sum -c -
+          (cd dist && sha256sum -c "$CHECKSUMS_NAME")
+          uv sync --extra build --locked
+          uv run --frozen --extra build python -m twine check "dist/$WHEEL_NAME" "dist/$SDIST_NAME"
+          uv run --frozen python scripts/check_distribution.py dist
+
+  publish:
+    name: Publish frozen assets with OIDC
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/p/geometric-function-atlas
+    steps:
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.3"
+          enable-cache: false
+      - name: Download exact GitHub release distributions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.verify.outputs.tag }}
+          WHEEL_NAME: ${{ needs.verify.outputs.wheel_name }}
+          SDIST_NAME: ${{ needs.verify.outputs.sdist_name }}
+        run: |
+          mkdir dist
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir dist \
+            --pattern "$WHEEL_NAME" \
+            --pattern "$SDIST_NAME"
+      - name: Reverify pinned distribution digests
+        env:
+          WHEEL_NAME: ${{ needs.verify.outputs.wheel_name }}
+          WHEEL_SHA: ${{ needs.verify.outputs.wheel_sha }}
+          SDIST_NAME: ${{ needs.verify.outputs.sdist_name }}
+          SDIST_SHA: ${{ needs.verify.outputs.sdist_sha }}
+        run: |
+          printf '%s  %s\n' "$WHEEL_SHA" "dist/$WHEEL_NAME" | sha256sum -c -
+          printf '%s  %s\n' "$SDIST_SHA" "dist/$SDIST_NAME" | sha256sum -c -
+      - name: Publish to PyPI with Trusted Publishing
+        run: uv publish --trusted-publishing always dist/*.whl dist/*.tar.gz

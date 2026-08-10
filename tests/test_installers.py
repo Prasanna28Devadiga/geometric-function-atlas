@@ -83,9 +83,11 @@ def test_ci_uses_only_free_public_standard_runners_without_persistent_storage() 
         encoding="utf-8"
     )
 
-    assert "runs-on: ubuntu-latest" in workflow
-    assert "runs-on: windows-latest" in workflow
+    assert "runs-on: ubuntu-24.04" in workflow
+    assert "runs-on: windows-2025" in workflow
+    assert "-latest" not in workflow
     assert "larger-runner" not in workflow
     assert "upload-artifact" not in workflow
     assert "enable-cache: true" not in workflow
+    assert "enable-cache: false" in workflow
     assert 'branches: [main, "release/**"]' not in workflow
