@@ -1,0 +1,42 @@
+{
+ "artifact_version": "2026.08.11",
+ "files": {
+  "bounds.json": {
+   "schema_version": 1,
+   "sha256": "87143bd9284a3702acff95387590fb23bfd1312a5256ae09b5147a9fcdc9bc0d"
+  },
+  "certificates.json": {
+   "schema_version": 1,
+   "sha256": "64921feb4d374445652f77231a4ba926065db2ecff477c2d51799469be29a9c7"
+  },
+  "classes.json": {
+   "schema_version": 1,
+   "sha256": "4751213869d69e2f4fedbe7f009f539b43cebf45f9d65d9fc03e89779b91e35a"
+  },
+  "expansions.json": {
+   "schema_version": 1,
+   "sha256": "41db7da6e45e92a3ba88ed9502c5aaafd70339183384fe7d6c09f12655fa2ac6"
+  },
+  "open_problems.json": {
+   "schema_version": 1,
+   "sha256": "e9025ab737cf8330f870eace6bd5482bcca675b39f22ee09a562f0defbaedf0a"
+  },
+  "proof_meta.json": {
+   "schema_version": 1,
+   "sha256": "ff80d63def0b8e8555fa2e970c5baec8a3286c1fe4a60dce1991a2e57afb98f6"
+  },
+  "reconciliation.json": {
+   "schema_version": 1,
+   "sha256": "389db0057bedc1e50e5491dd8f1496a43a5aae7c6e738803d1fd5b49d06ec5b4"
+  },
+  "references.md": {
+   "schema_version": 1,
+   "sha256": "e5699d0398829c14b9971b81e897a6be6d033e6733a40ffcc5467861a3570b6c"
+  }
+ },
+ "recipe": "scripts/bake_artifacts.py",
+ "schema_version": 1,
+ "snapshot_date": "2026-08-11",
+ "source_commit": "acee553e03f9ca2bdcb55977e18ff7d9deb57e40",
+ "source_repo": "gft-registry"
+}

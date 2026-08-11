@@ -43,6 +43,20 @@ def _assert_common(names: list[str], *, archive: Path) -> None:
     assert "geometric_function_atlas/schema/snapshot-manifest.schema.json" in joined, (
         f"{archive.name} is missing the snapshot manifest schema"
     )
+    for data_artifact in (
+        "data/manifest.json",
+        "data/classes.json",
+        "data/expansions.json",
+        "data/bounds.json",
+        "data/certificates.json",
+        "data/open_problems.json",
+        "data/proof_meta.json",
+        "data/reconciliation.json",
+        "data/references.md",
+    ):
+        assert f"geometric_function_atlas/{data_artifact}" in joined, (
+            f"{archive.name} is missing baked artifact {data_artifact}"
+        )
 
 
 def check_wheel(archive: Path) -> None:

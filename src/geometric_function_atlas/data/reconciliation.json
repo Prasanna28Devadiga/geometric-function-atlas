@@ -1,0 +1,1827 @@
+{
+ "counts": {
+  "A": 216,
+  "B": 14,
+  "C": 8,
+  "D": 12
+ },
+ "rows": [
+  {
+   "category": "A",
+   "class_key": "bean_tanh",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.25, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "bean_tanh",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "bean_tanh",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.25, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "bean_tanh",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "bean_tanh",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.25, face 0.1875) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "bean_tanh",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.25, face 0.4375) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "7/16"
+  },
+  {
+   "category": "C+D",
+   "class_key": "bean_tanh",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.01",
+   "slack": "0.01",
+   "value_exact": "1/16"
+  },
+  {
+   "category": "A",
+   "class_key": "bell",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "bell",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "bell",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "bell",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 1) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1"
+  },
+  {
+   "category": "A+B",
+   "class_key": "bell",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure | MATCH: Kumar–Cho–Ravichandran–Srivastava, Math. Slovaca 69 (2019)",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "bell",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.666667, face 0.777778) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "7/9"
+  },
+  {
+   "category": "A+B",
+   "class_key": "cardioid",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.666667, face 0.333333) — Ma–Minda general FS structure | MATCH: Sharma–Jain–Ravichandran, Afr. Mat. 27 (2016)",
+   "slack": "1e-06",
+   "value_exact": "2/3"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.666667, face 0.111111) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "2/3"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.666667, face 1.22222) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "11/9"
+  },
+  {
+   "category": "A+B",
+   "class_key": "cardioid",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.666667, face 0.555556) — Ma–Minda general FS structure | MATCH: Sharma–Jain–Ravichandran 2016",
+   "slack": "1e-06",
+   "value_exact": "2/3"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.666667, face 2.33333) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "7/3"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid_exp",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid_exp",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid_exp",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid_exp",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 1) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid_exp",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "cardioid_exp",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "cissoid_diocles",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.583333) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "7/12"
+  },
+  {
+   "category": "A",
+   "class_key": "cissoid_diocles",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.333333) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "cissoid_diocles",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.0833333) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "cissoid_diocles",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.833333) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "5/6"
+  },
+  {
+   "category": "A",
+   "class_key": "cissoid_diocles",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.166667) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "cissoid_diocles",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.16667) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "7/6"
+  },
+  {
+   "category": "A",
+   "class_key": "cosh_sqrt",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.25, face 0.0833333) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "cosh_sqrt",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.25, face 0.0208333) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "cosh_sqrt",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.25, face 0.0416667) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "cosh_sqrt",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.25, face 0.145833) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "cosh_sqrt",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.25, face 0.104167) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "cosh_sqrt",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.25, face 0.354167) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "17/48"
+  },
+  {
+   "category": "C+D",
+   "class_key": "cosh_sqrt",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.01",
+   "slack": "0.01",
+   "value_exact": "1/16"
+  },
+  {
+   "category": "A",
+   "class_key": "crescent",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A+B",
+   "class_key": "crescent",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure | MATCH: Raina–Sokół, C. R. Acad. Sci. Paris 353 (2015)",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "crescent",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "crescent",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A+B",
+   "class_key": "crescent",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure | MATCH: Raina–Sokół 2015",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "crescent",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/4"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_3",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.375, face 0.140625) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/8"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_3",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.375, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/8"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_3",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.375, face 0.140625) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/8"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_3",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.375, face 0.28125) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/8"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_3",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.375, face 0.28125) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/8"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_3",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.375, face 0.84375) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "27/32"
+  },
+  {
+   "category": "C+D",
+   "class_key": "epicycloid_3",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.01",
+   "slack": "0.01",
+   "value_exact": "5/32"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_6",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.428571, face 0.183673) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/7"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_6",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.428571, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/7"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_6",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.428571, face 0.183673) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/7"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_6",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.428571, face 0.367347) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/7"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_6",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.428571, face 0.367347) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/7"
+  },
+  {
+   "category": "A",
+   "class_key": "epicycloid_6",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.428571, face 1.10204) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "54/49"
+  },
+  {
+   "category": "A",
+   "class_key": "exponential",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A+B",
+   "class_key": "exponential",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure | MATCH: Mendiratta–Nagpal–Ravichandran, Bull. Malays. 38 (2015)",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "exponential",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "exponential",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A+B",
+   "class_key": "exponential",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure | MATCH: Mendiratta–Nagpal–Ravichandran 2015",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "exponential",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/4"
+  },
+  {
+   "category": "A",
+   "class_key": "four_leaf",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.416667, face 0.173611) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "5/12"
+  },
+  {
+   "category": "A",
+   "class_key": "four_leaf",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.416667, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "5/12"
+  },
+  {
+   "category": "A",
+   "class_key": "four_leaf",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.416667, face 0.173611) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "5/12"
+  },
+  {
+   "category": "A",
+   "class_key": "four_leaf",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.416667, face 0.347222) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/12"
+  },
+  {
+   "category": "A",
+   "class_key": "four_leaf",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.416667, face 0.347222) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "5/12"
+  },
+  {
+   "category": "A",
+   "class_key": "four_leaf",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.416667, face 1.04167) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "25/24"
+  },
+  {
+   "category": "C+D",
+   "class_key": "four_leaf",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.02",
+   "slack": "0.02",
+   "value_exact": "3/16"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.5_B-0.5",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.5_B-0.5",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.5_B-0.5",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.5_B-0.5",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.5_B-0.5",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.5_B-0.5",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/4"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.75_B-0.25",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.75_B-0.25",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.75_B-0.25",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.75_B-0.25",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/8"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.75_B-0.25",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A0.75_B-0.25",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "11/8"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B-0.5",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.75, face 0.9375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "15/16"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B-0.5",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.75, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B-0.5",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.75, face 0.1875) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B-0.5",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.75, face 1.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B-0.5",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.75, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B-0.5",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.75, face 3) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B0",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B0",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B0",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B0",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B0",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "janowski_A1_B0",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/2"
+  },
+  {
+   "category": "A",
+   "class_key": "lemniscate",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.25, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "lemniscate",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "lemniscate",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.25, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "lemniscate",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "lemniscate",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.25, face 0.1875) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "lemniscate",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.25, face 0.4375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "7/16"
+  },
+  {
+   "category": "B+D",
+   "class_key": "lemniscate",
+   "functional_key": "hankel2_2",
+   "notes": "MATCH: Lee–Ravichandran–Supramaniam, J. Inequal. Appl. 2013:281, Cor. 2.1(2) | slack 0.01",
+   "slack": "0.01",
+   "value_exact": "1/16"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.3",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.3, face 0.135) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/10"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.3",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.3, face 0.045) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/10"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.3",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.3, face 0.045) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/10"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.3",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.3, face 0.225) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/10"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.3",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.3, face 0.135) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/10"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.3",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.3, face 0.495) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "99/200"
+  },
+  {
+   "category": "C+D",
+   "class_key": "limacon_0.3",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.02",
+   "slack": "0.02",
+   "value_exact": "3/32"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.5",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.5",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.5",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.5",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/8"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.5",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.5",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "11/8"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.707",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.707107, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.707",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.707107, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "sqrt(2)/2"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.707",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.707107, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "sqrt(2)/2"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.707",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.707107, face 1.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/4"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.707",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.707107, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "limacon_0.707",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.707107, face 2.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "11/4"
+  },
+  {
+   "category": "A",
+   "class_key": "nephroid",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A+B",
+   "class_key": "nephroid",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure | MATCH: Wani–Swaminathan, Bull. Malays. 44 (2021)",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nephroid",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nephroid",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nephroid",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nephroid",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nonconvex_sec",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nonconvex_sec",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nonconvex_sec",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nonconvex_sec",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "nonconvex_sec",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "nonconvex_sec",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "5/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.25",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.75, face 1.3125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "21/16"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.25",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.75, face 0.75) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.25",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.75, face 0.1875) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.25",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.75, face 1.875) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "15/8"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.25",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.75, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.25",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.75, face 2.625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "21/8"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.5",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.5",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.5",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.5",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 1) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.5",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.5",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.75",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.25, face 0.3125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/16"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.75",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.25, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.75",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.25, face 0.1875) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.75",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.25, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/8"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.75",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.25, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "order_0.75",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.25, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "C+D",
+   "class_key": "order_0.75",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.02",
+   "slack": "0.02",
+   "value_exact": "1/16"
+  },
+  {
+   "category": "A",
+   "class_key": "parabolic",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.405285, face 0.434446) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "(48 + 8*pi**2)/(3*pi**4)"
+  },
+  {
+   "category": "A",
+   "class_key": "parabolic",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.405285, face 0.27019) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "4/pi**2"
+  },
+  {
+   "category": "A",
+   "class_key": "parabolic",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.405285, face 0.105934) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "4/pi**2"
+  },
+  {
+   "category": "A",
+   "class_key": "parabolic",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.405285, face 0.598701) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "(8/3 + 32/pi**2)/pi**2"
+  },
+  {
+   "category": "A",
+   "class_key": "parabolic",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.405285, face 0.0583216) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "4/pi**2"
+  },
+  {
+   "category": "A",
+   "class_key": "parabolic",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.405285, face 0.715344) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "(-8/3 + 96/pi**2)/pi**2"
+  },
+  {
+   "category": "A",
+   "class_key": "petal_arcsinh",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "petal_arcsinh",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "petal_arcsinh",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "petal_arcsinh",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "petal_arcsinh",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "petal_arcsinh",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.5) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/2"
+  },
+  {
+   "category": "A",
+   "class_key": "rational_kr",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.207107, face 0.214466) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "15/4 - 5*sqrt(2)/2"
+  },
+  {
+   "category": "A+C*+D",
+   "class_key": "rational_kr",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.207107, face 0.171573) — Ma–Minda general FS structure | NOT FOUND in literature — apparently first explicit instantiation | slack 0.001",
+   "slack": "0.001",
+   "value_exact": "-1/2 + sqrt(2)/2"
+  },
+  {
+   "category": "A",
+   "class_key": "rational_kr",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.207107, face 0.12868) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "-1/2 + sqrt(2)/2"
+  },
+  {
+   "category": "A",
+   "class_key": "rational_kr",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.207107, face 0.257359) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "9/2 - 3*sqrt(2)"
+  },
+  {
+   "category": "A+C*",
+   "class_key": "rational_kr",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.207107, face 0.0857864) — Ma–Minda general FS structure | NOT FOUND in literature — apparently first explicit instantiation",
+   "slack": "1e-06",
+   "value_exact": "-1/2 + sqrt(2)/2"
+  },
+  {
+   "category": "A",
+   "class_key": "rational_kr",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.207107, face 0.0857864) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "-1/2 + sqrt(2)/2"
+  },
+  {
+   "category": "B+D",
+   "class_key": "rational_kr",
+   "functional_key": "hankel2_2",
+   "notes": "PARTIAL: Naz–Kumar–Ravichandran arXiv:1905.05413 give 1/(4k^2) for INVERSE coefficients; direct H2(2) not found | slack 0.01",
+   "slack": "0.01",
+   "value_exact": "3/4 - sqrt(2)/2"
+  },
+  {
+   "category": "A",
+   "class_key": "sigmoid",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A+B",
+   "class_key": "sigmoid",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.25, face 0) — Ma–Minda general FS structure | MATCH: Goel–Kumar, Bull. Malays. 43 (2020) (and Ma–Minda 1994)",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "sigmoid",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "sigmoid",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.25, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A+B",
+   "class_key": "sigmoid",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.25, face 0.125) — Ma–Minda general FS structure | MATCH: Goel–Kumar 2020",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "sigmoid",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.25, face 0.375) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/8"
+  },
+  {
+   "category": "B+D",
+   "class_key": "sigmoid",
+   "functional_key": "hankel2_2",
+   "notes": "MATCH: follows from Lee et al. 2013 general B1^2/4 | slack 0.01",
+   "slack": "0.01",
+   "value_exact": "1/16"
+  },
+  {
+   "category": "A",
+   "class_key": "sine",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A+B",
+   "class_key": "sine",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure | MATCH: Cho–Kumar–Kumar–Ravichandran 2019 (and Ma–Minda 1994, B1=1, B2=0)",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "sine",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "sine",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "sine",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "sine",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/2"
+  },
+  {
+   "category": "A",
+   "class_key": "starlike",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 1, face 2) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "2"
+  },
+  {
+   "category": "A",
+   "class_key": "starlike",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 1, face 1) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "starlike",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 1, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "starlike",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 1, face 3) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3"
+  },
+  {
+   "category": "A",
+   "class_key": "starlike",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 1, face 1) — Ma–Minda general FS structure",
+   "slack": "0.0001",
+   "value_exact": "1"
+  },
+  {
+   "category": "A",
+   "class_key": "starlike",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 1, face 5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5"
+  },
+  {
+   "category": "A",
+   "class_key": "strip_arctan",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strip_arctan",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strip_arctan",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strip_arctan",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strip_arctan",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strip_arctan",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.5) — Ma–Minda general FS structure",
+   "slack": "1e-07",
+   "value_exact": "3/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.25",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.25, face 0.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.25",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.25",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.25, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.25",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.25, face 0.1875) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.25",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.25, face 0.0625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.25",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.25, face 0.3125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/16"
+  },
+  {
+   "category": "C+D",
+   "class_key": "strongly_0.25",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.01",
+   "slack": "0.01",
+   "value_exact": "1/16"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.5",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.5",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.5",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.5",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.75) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.5",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.5",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "5/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.75",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.75, face 1.125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "9/8"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.75",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.75, face 0.5625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.75",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.75, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.75",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.75, face 1.6875) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "27/16"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.75",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.75, face 0.5625) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/4"
+  },
+  {
+   "category": "A",
+   "class_key": "strongly_0.75",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.75, face 2.8125) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "45/16"
+  },
+  {
+   "category": "A",
+   "class_key": "tanh",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "tanh",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.5, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "tanh",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.5, face 0.25) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "tanh",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "tanh",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.5, face 0.5) — Ma–Minda general FS structure",
+   "slack": "0",
+   "value_exact": "1/2"
+  },
+  {
+   "category": "A",
+   "class_key": "tanh",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.5, face 1.5) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "3/2"
+  },
+  {
+   "category": "A",
+   "class_key": "three_leaf",
+   "functional_key": "fekete_szego_mu0.25",
+   "notes": "= max(tail 0.4, face 0.16) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "2/5"
+  },
+  {
+   "category": "A",
+   "class_key": "three_leaf",
+   "functional_key": "fekete_szego_mu0.5",
+   "notes": "= max(tail 0.4, face 0) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "2/5"
+  },
+  {
+   "category": "A",
+   "class_key": "three_leaf",
+   "functional_key": "fekete_szego_mu0.75",
+   "notes": "= max(tail 0.4, face 0.16) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "2/5"
+  },
+  {
+   "category": "A",
+   "class_key": "three_leaf",
+   "functional_key": "fekete_szego_mu0",
+   "notes": "= max(tail 0.4, face 0.32) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "2/5"
+  },
+  {
+   "category": "A",
+   "class_key": "three_leaf",
+   "functional_key": "fekete_szego_mu1",
+   "notes": "= max(tail 0.4, face 0.32) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "2/5"
+  },
+  {
+   "category": "A",
+   "class_key": "three_leaf",
+   "functional_key": "fekete_szego_mu2",
+   "notes": "= max(tail 0.4, face 0.96) — Ma–Minda general FS structure",
+   "slack": "1e-06",
+   "value_exact": "24/25"
+  },
+  {
+   "category": "C+D",
+   "class_key": "three_leaf",
+   "functional_key": "hankel2_2",
+   "notes": "slack 0.02",
+   "slack": "0.02",
+   "value_exact": "1/6"
+  }
+ ],
+ "schema_version": 1
+}

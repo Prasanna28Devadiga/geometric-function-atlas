@@ -11,6 +11,7 @@ import sys
 from collections.abc import Sequence
 from typing import Any
 
+from . import artifacts as _artifact_data
 from .catalog import get_generator, list_generators
 from .classes import (
     class_admissibility,
@@ -21,12 +22,15 @@ from .classes import (
 )
 from .coefficients import generator_series
 from .contracts import (
+    CheckStatus,
     CorruptArtifactError,
     FailureState,
     InvalidInputError,
     ResourceLimitError,
     UnresolvedError,
     UnsupportedError,
+    VerificationCheck,
+    VerificationReport,
     failure_payload,
     validate_error_payload,
 )
@@ -815,6 +819,166 @@ def _image_lab(args: argparse.Namespace) -> None:
     print("Scope: empirical convolution transform; not a GFT theorem")
 
 
+_ARTIFACT_ASSUMPTIONS = (
+    "records are transcribed from the versioned website snapshot",
+    "sharpness, enclosure, and novelty semantics remain those of the source record",
+)
+
+
+def _artifact_emit(
+    args: argparse.Namespace,
+    *,
+    result_type: str,
+    record: Any,
+    canonical_inputs: dict[str, Any] | None = None,
+    evidence_status: str = "screened",
+    record_count: int | None = None,
+) -> None:
+    if isinstance(record, list):
+        record = {"count": len(record), "rows": record}
+    if record_count is None:
+        record_count = int(record.get("count", 1)) if isinstance(record, dict) else 1
+    verification = VerificationReport(
+        (
+            VerificationCheck(
+                name="artifact_lookup",
+                checked="requested baked artifact record",
+                expected="present",
+                observed="present",
+                status=CheckStatus.PASS,
+                scope="versioned package data lookup",
+            ),
+        )
+    )
+    payload = _artifact_data.snapshot_payload(
+        result_type=result_type,
+        canonical_inputs=canonical_inputs or {},
+        record=record,
+        evidence_status=evidence_status,
+        assumptions=_ARTIFACT_ASSUMPTIONS,
+        source_references=("Geometric Function Atlas versioned package snapshot",),
+        verification=verification,
+        record_count=record_count,
+    )
+    if args.json:
+        _write(payload, as_json=True)
+    else:
+        _write(record, as_json=False)
+
+
+def _artifact_snapshot(args: argparse.Namespace) -> None:
+    record = (
+        _artifact_data.snapshot_verify()
+        if args.action == "verify"
+        else _artifact_data.snapshot_info()
+    )
+    _artifact_emit(
+        args,
+        result_type="snapshot_verify",
+        record=record,
+        canonical_inputs={"action": args.action},
+        record_count=record.get("files_verified", 1),
+    )
+
+
+def _artifact_classes(args: argparse.Namespace) -> None:
+    records = _artifact_data.list_classes()
+    _artifact_emit(args, result_type="classes", record=records, record_count=len(records))
+
+
+def _artifact_class(args: argparse.Namespace) -> None:
+    _artifact_emit(
+        args,
+        result_type="classes",
+        record=_artifact_data.class_info(args.class_key),
+        canonical_inputs={"class_key": args.class_key},
+    )
+
+
+def _artifact_expansion(args: argparse.Namespace) -> None:
+    _artifact_emit(
+        args,
+        result_type="expansion",
+        record=_artifact_data.expansion(args.class_key),
+        canonical_inputs={"class_key": args.class_key},
+    )
+
+
+def _artifact_bound(args: argparse.Namespace) -> None:
+    _artifact_emit(
+        args,
+        result_type="coefficient_bound",
+        record=_artifact_data.coefficient_bound(args.class_key, args.functional_key),
+        canonical_inputs={
+            "class_key": args.class_key,
+            "functional_key": args.functional_key,
+        },
+    )
+
+
+def _artifact_proofs(args: argparse.Namespace) -> None:
+    record = _artifact_data.list_proofs(
+        class_key=args.class_key,
+        functional_key=args.functional_key,
+        status=args.status,
+        search=args.search,
+    )
+    _artifact_emit(args, result_type="proofs", record=record, record_count=record["count"])
+
+
+def _artifact_proof(args: argparse.Namespace) -> None:
+    _artifact_emit(
+        args,
+        result_type="proof",
+        record=_artifact_data.get_proof(args.name, raw=args.raw),
+        canonical_inputs={"name": args.name, "raw": args.raw},
+    )
+
+
+def _artifact_open_problems(args: argparse.Namespace) -> None:
+    record = _artifact_data.open_problems(args.kind)
+    _artifact_emit(
+        args,
+        result_type="open_problems",
+        record=record,
+        canonical_inputs={"kind": args.kind},
+        record_count=record["counts"]["enclosures"] + record["counts"]["numerical"],
+    )
+
+
+def _artifact_reconciliation(args: argparse.Namespace) -> None:
+    record = _artifact_data.reconciliation(
+        class_key=args.class_key,
+        functional_key=args.functional_key,
+        category=args.category,
+    )
+    _artifact_emit(
+        args,
+        result_type="reconciliation",
+        record=record,
+        canonical_inputs={
+            "class_key": args.class_key,
+            "functional_key": args.functional_key,
+            "category": args.category,
+        },
+        record_count=record["total"],
+    )
+
+
+def _artifact_references(args: argparse.Namespace) -> None:
+    _artifact_emit(args, result_type="references", record=_artifact_data.references())
+
+
+def _artifact_certificate(args: argparse.Namespace) -> None:
+    _artifact_emit(
+        args,
+        result_type="certificate_replay",
+        record=_artifact_data.verify_certificate(args.name),
+        canonical_inputs={"name": args.name},
+        evidence_status="proven_exact_under_declared_assumptions",
+    )
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="geometric-function-atlas",
@@ -1169,6 +1333,86 @@ def _parser() -> argparse.ArgumentParser:
     _add_limit(hierarchy)
     hierarchy.add_argument("--json", action="store_true", help="emit JSON")
     hierarchy.set_defaults(handler=_snapshot_hierarchy)
+
+    artifact_snapshot = subparsers.add_parser(
+        "artifact-snapshot", help="inspect or verify the baked scientific artifacts"
+    )
+    artifact_snapshot.add_argument("action", choices=["info", "verify"])
+    artifact_snapshot.add_argument("--json", action="store_true", help="emit JSON")
+    artifact_snapshot.set_defaults(handler=_artifact_snapshot)
+
+    artifact_classes = subparsers.add_parser(
+        "artifact-classes", help="list the exact baked 39-class catalog"
+    )
+    artifact_classes.add_argument("--json", action="store_true", help="emit JSON")
+    artifact_classes.set_defaults(handler=_artifact_classes)
+
+    artifact_class = subparsers.add_parser(
+        "class", help="show one baked class and its exact generator coefficients"
+    )
+    artifact_class.add_argument("class_key")
+    artifact_class.add_argument("--json", action="store_true", help="emit JSON")
+    artifact_class.set_defaults(handler=_artifact_class)
+
+    expansion = subparsers.add_parser(
+        "expansion", help="look up a baked Schur-parameter expansion"
+    )
+    expansion.add_argument("class_key")
+    expansion.add_argument("--json", action="store_true", help="emit JSON")
+    expansion.set_defaults(handler=_artifact_expansion)
+
+    bound = subparsers.add_parser(
+        "coefficient-bound", help="look up a baked coefficient bound"
+    )
+    bound.add_argument("class_key")
+    bound.add_argument("functional_key", nargs="?")
+    bound.add_argument("--json", action="store_true", help="emit JSON")
+    bound.set_defaults(handler=_artifact_bound)
+
+    proofs = subparsers.add_parser("proofs", help="list baked proof certificates")
+    proofs.add_argument("--class", dest="class_key")
+    proofs.add_argument("--functional", dest="functional_key")
+    proofs.add_argument("--status")
+    proofs.add_argument("--search")
+    proofs.add_argument("--json", action="store_true", help="emit JSON")
+    proofs.set_defaults(handler=_artifact_proofs)
+
+    proof = subparsers.add_parser("proof", help="show one baked proof certificate")
+    proof.add_argument("name")
+    proof.add_argument("--raw", action="store_true")
+    proof.add_argument("--json", action="store_true", help="emit JSON")
+    proof.set_defaults(handler=_artifact_proof)
+
+    open_problems = subparsers.add_parser(
+        "open-problems", help="list baked enclosures and numerical conjectures"
+    )
+    open_problems.add_argument(
+        "--kind", default="all", choices=["all", "enclosure", "numerical"]
+    )
+    open_problems.add_argument("--json", action="store_true", help="emit JSON")
+    open_problems.set_defaults(handler=_artifact_open_problems)
+
+    reconciliation = subparsers.add_parser(
+        "reconciliation", help="show baked literature-reconciliation rows"
+    )
+    reconciliation.add_argument("--class", dest="class_key")
+    reconciliation.add_argument("--functional", dest="functional_key")
+    reconciliation.add_argument("--category")
+    reconciliation.add_argument("--json", action="store_true", help="emit JSON")
+    reconciliation.set_defaults(handler=_artifact_reconciliation)
+
+    references = subparsers.add_parser(
+        "references", help="print the baked method-reference document"
+    )
+    references.add_argument("--json", action="store_true", help="emit JSON")
+    references.set_defaults(handler=_artifact_references)
+
+    certificate = subparsers.add_parser(
+        "verify-certificate", help="replay one baked Schur certificate"
+    )
+    certificate.add_argument("name")
+    certificate.add_argument("--json", action="store_true", help="emit JSON")
+    certificate.set_defaults(handler=_artifact_certificate)
 
     return parser
 

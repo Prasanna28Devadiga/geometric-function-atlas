@@ -1,5 +1,22 @@
 """Public API for reproducible Geometric Function Atlas computations."""
 
+from .artifacts import (
+    SNAPSHOT_SCHEMA_VERSION,
+    class_info,
+    coefficient_bound,
+    expansion,
+    get_proof,
+    list_classes,
+    list_proofs,
+    open_problems,
+    reconciliation,
+    references,
+    snapshot_info,
+    snapshot_payload,
+    snapshot_verify,
+    validate_snapshot_payload,
+    verify_certificate,
+)
 from .catalog import get_generator, list_generators
 from .classes import (
     ClassAdmissibilityResult,
@@ -9,7 +26,7 @@ from .classes import (
     class_containment_screen,
     class_extremal_coefficients,
     class_member_screen,
-    list_classes,
+    list_classes as list_screen_classes,
 )
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
 from .contracts import (  # noqa: F401
@@ -36,6 +53,7 @@ from .counterexamples import (
     find_counterexample,
     verify_counterexample,
 )
+from .exact import ExactExpressionError, parse_exact_expression
 from .fekete_szego import FeketeSzegoResult, fekete_szego
 from .implementation_registry import (  # noqa: F401
     get_trusted_implementation,
@@ -90,13 +108,16 @@ from .snapshot import (
     SnapshotVerification,
     VerificationRun,
     install_snapshot,
-    snapshot_info,
-    verify_snapshot,
+    snapshot_info as registry_snapshot_info,
+    verify_snapshot as verify_registry_snapshot,
 )
 from .verify import FunctionVerificationResult, verify_function
 from .version import __version__
 
+verify_snapshot = verify_registry_snapshot
+
 __all__ = [
+    "SNAPSHOT_SCHEMA_VERSION",
     "Application",
     "ClassAdmissibilityResult",
     "ClassContainmentResult",
@@ -105,6 +126,7 @@ __all__ = [
     "Counterexample",
     "CounterexampleResult",
     "DomainPlotResult",
+    "ExactExpressionError",
     "Evidence",
     "Fact",
     "FeketeSzegoResult",
@@ -143,24 +165,39 @@ __all__ = [
     "class_containment_screen",
     "class_extremal_coefficients",
     "class_member_screen",
+    "class_info",
+    "coefficient_bound",
     "conformal_grid",
     "fekete_szego",
     "find_counterexample",
+    "expansion",
     "generator_function_coefficients",
     "generator_series",
     "get_generator",
+    "get_proof",
     "install_snapshot",
     "list_classes",
     "list_generators",
+    "list_proofs",
     "list_radii",
+    "list_screen_classes",
+    "open_problems",
+    "parse_exact_expression",
     "radius",
+    "reconciliation",
+    "references",
     "snapshot_info",
+    "snapshot_payload",
+    "snapshot_verify",
+    "registry_snapshot_info",
     "taylor_coefficients",
     "validate_screen_record",
     "verify_counterexample",
     "verify_snapshot",
     "verify_function",
     "verify_radius_certificate",
+    "validate_snapshot_payload",
+    "verify_certificate",
     "write_coefficient_plot",
     "write_domain_plot",
     "write_phase_plot",
