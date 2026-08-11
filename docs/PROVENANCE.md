@@ -59,3 +59,19 @@ The original registry repository is treated as a research artifact and source of
 - no Flask, deployment, OCR, or private-review dependency;
 - a provenance note naming the originating artifact and the audit performed;
 - clean wheel/sdist installation verification.
+
+## Registry snapshots
+
+Registry data is not package code and is never bundled into the wheel. A snapshot
+manifest is the identity boundary: it records the dataset version, decompressed
+SQLite byte count and SHA-256, required application tables, and row populations.
+Compressed assets additionally carry their own byte count and SHA-256. Installation
+verifies the compressed asset, enforces compressed/decompressed resource limits,
+opens the result with SQLite read-only and immutable flags, and checks both
+`PRAGMA quick_check` and `PRAGMA integrity_check` before atomically installing it.
+
+A successful database hash does not make a live mutable database equivalent to the
+snapshot: row populations and required tables are checked as well. Snapshot facts,
+paper claims, evidence records, and application associations remain observations
+from the selected dataset. They do not by themselves establish a theorem,
+application effectiveness, or literature novelty.

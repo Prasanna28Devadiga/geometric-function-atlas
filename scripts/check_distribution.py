@@ -40,6 +40,9 @@ def _assert_common(names: list[str], *, archive: Path) -> None:
     assert "geometric_function_atlas/schema/error.schema.json" in joined, (
         f"{archive.name} is missing the error schema"
     )
+    assert "geometric_function_atlas/schema/snapshot-manifest.schema.json" in joined, (
+        f"{archive.name} is missing the snapshot manifest schema"
+    )
 
 
 def check_wheel(archive: Path) -> None:

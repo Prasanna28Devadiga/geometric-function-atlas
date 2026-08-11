@@ -33,6 +33,12 @@ from .contracts import (
 from .counterexamples import find_counterexample, verify_counterexample
 from .fekete_szego import fekete_szego
 from .plotting import write_plot
+from .snapshot import (
+    RegistrySnapshot,
+    install_snapshot,
+    snapshot_info,
+    verify_snapshot,
+)
 from .verify import verify_function
 from .version import __version__
 
@@ -66,7 +72,14 @@ def _write(payload: Any, *, as_json: bool) -> None:
         )
     elif isinstance(payload, list):
         for row in payload:
-            print(f"{row['key']}: {row['formula']} — {row['citation']}")
+            label = (
+                row.get("key")
+                or row.get("canonical_key")
+                or row.get("title")
+                or row.get("kind")
+            )
+            detail = row.get("formula") or row.get("display_name") or row.get("name") or ""
+            print(f"{label}: {detail}" if detail else str(label))
     else:
         for key, value in payload.items():
             print(f"{key}: {value}")
@@ -165,6 +178,236 @@ def _verify_counterexample(args: argparse.Namespace) -> None:
         f"Counterexample condition: value {comparison} {result.threshold:g}",
     ]
     _write_utf8("\n".join(lines))
+
+
+def _snapshot_manifest(args: argparse.Namespace) -> str | None:
+    return getattr(args, "manifest", None)
+
+
+def _snapshot_info(args: argparse.Namespace) -> None:
+    _write(
+        snapshot_info(args.path, manifest=_snapshot_manifest(args)).to_dict(),
+        as_json=args.json,
+    )
+
+
+def _snapshot_verify(args: argparse.Namespace) -> None:
+    report = verify_snapshot(
+        args.path,
+        manifest=_snapshot_manifest(args),
+        raise_on_error=True,
+    )
+    _write(report.to_dict(), as_json=args.json)
+
+
+def _snapshot_install(args: argparse.Namespace) -> None:
+    installed = install_snapshot(
+        args.source,
+        args.destination,
+        manifest=args.manifest,
+    )
+    payload = {
+        "installed": str(installed),
+        "verification": verify_snapshot(installed, manifest=args.manifest).to_dict(),
+    }
+    _write(payload, as_json=args.json)
+
+
+def _snapshot_stats(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(snapshot.stats().to_dict(), as_json=args.json)
+
+
+def _snapshot_search(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.search(
+                    args.query, kind=args.kind, limit=args.limit
+                )
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_families(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.families(group=args.group, limit=args.limit)
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_family(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            snapshot.family(args.identifier, limit=args.limit).to_dict(),
+            as_json=args.json,
+        )
+
+
+def _snapshot_facts(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.facts(
+                    args.identifier,
+                    property=args.property,
+                    status=args.status,
+                    limit=args.limit,
+                )
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_evidence(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.evidence(args.identifier, limit=args.limit)
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_runs(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.runs(args.identifier, limit=args.limit)
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_papers(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.papers(
+                    query=args.query,
+                    author=args.author,
+                    year=args.year,
+                    class_key=args.class_key,
+                    tag=args.tag,
+                    claim=args.claim,
+                    sort=args.sort,
+                    limit=args.limit,
+                )
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_paper(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            snapshot.paper(args.identifier, limit=args.limit).to_dict(),
+            as_json=args.json,
+        )
+
+
+def _snapshot_applications(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.applications(args.area, limit=args.limit)
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_counterexamples(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.counterexamples(
+                    args.identifier,
+                    property=args.property,
+                    limit=args.limit,
+                )
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_aliases(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [dict(item) for item in snapshot.aliases(args.query, limit=args.limit)],
+            as_json=args.json,
+        )
+
+
+def _snapshot_normalize_class(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            {"input": args.text, "canonical_key": snapshot.normalize_class(args.text)},
+            as_json=args.json,
+        )
+
+
+def _snapshot_hierarchy(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.hierarchy(args.property, limit=args.limit)
+            ],
+            as_json=args.json,
+        )
+
+
+def _add_snapshot_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--snapshot", required=True, help="path to a verified SQLite snapshot"
+    )
+    parser.add_argument("--manifest", help="path to the matching snapshot manifest")
+
+
+def _add_limit(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--limit", type=int, default=100, help="maximum records to return"
+    )
 
 
 def _record_lines(payload: dict[str, Any]) -> list[str]:
@@ -686,6 +929,155 @@ def _parser() -> argparse.ArgumentParser:
     image_sample.add_argument("--seed", type=int, default=0)
     image_sample.add_argument("--size", type=int, default=32)
     image_sample.set_defaults(handler=_image_lab)
+
+    snapshot = subparsers.add_parser(
+        "snapshot", help="install, inspect, or verify a registry snapshot"
+    )
+    snapshot_subparsers = snapshot.add_subparsers(
+        dest="snapshot_command", required=True
+    )
+
+    snapshot_info_parser = snapshot_subparsers.add_parser(
+        "info", help="inspect immutable SQLite metadata"
+    )
+    snapshot_info_parser.add_argument("path")
+    snapshot_info_parser.add_argument("--manifest")
+    snapshot_info_parser.add_argument("--json", action="store_true", help="emit JSON")
+    snapshot_info_parser.set_defaults(handler=_snapshot_info)
+
+    snapshot_verify_parser = snapshot_subparsers.add_parser(
+        "verify", help="verify snapshot hashes and integrity"
+    )
+    snapshot_verify_parser.add_argument("path")
+    snapshot_verify_parser.add_argument("--manifest", required=True)
+    snapshot_verify_parser.add_argument("--json", action="store_true", help="emit JSON")
+    snapshot_verify_parser.set_defaults(handler=_snapshot_verify)
+
+    snapshot_install_parser = snapshot_subparsers.add_parser(
+        "install", help="verify and atomically install a snapshot"
+    )
+    snapshot_install_parser.add_argument("source")
+    snapshot_install_parser.add_argument("destination")
+    snapshot_install_parser.add_argument("--manifest", required=True)
+    snapshot_install_parser.add_argument("--json", action="store_true", help="emit JSON")
+    snapshot_install_parser.set_defaults(handler=_snapshot_install)
+
+    stats = subparsers.add_parser("stats", help="report registry snapshot statistics")
+    _add_snapshot_options(stats)
+    stats.add_argument("--json", action="store_true", help="emit JSON")
+    stats.set_defaults(handler=_snapshot_stats)
+
+    snapshot_search = subparsers.add_parser(
+        "search", help="search families, papers, or evidence"
+    )
+    snapshot_search.add_argument("query")
+    snapshot_search.add_argument("--kind", choices=("family", "paper", "proof"))
+    _add_snapshot_options(snapshot_search)
+    _add_limit(snapshot_search)
+    snapshot_search.add_argument("--json", action="store_true", help="emit JSON")
+    snapshot_search.set_defaults(handler=_snapshot_search)
+
+    families = subparsers.add_parser("families", help="list function families")
+    families.add_argument("--group")
+    _add_snapshot_options(families)
+    _add_limit(families)
+    families.add_argument("--json", action="store_true", help="emit JSON")
+    families.set_defaults(handler=_snapshot_families)
+
+    family = subparsers.add_parser("family", help="inspect one function family")
+    family.add_argument("identifier")
+    _add_snapshot_options(family)
+    _add_limit(family)
+    family.add_argument("--json", action="store_true", help="emit JSON")
+    family.set_defaults(handler=_snapshot_family)
+
+    facts = subparsers.add_parser("facts", help="query family facts")
+    facts.add_argument("identifier")
+    facts.add_argument("--property")
+    facts.add_argument("--status")
+    _add_snapshot_options(facts)
+    _add_limit(facts)
+    facts.add_argument("--json", action="store_true", help="emit JSON")
+    facts.set_defaults(handler=_snapshot_facts)
+
+    evidence = subparsers.add_parser("evidence", help="query family evidence")
+    evidence.add_argument("identifier")
+    _add_snapshot_options(evidence)
+    _add_limit(evidence)
+    evidence.add_argument("--json", action="store_true", help="emit JSON")
+    evidence.set_defaults(handler=_snapshot_evidence)
+
+    runs = subparsers.add_parser("runs", help="query verification runs")
+    runs.add_argument("identifier")
+    _add_snapshot_options(runs)
+    _add_limit(runs)
+    runs.add_argument("--json", action="store_true", help="emit JSON")
+    runs.set_defaults(handler=_snapshot_runs)
+
+    papers = subparsers.add_parser("papers", help="search papers and facets")
+    papers.add_argument("--query")
+    papers.add_argument("--author")
+    papers.add_argument("--year", type=int)
+    papers.add_argument("--class-key")
+    papers.add_argument("--tag")
+    papers.add_argument("--claim")
+    papers.add_argument(
+        "--sort", choices=("relevance", "year", "title"), default="relevance"
+    )
+    _add_snapshot_options(papers)
+    _add_limit(papers)
+    papers.add_argument("--json", action="store_true", help="emit JSON")
+    papers.set_defaults(handler=_snapshot_papers)
+
+    paper = subparsers.add_parser("paper", help="inspect one paper and its claims")
+    paper.add_argument("identifier")
+    _add_snapshot_options(paper)
+    _add_limit(paper)
+    paper.add_argument("--json", action="store_true", help="emit JSON")
+    paper.set_defaults(handler=_snapshot_paper)
+
+    applications = subparsers.add_parser(
+        "applications", help="list conservative application associations"
+    )
+    applications.add_argument("area", nargs="?")
+    _add_snapshot_options(applications)
+    _add_limit(applications)
+    applications.add_argument("--json", action="store_true", help="emit JSON")
+    applications.set_defaults(handler=_snapshot_applications)
+
+    stored_counterexamples = subparsers.add_parser(
+        "counterexamples", help="list stored counterexample records"
+    )
+    stored_counterexamples.add_argument("identifier", nargs="?")
+    stored_counterexamples.add_argument("--property")
+    _add_snapshot_options(stored_counterexamples)
+    _add_limit(stored_counterexamples)
+    stored_counterexamples.add_argument("--json", action="store_true", help="emit JSON")
+    stored_counterexamples.set_defaults(handler=_snapshot_counterexamples)
+
+    aliases = subparsers.add_parser("aliases", help="list snapshot class aliases")
+    aliases.add_argument("query", nargs="?")
+    _add_snapshot_options(aliases)
+    _add_limit(aliases)
+    aliases.add_argument("--json", action="store_true", help="emit JSON")
+    aliases.set_defaults(handler=_snapshot_aliases)
+
+    normalize_class = subparsers.add_parser(
+        "normalize-class", help="normalize a stored class name"
+    )
+    normalize_class.add_argument("text")
+    _add_snapshot_options(normalize_class)
+    normalize_class.add_argument("--json", action="store_true", help="emit JSON")
+    normalize_class.set_defaults(handler=_snapshot_normalize_class)
+
+    hierarchy = subparsers.add_parser(
+        "hierarchy", help="list stored property implications"
+    )
+    hierarchy.add_argument("property", nargs="?")
+    _add_snapshot_options(hierarchy)
+    _add_limit(hierarchy)
+    hierarchy.add_argument("--json", action="store_true", help="emit JSON")
+    hierarchy.set_defaults(handler=_snapshot_hierarchy)
 
     return parser
 

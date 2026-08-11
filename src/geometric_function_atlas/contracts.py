@@ -337,7 +337,7 @@ def build_result_payload(
     literature_status: LiteratureStatus | str = LiteratureStatus.NOT_ASSESSED,
     failure_state: FailureState | str | None = None,
 ) -> dict[str, Any]:
-    """Build the stable envelope while retaining Phase-1 legacy fields."""
+    """Build the stable envelope while retaining established result fields."""
 
     status = LiteratureStatus(literature_status)
     failure = None if failure_state is None else FailureState(failure_state)
@@ -1159,7 +1159,7 @@ def _decode_expression_dag(
 
 
 def _validate_authoritative_operation(payload: Mapping[str, Any]) -> None:
-    """Recompute successful Phase-1 values from the exact DAG, never its printer."""
+    """Recompute successful exact values from the exact DAG, never its printer."""
 
     result_type = payload["result_type"]
     required_roots = {
