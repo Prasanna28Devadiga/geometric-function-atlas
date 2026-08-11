@@ -196,6 +196,17 @@ def test_snapshot_verification_is_fail_closed_and_reports_population(tmp_path: P
         verify_snapshot(database, manifest=manifest, raise_on_error=True)
 
 
+def test_manifest_preserves_optional_acquisition_provenance(tmp_path: Path) -> None:
+    _database, manifest = make_snapshot(tmp_path)
+    payload = SnapshotManifest.load(manifest).to_dict()
+    payload["source_url"] = "https://example.invalid/registry.sqlite"
+
+    restored = SnapshotManifest.from_dict(payload)
+
+    assert restored.source_url == "https://example.invalid/registry.sqlite"
+    assert restored.to_dict()["source_url"] == "https://example.invalid/registry.sqlite"
+
+
 def test_snapshot_install_copies_verified_database_without_write_access(tmp_path: Path) -> None:
     source, manifest = make_snapshot(tmp_path / "source")
     destination = tmp_path / "installed" / "registry.sqlite"
@@ -221,6 +232,8 @@ def test_typed_snapshot_queries_cover_the_website_registry_surface(tmp_path: Pat
         assert snapshot.evidence("sine")[0].evidence_type == "citation"
         assert snapshot.runs("sine")[0].direction == "screens"
         assert snapshot.papers(query="image processing")[0].id == 1
+        assert snapshot.papers(citation="10/demo")[0].id == 1
+        assert snapshot.papers(citation="@article{sine}")[0].id == 1
         assert snapshot.paper(1).claims[0].claim_type == "starlike"
         assert snapshot.applications("image_processing")[0].family_key == "sine"
         assert snapshot.counterexamples("sine")[0].property_name == "starlike"

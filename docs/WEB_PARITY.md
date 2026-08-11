@@ -1,8 +1,9 @@
 # Website → package parity
 
 The package is the local reproduction layer for the Geometric Function Atlas website.
-Each scientific webpage action should have one short `gfa` command and a
-Python function backed by the same implementation. A separate GUI is out of scope.
+Each capability represented in this table has one short `gfa` command and a
+Python function backed by the same implementation. Browser-only panels and a
+separate GUI are out of scope.
 
 | Website capability | Local package interface | State |
 |---|---|---|
@@ -20,8 +21,8 @@ Python function backed by the same implementation. A separate GUI is out of scop
 | Compare classes and hierarchy | `gfa compare` | **available** |
 | Inspect class application tags | `gfa applications` | available |
 | Inspect papers and reconciliation records | `gfa papers`, `gfa reconciliation` | available |
-| Reproduce Image Lab transformations | `gfa image-lab` | **available** (lab extra) |
-| Reproduce Cryptography Lab metrics | `gfa crypto-lab` | **available** (lab extra) |
+| Reproduce the Image Lab's finite coefficient-derived filters and metrics | `gfa image-lab` | **available** (lab extra; no analytic or conformal-warp claim) |
+| Reproduce Cryptography Lab benchmark metrics | `gfa crypto-lab` | **available** (lab extra; no security claim) |
 | Report registry snapshot statistics | `gfa stats` | available |
 
 ## Completion rule
@@ -34,9 +35,11 @@ A row is complete only when:
 4. the output clearly distinguishes a proof, a certified enclosure, a numerical
    screen, and an unresolved result.
 
-The registry database remains a separately versioned snapshot. Snapshot selection,
-provenance, and integrity checks may be handled internally; ordinary users should not
-need to understand those details to run a command.
+The registry database remains a separately versioned snapshot. The package does
+not bundle it and does not currently publish a canonical snapshot URL. Users
+provide the database and matching manifest explicitly; `gfa snapshot install`
+verifies hashes, populations, and SQLite integrity before installation, while
+paper facets can search citation metadata as well as claims and tags.
 
 The package ships the complete lightweight parity surface represented by this
 table: deterministic generator/class computations, SVG visualizations, baked

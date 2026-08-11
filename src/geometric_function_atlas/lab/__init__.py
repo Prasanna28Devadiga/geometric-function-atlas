@@ -9,6 +9,21 @@ from __future__ import annotations
 
 from typing import Any
 
+SPECIAL_FUNCTIONS = (
+    "miller_ross",
+    "mittag_leffler",
+    "bessel",
+    "hypergeometric",
+    "rabotnov",
+    "struve",
+    "cardioid",
+    "sine",
+    "nephroid",
+    "exp_cardioid",
+    "quartic",
+    "cusp",
+)
+
 _CRYPTO_EXPORTS = frozenset(
     {
         "AES_SBOX",
@@ -24,6 +39,7 @@ _IMAGE_EXPORTS = frozenset(
         "image_metrics",
         "image_metrics_record",
         "sample_image",
+        "special_function_coefficients",
         "transform_record",
     }
 )
@@ -61,6 +77,6 @@ def __getattr__(name: str) -> Any:
     raise AttributeError(f"geometric_function_atlas.lab has no attribute {name!r}")
 
 
-__all__ = ("lab_available", "require_lab") + tuple(
+__all__ = ("SPECIAL_FUNCTIONS", "lab_available", "require_lab") + tuple(
     sorted(_CRYPTO_EXPORTS)
 ) + tuple(sorted(_IMAGE_EXPORTS))

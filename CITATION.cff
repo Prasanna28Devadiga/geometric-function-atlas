@@ -2,8 +2,8 @@ cff-version: 1.2.0
 title: geometric-function-atlas
 message: "If you use this software, please cite the software release and the associated paper."
 type: software
-version: 0.1.1
-date-released: 2026-08-10
+version: 0.2.0
+date-released: 2026-08-11
 authors:
   - family-names: Devadiga
     given-names: Prasanna

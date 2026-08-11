@@ -58,11 +58,15 @@ Status: shipped behind the `lab` extra (NumPy).
 
 ## Registry snapshots and reconciliation
 
-Planned. The registry database is a separately versioned snapshot with
-schemas and checksums; snapshot selection and integrity checks are internal.
-Typed verdicts (known general, specific known, candidate improvement,
-contradiction, no extracted claim, unresolved) will be separate from
-computational evidence, and no automated novelty declaration will be emitted.
+Status: shipped as a user-supplied snapshot boundary. The registry database is
+not bundled in the wheel and this package does not currently publish a
+canonical snapshot URL. Users install a database plus matching manifest with
+`gfa snapshot install SOURCE DESTINATION --manifest MANIFEST`; the manifest
+records hashes, populations, and an optional HTTPS `source_url`. Snapshot
+selection and integrity checks are local and fail closed. Typed verdicts
+(known general, specific known, candidate improvement, contradiction, no
+extracted claim, unresolved) remain separate from computational evidence, and
+no automated novelty declaration is emitted.
 
 ## Paper-level reproduction
 

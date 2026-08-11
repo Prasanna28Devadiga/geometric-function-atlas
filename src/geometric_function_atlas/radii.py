@@ -651,7 +651,7 @@ def _replay_chain(source: str, target: str, steps: list[ReplayStep], *, dps: int
 
 
 def _load_json(name: str) -> dict[str, Any]:
-    resource = resources.files("geometric_function_atlas").joinpath("data", name)
+    resource = resources.files("geometric_function_atlas").joinpath("data").joinpath(name)
     try:
         return json.loads(resource.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -661,7 +661,7 @@ def _load_json(name: str) -> dict[str, Any]:
 def _resource_sha256(name: str) -> str:
     import hashlib
 
-    resource = resources.files("geometric_function_atlas").joinpath("data", name)
+    resource = resources.files("geometric_function_atlas").joinpath("data").joinpath(name)
     return hashlib.sha256(resource.read_bytes()).hexdigest()
 
 

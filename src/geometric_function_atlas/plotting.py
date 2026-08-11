@@ -321,9 +321,9 @@ def write_coefficient_plot(
     svg = "\n".join(
         [
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">',
-            f"  <title id=\\\"title\\\">{escape(title)}</title>",
-            f"  <desc id=\\\"desc\\\">{escape(subtitle)}. Coefficient magnitudes of the displayed Taylor polynomial.</desc>",
-            "  <rect width=\\\"100%\\\" height=\\\"100%\\\" fill=\\\"#fbfaf7\\\"/>",
+            f'  <title id="title">{escape(title)}</title>',
+            f'  <desc id="desc">{escape(subtitle)}. Coefficient magnitudes of the displayed Taylor polynomial.</desc>',
+            '  <rect width="100%" height="100%" fill="#fbfaf7"/>',
             "  <style>.bar{fill:#265d8f}.tick{font:13px ui-monospace,monospace;fill:#5f6872;text-anchor:middle}.value{font:12px ui-monospace,monospace;fill:#18212b;text-anchor:middle}.title{font:600 24px system-ui,sans-serif;fill:#18212b}.subtitle{font:15px ui-monospace,monospace;fill:#5f6872}.axis{stroke:#9aa3ad;stroke-width:1}</style>",
             f'  <text class="title" x="42" y="36">{escape(title)}</text>',
             f'  <text class="subtitle" x="42" y="64">{escape(subtitle)}</text>',
@@ -404,7 +404,7 @@ def write_real_part_plot(
     if isinstance(grid, bool) or not isinstance(grid, int) or not 16 <= grid <= 256:
         raise ValueError("grid must be an integer between 16 and 256")
     values, title, generator_key, approximation = _resolve_plot_inputs(
-        generator, coefficients, order, label="Re(z f'/f) heatmap"
+        generator, coefficients, order, label="Re(z f'(z) / f(z)) heatmap"
     )
     width, height, pad = 900, 860, 40
     pad_top = 88
@@ -426,15 +426,15 @@ def write_real_part_plot(
             f'fill="{_diverging_color(float(quantity))}"/>'
         )
     subtitle = (
-        f"{approximation}; sampled Re(z f'/f) on |z| <= {rmax:g} "
+        f"{approximation}; sampled Re(z f'(z) / f(z)) on |z| <= {rmax:g} "
         "(red = negative, blue = positive). Numerical screen, not a proof."
     )
     svg = "\n".join(
         [
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">',
-            f"  <title id=\\\"title\\\">{escape(title)}</title>",
-            f"  <desc id=\\\"desc\\\">{escape(subtitle)}</desc>",
-            "  <rect width=\\\"100%\\\" height=\\\"100%\\\" fill=\\\"#fbfaf7\\\"/>",
+            f'  <title id="title">{escape(title)}</title>',
+            f'  <desc id="desc">{escape(subtitle)}</desc>',
+            '  <rect width="100%" height="100%" fill="#fbfaf7"/>',
             "  <style>.cell{stroke:none}.title{font:600 24px system-ui,sans-serif;fill:#18212b}.subtitle{font:15px ui-monospace,monospace;fill:#5f6872}.axis{stroke:#9aa3ad;stroke-width:1.4;fill:none}</style>",
             f'  <text class="title" x="42" y="36">{escape(title)}</text>',
             f'  <text class="subtitle" x="42" y="64">{escape(subtitle)}</text>',
@@ -502,9 +502,9 @@ def write_phase_plot(
     svg = "\n".join(
         [
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">',
-            f"  <title id=\\\"title\\\">{escape(title)}</title>",
-            f"  <desc id=\\\"desc\\\">{escape(subtitle)}</desc>",
-            "  <rect width=\\\"100%\\\" height=\\\"100%\\\" fill=\\\"#fbfaf7\\\"/>",
+            f'  <title id="title">{escape(title)}</title>',
+            f'  <desc id="desc">{escape(subtitle)}</desc>',
+            '  <rect width="100%" height="100%" fill="#fbfaf7"/>',
             "  <style>.cell{stroke:none}.title{font:600 24px system-ui,sans-serif;fill:#18212b}.subtitle{font:15px ui-monospace,monospace;fill:#5f6872}.axis{stroke:#9aa3ad;stroke-width:1.4;fill:none}</style>",
             f'  <text class="title" x="42" y="36">{escape(title)}</text>',
             f'  <text class="subtitle" x="42" y="64">{escape(subtitle)}</text>',

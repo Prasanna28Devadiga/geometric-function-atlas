@@ -8,7 +8,9 @@ This repository is intentionally separate from the registry website and its rese
 
 ## What you can do
 
-Every scientific operation on the website has a local command and a Python function. The table below is the complete shipped surface.
+Every operation represented in the package's parity table has a local command
+and a Python function. The table below is the complete shipped surface; browser-
+only panels and research-workspace workflows are explicit non-goals.
 
 | Website capability | CLI | Python function |
 |---|---|---|
@@ -31,7 +33,7 @@ Every scientific operation on the website has a local command and a Python funct
 | Query snapshot statistics, families, papers, evidence, and applications | `gfa stats|search|families|family|facts|evidence|runs|papers|paper|applications` | `RegistrySnapshot.stats()`, `.search()`, `.families()`, `.family()`, `.facts()`, `.evidence()`, `.runs()`, `.papers()`, `.paper()`, `.applications()` |
 | Query aliases, hierarchy, and stored witnesses | `gfa aliases|normalize-class|hierarchy|counterexamples` | `RegistrySnapshot.aliases()`, `.normalize_class()`, `.hierarchy()`, `.counterexamples()` |
 | Cryptography Lab S-box metrics (optional) | `gfa crypto-lab ...` | `geometric_function_atlas.lab.*` |
-| Image Lab metrics and transforms (optional) | `gfa image-lab ...` | `geometric_function_atlas.lab.*` |
+| Image Lab finite coefficient-derived filters, metrics, and transforms (optional) | `gfa image-lab ...` | `geometric_function_atlas.lab.*` |
 
 Result-printing commands accept `--json` for machine-readable output;
 file-writing commands (`plot`, `image-lab transform`, `image-lab sample`)
@@ -58,10 +60,28 @@ After restarting the terminal, run `gfa --version`. Existing `uv` users can
 install the GitHub release wheel directly:
 
 ```bash
-uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.1/geometric_function_atlas-0.1.1-py3-none-any.whl
+uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.2.0/geometric_function_atlas-0.2.0-py3-none-any.whl
 ```
 
 See `docs/INSTALL.md` for removal and maintainer installation from a local wheel.
+
+## Registry snapshot boundary
+
+The package does not bundle the mutable registry database, and no canonical snapshot URL is bundled.
+Snapshot users provide a user-supplied HTTPS database and matching manifest
+(the manifest can preserve its `source_url`), then verify
+and install it locally:
+
+```bash
+gfa snapshot install https://example.org/registry.sqlite \
+  ~/.cache/gft-registry/registry.sqlite --manifest registry.manifest.json
+gfa papers --citation 10.example/record \
+  --snapshot ~/.cache/gft-registry/registry.sqlite --manifest registry.manifest.json
+```
+
+The URL above is an illustrative caller input, not a package-hosted release
+asset. Snapshot hashes, required tables, populations, and SQLite integrity
+checks are authoritative; a snapshot does not certify the underlying claims.
 
 The optional Image Lab and Cryptography Lab operations need NumPy. Install with
 the `lab` extra:
@@ -71,6 +91,13 @@ uv tool install geometric-function-atlas --extra lab   # once published on PyPI
 # or locally:
 uv tool install --with "numpy>=1.24" dist/geometric_function_atlas-*.whl
 ```
+
+The optional crypto lab deliberately covers five named registry functions and
+two deterministic S-box constructions. Its outputs are benchmark metrics, never security claims; invertibility and empirical comparisons do not amount to
+provable cryptographic security. The image lab is likewise an empirical
+transform/metric sandbox. It exposes the finite coefficient-derived filter
+subset used by the website's named functions, but does not claim analytic
+special-function or conformal-warp parity.
 
 ## Python API
 

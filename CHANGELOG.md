@@ -2,7 +2,7 @@
 
 All notable changes to Geometric Function Atlas are recorded here.
 
-## Unreleased
+## 0.2.0 — 2026-08-11
 
 ### Added
 
@@ -23,6 +23,14 @@ All notable changes to Geometric Function Atlas are recorded here.
   deterministic generated arrays. Crypto outputs are benchmark metrics,
   never security claims; image outputs are empirical.
 - `lab` extra and CI coverage for the optional labs.
+- Python 3.10-compatible typing in the snapshot module and neutral-install
+  checks for the public CLI.
+- Certificate replay records that distinguish artifact lookup, candidate
+  attainment, upper-bound consistency/certification, and independently proven
+  sharpness. Non-sharp source records remain `certified_enclosure`.
+- Citation-aware paper facets (`journal`, `doi`, `citation`) and optional
+  acquisition URLs preserved in snapshot manifests.
+- Valid 3x3, 5x5, and 7x7 image-lab tap handling and XML-valid SVG metadata.
 
 ## 0.1.1 — 2026-08-10
 

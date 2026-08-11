@@ -36,6 +36,7 @@ from .contracts import (
 )
 from .counterexamples import find_counterexample, verify_counterexample
 from .fekete_szego import fekete_szego
+from .lab import SPECIAL_FUNCTIONS
 from .plotting import write_plot
 from .radii import (
     RadiusStatus,
@@ -377,6 +378,9 @@ def _snapshot_papers(args: argparse.Namespace) -> None:
                     query=args.query,
                     author=args.author,
                     year=args.year,
+                    journal=args.journal,
+                    doi=args.doi,
+                    citation=args.citation,
                     class_key=args.class_key,
                     tag=args.tag,
                     claim=args.claim,
@@ -820,10 +824,15 @@ def _image_lab(args: argparse.Namespace) -> None:
 
     array = np.load(args.input)
     output = apply_image_transform(
-        array, args.operation, gain=args.gain, taps=args.taps
+        array,
+        args.operation,
+        gain=args.gain,
+        taps=args.taps,
+        function=args.function,
     )
     np.save(args.output, output)
-    print(f"Wrote {args.operation} transform {output.shape} to {args.output}")
+    function_label = f" ({args.function})" if args.function else ""
+    print(f"Wrote {args.operation}{function_label} transform {output.shape} to {args.output}")
     print("Scope: empirical convolution transform; not a GFT theorem")
 
 
@@ -841,12 +850,13 @@ def _artifact_emit(
     canonical_inputs: dict[str, Any] | None = None,
     evidence_status: str = "screened",
     record_count: int | None = None,
+    verification: VerificationReport | None = None,
 ) -> None:
     if isinstance(record, list):
         record = {"count": len(record), "rows": record}
     if record_count is None:
         record_count = int(record.get("count", 1)) if isinstance(record, dict) else 1
-    verification = VerificationReport(
+    verification = verification or VerificationReport(
         (
             VerificationCheck(
                 name="artifact_lookup",
@@ -982,12 +992,60 @@ def _artifact_references(args: argparse.Namespace) -> None:
 
 
 def _artifact_certificate(args: argparse.Namespace) -> None:
+    record = _artifact_data.verify_certificate(args.name)
+    checks = [
+        VerificationCheck(
+            name="artifact_lookup",
+            checked="requested certificate record",
+            expected="present",
+            observed=args.name,
+            status=CheckStatus.PASS,
+            scope="versioned package data lookup",
+        ),
+        VerificationCheck(
+            name="candidate_attainment",
+            checked="functional value matches the stored extremal candidate",
+            expected=True,
+            observed=record["attained_candidate"],
+            status=CheckStatus.PASS if record["attained_candidate"] else CheckStatus.FAIL,
+            scope="certificate replay (exact Schur machinery)",
+            failure_reason=None if record["attained_candidate"] else "candidate mismatch",
+        ),
+        VerificationCheck(
+            name="upper_bound_consistency",
+            checked="replayed value lies within the declared upper bound + slack",
+            expected=True,
+            observed=record["upper_bound_consistent"],
+            status=CheckStatus.PASS if record["upper_bound_consistent"] else CheckStatus.FAIL,
+            scope="certificate replay (exact Schur machinery)",
+            failure_reason=None if record["upper_bound_consistent"] else "upper-bound mismatch",
+        ),
+        VerificationCheck(
+            name="upper_bound_certification",
+            checked="source certificate declares a certified upper bound",
+            expected=True,
+            observed=record["upper_bound_certified"],
+            status=CheckStatus.PASS if record["upper_bound_certified"] else CheckStatus.FAIL,
+            scope="versioned certificate metadata; replay does not establish sharpness",
+            failure_reason=None if record["upper_bound_certified"] else "upper bound is not certified",
+        ),
+        VerificationCheck(
+            name="sharpness_proof",
+            checked="stored certificate proves sharpness, rather than only attainment",
+            expected=True,
+            observed=record["sharpness_proven"],
+            status=CheckStatus.PASS if record["sharpness_proven"] else CheckStatus.SKIP,
+            scope="versioned certificate metadata",
+            required=False,
+        ),
+    ]
     _artifact_emit(
         args,
         result_type="certificate_replay",
-        record=_artifact_data.verify_certificate(args.name),
+        record=record,
         canonical_inputs={"name": args.name},
-        evidence_status="proven_exact_under_declared_assumptions",
+        evidence_status=record["evidence_status"],
+        verification=VerificationReport(tuple(checks)),
     )
 
 
@@ -1194,6 +1252,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     image_transform.add_argument("--gain", type=float, default=1.0)
     image_transform.add_argument("--taps", type=int, default=3, choices=[3, 5, 7])
+    image_transform.add_argument("--function", choices=SPECIAL_FUNCTIONS)
     image_transform.set_defaults(handler=_image_lab)
     image_sample = image_sub.add_parser("sample", help="write a deterministic sample array")
     image_sample.add_argument("--output", required=True, help="output .npy file")
@@ -1289,6 +1348,9 @@ def _parser() -> argparse.ArgumentParser:
     papers.add_argument("--query")
     papers.add_argument("--author")
     papers.add_argument("--year", type=int)
+    papers.add_argument("--journal")
+    papers.add_argument("--doi")
+    papers.add_argument("--citation", help="search DOI, BibTeX, journal, or filename")
     papers.add_argument("--class-key")
     papers.add_argument("--tag")
     papers.add_argument("--claim")

@@ -1,6 +1,6 @@
 # Structured result and verification contract
 
-The `v0.1.x` result contract is schema version `1`. It is shared by the
+The `v0.2.x` result contract is schema version `1`. It is shared by the
 shipped structured results and is the envelope intended for future certificate
 replay and snapshot operations. It is deliberately separate from the live
 registry website and from any mutable database.
@@ -8,7 +8,7 @@ registry website and from any mutable database.
 ## Success records
 
 `GeneratorSeriesResult.to_dict()` and `FeketeSzegoResult.to_dict()` retain the
-legacy `v0.1.x` fields and add the following closed envelope:
+legacy `v0.2.x` fields and add the following closed envelope:
 
 - `schema_version`: integer contract version (`1`);
 - `result_type`: trusted operation name;

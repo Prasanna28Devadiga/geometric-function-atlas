@@ -92,7 +92,7 @@ _GAMMA_STRING = re.compile(r"^[+-]?[0-9]+(?:/[0-9]+)?$", re.ASCII)
 
 def _data_file(name: str) -> Any:
     """Return the packaged resource handle for one baked artifact."""
-    return resources.files("geometric_function_atlas").joinpath("data", name)
+    return resources.files("geometric_function_atlas").joinpath("data").joinpath(name)
 
 
 @cache
@@ -670,7 +670,28 @@ def verify_certificate(name: str) -> dict[str, Any]:
     expected_exact = candidate.get("value_exact")
     expected_float = candidate.get("value_float")
 
-    checks: list[VerificationCheck] = []
+    artifact_lookup = True
+    upper_bound_certified = certificate.get("status") == "PROVED"
+    sharpness_proven = sharp.get("proven") is True
+    checks: list[VerificationCheck] = [
+        VerificationCheck(
+            name="artifact_lookup",
+            checked="requested certificate record",
+            expected="present",
+            observed=name,
+            status=CheckStatus.PASS,
+            scope="versioned package data lookup",
+        ),
+        VerificationCheck(
+            name="upper_bound_certification",
+            checked="source certificate declares a certified upper bound",
+            expected="status=PROVED",
+            observed=certificate.get("status"),
+            status=CheckStatus.PASS if upper_bound_certified else CheckStatus.FAIL,
+            scope="versioned certificate metadata; replay does not establish sharpness",
+            failure_reason=None if upper_bound_certified else "certificate is not marked PROVED",
+        ),
+    ]
     if expected_exact is not None:
         try:
             parsed = parse_exact_expression(str(expected_exact))
@@ -721,6 +742,11 @@ def verify_certificate(name: str) -> dict[str, Any]:
         raise CorruptArtifactError(
             f"certificate {name} failed replay: {detail}"
         )
+    evidence_status = (
+        "proven_exact_under_declared_assumptions"
+        if sharpness_proven
+        else "certified_enclosure"
+    )
     return {
         "name": name,
         "class_key": class_key,
@@ -732,7 +758,14 @@ def verify_certificate(name: str) -> dict[str, Any]:
         "bound": certificate.get("bound"),
         "bound_float": bound_float,
         "slack": slack,
-        "sharp": bool(sharp.get("proven")),
+        "sharp": sharpness_proven,
+        "artifact_lookup": artifact_lookup,
+        "attained_candidate": attained,
+        "upper_bound_consistent": bound_consistent,
+        "upper_bound_certified": upper_bound_certified,
+        "sharpness_proven": sharpness_proven,
+        "evidence_status": evidence_status,
+        "verification": report.to_dict(),
         "matched": True,
     }
 

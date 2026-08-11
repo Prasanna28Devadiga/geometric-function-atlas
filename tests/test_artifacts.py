@@ -310,6 +310,46 @@ def test_certificate_replay_passes_for_float_gamma_enclosure() -> None:
     assert record["sharp"] is False
 
 
+def test_certificate_replay_keeps_lookup_attainment_bound_and_sharpness_distinct() -> None:
+    record = gfa.verify_certificate("bean_tanh__hankel2_2")
+
+    assert record["artifact_lookup"] is True
+    assert record["attained_candidate"] is True
+    assert record["upper_bound_consistent"] is True
+    assert record["upper_bound_certified"] is True
+    assert record["sharpness_proven"] is False
+    assert record["evidence_status"] == "certified_enclosure"
+
+
+def test_certificate_replay_sharp_anchor_reports_exact_evidence() -> None:
+    record = gfa.verify_certificate("starlike__fekete_szego_mu1")
+
+    assert record["artifact_lookup"] is True
+    assert record["attained_candidate"] is True
+    assert record["upper_bound_certified"] is True
+    assert record["sharpness_proven"] is True
+    assert record["evidence_status"] == "proven_exact_under_declared_assumptions"
+
+
+def test_certificate_replay_nonsharp_negative_control_cannot_promote_string_flag(
+    monkeypatch,
+) -> None:
+    source = artifacts_module._load_json("certificates.json")["certificates"]
+    nonsharp = json.loads(json.dumps(source["bean_tanh__hankel2_2"]))
+    nonsharp["sharp"]["proven"] = "false"
+
+    monkeypatch.setattr(
+        artifacts_module,
+        "_certificates",
+        lambda: {"bean_tanh__hankel2_2": nonsharp},
+    )
+
+    record = gfa.verify_certificate("bean_tanh__hankel2_2")
+
+    assert record["sharpness_proven"] is False
+    assert record["evidence_status"] == "certified_enclosure"
+
+
 def test_certificate_replay_covers_the_entire_corpus() -> None:
     certificates = artifacts_module._load_json(
         "certificates.json"

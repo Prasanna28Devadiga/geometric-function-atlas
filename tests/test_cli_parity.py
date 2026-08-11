@@ -49,6 +49,35 @@ def test_crypto_construct_fails_closed_without_lab_extra() -> None:
     assert payload["failure_state"] == "unsupported"
 
 
+def test_image_transform_exposes_named_function_kernel(tmp_path: Path) -> None:
+    if importlib.util.find_spec("numpy") is None:
+        pytest.skip("image lab requires the optional numpy dependency")
+    import numpy as np
+
+    source = tmp_path / "source.npy"
+    target = tmp_path / "target.npy"
+    np.save(source, np.full((8, 8), 0.5))
+
+    completed = run_cli(
+        "image-lab",
+        "transform",
+        "--input",
+        str(source),
+        "--output",
+        str(target),
+        "--operation",
+        "smooth",
+        "--function",
+        "sine",
+        "--taps",
+        "5",
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert target.is_file()
+    assert np.allclose(np.load(target), 0.5)
+
+
 def test_broken_pipe_on_stdout_exits_quietly_with_io_code(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -167,7 +167,7 @@
         "status": {"enum": ["pass", "fail", "skip"]},
         "scope": {"type": "string", "minLength": 1},
         "failure_reason": {"type": ["string", "null"]},
-        "required": {"const": true}
+        "required": {"type": "boolean"}
       },
       "allOf": [
         {"if": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}, "then": {"properties": {"failure_reason": {"type": "string", "minLength": 1}}}},

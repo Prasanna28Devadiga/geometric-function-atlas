@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from shutil import which
 from types import MappingProxyType, TracebackType
-from typing import Any, Self, cast
+from typing import Any, TypeVar, cast
 
 from .contracts import CorruptArtifactError, ResourceLimitError, UnsupportedError
 
@@ -31,6 +31,8 @@ MANIFEST_SCHEMA_VERSION = 1
 DEFAULT_MAX_COMPRESSED_BYTES = 512 * 1024 * 1024
 DEFAULT_MAX_DECOMPRESSED_BYTES = 2 * 1024 * 1024 * 1024
 _SHA256_LENGTH = 64
+_SnapshotManifestT = TypeVar("_SnapshotManifestT", bound="SnapshotManifest")
+_RegistrySnapshotT = TypeVar("_RegistrySnapshotT", bound="RegistrySnapshot")
 
 
 class SnapshotError(CorruptArtifactError):
@@ -64,6 +66,7 @@ class SnapshotManifest:
     compressed_bytes: int | None = None
     compressed_sha256: str | None = None
     package_commit: str | None = None
+    source_url: str | None = None
 
     def __post_init__(self) -> None:
         if self.manifest_schema_version != MANIFEST_SCHEMA_VERSION:
@@ -102,11 +105,17 @@ class SnapshotManifest:
             _validate_hash(self.compressed_sha256, "compressed.sha256")
         elif self.compressed_bytes is not None or self.compressed_sha256 is not None:
             raise SnapshotManifestError("compressed metadata is incomplete")
+        if self.source_url is not None:
+            parsed_url = urllib.parse.urlparse(self.source_url)
+            if parsed_url.scheme not in {"http", "https"} or not parsed_url.netloc:
+                raise SnapshotManifestError("source_url must be an absolute HTTP(S) URL")
         object.__setattr__(self, "application_tables", tuple(sorted(self.application_tables)))
         object.__setattr__(self, "row_counts", MappingProxyType(dict(sorted(self.row_counts.items()))))
 
     @classmethod
-    def from_dict(cls, payload: Mapping[str, Any]) -> Self:
+    def from_dict(  # noqa: PYI019 -- typing.Self is unavailable on Python 3.10
+        cls: type[_SnapshotManifestT], payload: Mapping[str, Any]
+    ) -> _SnapshotManifestT:
         if not isinstance(payload, Mapping):
             raise SnapshotManifestError("manifest must be a JSON object")
         # The audited release nests the useful fields under `snapshot`; accepting
@@ -145,10 +154,13 @@ class SnapshotManifest:
             compressed_bytes=(compressed or {}).get("bytes"),
             compressed_sha256=(compressed or {}).get("sha256"),
             package_commit=package_commit,
+            source_url=cast(str | None, root.get("source_url", payload.get("source_url"))),
         )
 
     @classmethod
-    def load(cls, path: str | os.PathLike[str]) -> Self:
+    def load(  # noqa: PYI019 -- typing.Self is unavailable on Python 3.10
+        cls: type[_SnapshotManifestT], path: str | os.PathLike[str]
+    ) -> _SnapshotManifestT:
         manifest_path = Path(path)
         try:
             payload = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -179,6 +191,8 @@ class SnapshotManifest:
             }
         if self.package_commit is not None:
             result["package"] = {"commit": self.package_commit}
+        if self.source_url is not None:
+            result["source_url"] = self.source_url
         return result
 
 
@@ -869,13 +883,13 @@ class RegistrySnapshot:
         self.manifest = manifest
 
     @classmethod
-    def open(
-        cls,
+    def open(  # noqa: PYI019 -- typing.Self is unavailable on Python 3.10
+        cls: type[_RegistrySnapshotT],
         path: str | os.PathLike[str],
         *,
         manifest: SnapshotManifest | Mapping[str, Any] | str | os.PathLike[str] | None = None,
         max_bytes: int = DEFAULT_MAX_DECOMPRESSED_BYTES,
-    ) -> Self:
+    ) -> _RegistrySnapshotT:
         snapshot_path = Path(path)
         if not snapshot_path.is_file():
             raise SnapshotIntegrityError(f"snapshot not found: {snapshot_path}")
@@ -915,7 +929,7 @@ class RegistrySnapshot:
     def close(self) -> None:
         self.connection.close()
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> "RegistrySnapshot":  # noqa: PYI034, UP037 -- Python 3.10-compatible annotation
         return self
 
     def __exit__(
@@ -1119,6 +1133,9 @@ class RegistrySnapshot:
         *,
         author: str | None = None,
         year: int | None = None,
+        journal: str | None = None,
+        doi: str | None = None,
+        citation: str | None = None,
         class_key: str | None = None,
         tag: str | None = None,
         claim: str | None = None,
@@ -1131,7 +1148,11 @@ class RegistrySnapshot:
         params: list[Any] = []
         if query:
             needle = f"%{query.strip().lower()}%"
-            clauses.append("lower(coalesce(p.title,'') || ' ' || coalesce(p.authors,'') || ' ' || coalesce(p.abstract,'')) LIKE ?")
+            clauses.append(
+                "lower(coalesce(p.title,'') || ' ' || coalesce(p.authors,'') || ' ' || "
+                "coalesce(p.journal,'') || ' ' || coalesce(p.doi,'') || ' ' || "
+                "coalesce(p.bibtex,'') || ' ' || coalesce(p.abstract,'')) LIKE ?"
+            )
             params.append(needle)
         if author:
             clauses.append("lower(coalesce(p.authors,'')) LIKE ?")
@@ -1139,6 +1160,18 @@ class RegistrySnapshot:
         if year is not None:
             clauses.append("p.year=?")
             params.append(year)
+        if journal:
+            clauses.append("lower(coalesce(p.journal,'')) LIKE ?")
+            params.append(f"%{journal.lower()}%")
+        if doi:
+            clauses.append("lower(coalesce(p.doi,'')) LIKE ?")
+            params.append(f"%{doi.lower()}%")
+        if citation:
+            clauses.append(
+                "lower(coalesce(p.doi,'') || ' ' || coalesce(p.bibtex,'') || ' ' || "
+                "coalesce(p.journal,'') || ' ' || coalesce(p.filename,'')) LIKE ?"
+            )
+            params.append(f"%{citation.lower()}%")
         if class_key:
             _require_tables(self.connection, "paper_class_tags")
             clauses.append("EXISTS (SELECT 1 FROM paper_class_tags pct WHERE pct.paper_id=p.id AND pct.class_key=?)")

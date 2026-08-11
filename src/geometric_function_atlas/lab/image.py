@@ -9,6 +9,8 @@ theorem is claimed. Import lazily through :mod:`geometric_function_atlas.lab`.
 
 from __future__ import annotations
 
+import math
+from collections.abc import Mapping
 from typing import Any
 
 import numpy as np
@@ -145,13 +147,17 @@ def _downsample2(a: np.ndarray) -> np.ndarray:
     ) / 4.0
 
 
-def _convolve3(a: np.ndarray, kernel: np.ndarray) -> np.ndarray:
-    """3x3 correlation with nearest-edge padding (scipy ``convolve`` parity)."""
+def _convolve(a: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    """Odd-sized correlation with nearest-edge padding."""
 
-    padded = np.pad(a, 1, mode="edge")
+    if kernel.ndim != 2 or kernel.shape[0] != kernel.shape[1] or kernel.shape[0] % 2 != 1:
+        raise ValueError("kernel must be a square array with odd side length")
+    side = kernel.shape[0]
+    pad = side // 2
+    padded = np.pad(a, pad, mode="edge")
     result = np.zeros_like(a, dtype=float)
-    for row in range(3):
-        for column in range(3):
+    for row in range(side):
+        for column in range(side):
             result += (
                 kernel[row, column]
                 * padded[row : row + a.shape[0], column : column + a.shape[1]]
@@ -166,8 +172,8 @@ def gmsd(reference: np.ndarray, test: np.ndarray, c: float = 170.0) -> float:
     t = _downsample2(_to_luma_255(test))
     hx = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]], dtype=float) / 3.0
     hy = hx.T
-    mr = np.sqrt(_convolve3(r, hx) ** 2 + _convolve3(r, hy) ** 2)
-    mt = np.sqrt(_convolve3(t, hx) ** 2 + _convolve3(t, hy) ** 2)
+    mr = np.sqrt(_convolve(r, hx) ** 2 + _convolve(r, hy) ** 2)
+    mt = np.sqrt(_convolve(t, hx) ** 2 + _convolve(t, hy) ** 2)
     gms = (2 * mr * mt + c) / (mr**2 + mt**2 + c)
     return float(np.sqrt(np.mean((gms - gms.mean()) ** 2)))
 
@@ -194,6 +200,121 @@ def image_metrics(reference: Any, test: Any) -> dict[str, Any]:
 
 _OPERATIONS = ("smooth", "sharpen", "edge")
 
+_SPECIAL_FUNCTION_DEFAULTS: dict[str, dict[str, float]] = {
+    "miller_ross": {"nu": 0.5, "rho": 0.8},
+    "mittag_leffler": {"alpha": 1.0, "beta": 1.0},
+    "bessel": {"nu": 0.0},
+    "hypergeometric": {"a": 1.0, "b": 1.0, "c": 2.0},
+    "rabotnov": {"alpha": 0.5, "beta": 1.0},
+    "struve": {"nu": 0.0},
+    "cardioid": {},
+    "sine": {},
+    "nephroid": {},
+    "exp_cardioid": {},
+    "quartic": {},
+    "cusp": {},
+}
+SPECIAL_FUNCTIONS = tuple(_SPECIAL_FUNCTION_DEFAULTS)
+
+
+def _function_parameters(
+    function: str,
+    parameters: Mapping[str, float] | None,
+) -> dict[str, float]:
+    if function not in _SPECIAL_FUNCTION_DEFAULTS:
+        raise ValueError(
+            f"unknown image-lab function {function!r}; available: "
+            f"{', '.join(SPECIAL_FUNCTIONS)}"
+        )
+    values = dict(_SPECIAL_FUNCTION_DEFAULTS[function])
+    if parameters is not None:
+        unknown = set(parameters) - set(values)
+        if unknown:
+            raise ValueError(
+                f"unknown parameters for {function}: {', '.join(sorted(unknown))}"
+            )
+        values.update(parameters)
+    if not all(
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+        for value in values.values()
+    ):
+        raise ValueError("image-lab function parameters must be finite real numbers")
+    return values
+
+
+def special_function_coefficients(
+    function: str,
+    *,
+    terms: int = 8,
+    parameters: Mapping[str, float] | None = None,
+) -> tuple[float, ...]:
+    """Return the website's normalized coefficients ``a_1, ..., a_terms``.
+
+    These finite coefficient rules reproduce the static Image Lab's named
+    special-function anchors. They support empirical filters only; they are not
+    analytic continuation or a theorem about an image-processing result.
+    """
+
+    if isinstance(terms, bool) or not isinstance(terms, int) or not 1 <= terms <= 64:
+        raise ValueError("terms must be an integer between 1 and 64")
+    values = _function_parameters(function, parameters)
+    nu = values.get("nu")
+    if function in {"miller_ross", "bessel"} and nu is not None and nu <= -1:
+        raise ValueError("nu must be greater than -1")
+    if function == "struve" and nu is not None and nu <= -1.5:
+        raise ValueError("nu must be greater than -1.5")
+    if function in {"mittag_leffler", "rabotnov"}:
+        alpha = values["alpha"]
+        beta = values["beta"]
+        if alpha <= 0 or beta <= 0:
+            raise ValueError("alpha and beta must be positive")
+    if function == "hypergeometric" and values["c"] <= 0:
+        raise ValueError("c must be positive")
+    coefficients: list[float] = []
+    for index in range(1, terms + 1):
+        k = index - 1
+        if function == "miller_ross":
+            value = values["rho"] ** k * math.gamma(values["nu"] + 1) / math.gamma(values["nu"] + index)
+        elif function == "mittag_leffler":
+            value = math.gamma(values["beta"]) / math.gamma(values["alpha"] * k + values["beta"])
+        elif function == "bessel":
+            value = (-0.25) ** k / (math.factorial(k) * math.prod(values["nu"] + 1 + offset for offset in range(k)))
+        elif function == "hypergeometric":
+            value = (
+                math.prod(values["a"] + offset for offset in range(k))
+                * math.prod(values["b"] + offset for offset in range(k))
+                / (
+                    math.prod(values["c"] + offset for offset in range(k))
+                    * math.factorial(k)
+                )
+            )
+        elif function == "rabotnov":
+            value = values["beta"] ** k * math.gamma(values["alpha"] + 1) / math.gamma((values["alpha"] + 1) * index)
+        elif function == "struve":
+            value = 1.0 if index == 1 else (-1) ** k / (
+                4**k
+                * math.prod(1.5 + offset for offset in range(k))
+                * math.prod(values["nu"] + 1.5 + offset for offset in range(k))
+            )
+        elif function == "cardioid":
+            value = {0: 1.0, 1: 4 / 3, 2: 2 / 3}.get(k, 0.0)
+        elif function == "sine":
+            value = 1.0 if k == 0 else ((-1) ** ((k - 1) // 2) / math.factorial(k) if k % 2 else 0.0)
+        elif function == "nephroid":
+            value = {0: 1.0, 1: 1.0, 3: 1 / 3}.get(k, 0.0)
+        elif function == "exp_cardioid":
+            value = 1.0 if k == 0 else 1 / math.factorial(k - 1)
+        elif function == "quartic":
+            value = {0: 1.0, 1: 4 / 5, 4: 1 / 5}.get(k, 0.0)
+        else:  # cusp
+            value = {1: 1.0, 2: 0.75, 3: 0.5, 4: 0.375}.get(index, 0.0)
+        if not math.isfinite(value):
+            raise ValueError(f"{function} produced a non-finite coefficient")
+        coefficients.append(float(value))
+    return tuple(coefficients)
+
 
 def _kernel(operation: str, taps: int, gain: float) -> Any:
     if operation == "smooth":
@@ -208,18 +329,63 @@ def _kernel(operation: str, taps: int, gain: float) -> Any:
     return sobel_x, sobel_y
 
 
+def _function_kernel(
+    function: str,
+    operation: str,
+    taps: int,
+    gain: float,
+    parameters: Mapping[str, float] | None,
+) -> np.ndarray:
+    """Build the static Image Lab's coefficient-derived directional kernel."""
+
+    coefficients = special_function_coefficients(
+        function, terms=taps + 1, parameters=parameters
+    )
+    side = np.abs(np.asarray(coefficients[1:], dtype=float))
+    vector = np.concatenate((side[::-1], np.array([1.0]), side))
+    vector /= vector.sum()
+    size = vector.size
+    center = size // 2
+    low_pass = np.zeros((size, size), dtype=float)
+    for angle in (0, 45, 90, 135):
+        directional = np.zeros_like(low_pass)
+        for index, weight in enumerate(vector):
+            offset = index - center
+            if angle == 0:
+                row, column = center, center + offset
+            elif angle == 90:
+                row, column = center + offset, center
+            elif angle == 45:
+                row, column = center - offset, center + offset
+            else:
+                row, column = center + offset, center + offset
+            if 0 <= row < size and 0 <= column < size:
+                directional[row, column] += weight
+        low_pass += directional / 4.0
+    identity = np.zeros_like(low_pass)
+    identity[center, center] = 1.0
+    if operation == "smooth":
+        return low_pass
+    if operation == "edge":
+        return gain * (identity - low_pass)
+    return identity + gain * (identity - low_pass)
+
+
 def apply_image_transform(
     array: Any,
     operation: str,
     *,
     gain: float = 1.0,
     taps: int = 3,
+    function: str | None = None,
+    parameters: Mapping[str, float] | None = None,
 ) -> np.ndarray:
     """Apply a deterministic convolution transform to a float array in [0, 1].
 
-    Operations: ``smooth`` (box filter), ``sharpen`` (identity minus the
-    Laplacian, scaled by ``gain``), ``edge`` (Sobel magnitude). Output is
-    clipped to ``[0, 1]``. Empirical transform, not a GFT theorem.
+    Operations without ``function`` are dependency-free generic transforms.
+    Supplying one of :data:`SPECIAL_FUNCTIONS` uses the website's finite
+    coefficient-derived directional kernel. Output is clipped to ``[0, 1]``;
+    every result is an empirical transform, not a GFT theorem.
     """
 
     if operation not in _OPERATIONS:
@@ -233,15 +399,24 @@ def apply_image_transform(
     values = _as_float_array(array, label="array")
     channels = values[..., None] if values.ndim == 2 else values
     result = np.zeros_like(channels, dtype=float)
+    function_kernel = (
+        _function_kernel(function, operation, taps, gain, parameters)
+        if function is not None
+        else None
+    )
     for channel in range(channels.shape[2]):
-        if operation == "edge":
+        if function_kernel is not None:
+            result[..., channel] = _convolve(
+                channels[..., channel], function_kernel
+            )
+        elif operation == "edge":
             sobel_x, sobel_y = _kernel("edge", taps, gain)
-            gx = _convolve3(channels[..., channel], sobel_x)
-            gy = _convolve3(channels[..., channel], sobel_y)
+            gx = _convolve(channels[..., channel], sobel_x)
+            gy = _convolve(channels[..., channel], sobel_y)
             result[..., channel] = np.sqrt(gx**2 + gy**2)
         else:
             kernel = _kernel(operation, taps, gain)
-            result[..., channel] = _convolve3(channels[..., channel], kernel)
+            result[..., channel] = _convolve(channels[..., channel], kernel)
     result = np.clip(result, 0.0, 1.0)
     return result[..., 0] if values.ndim == 2 else result
 
@@ -320,6 +495,8 @@ def transform_record(
     *,
     gain: float = 1.0,
     taps: int = 3,
+    function: str | None = None,
+    parameters: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
     """Wrap a transform run in the closed analysis-record shape."""
 
@@ -329,7 +506,14 @@ def transform_record(
         VerificationReport,
     )
 
-    output = apply_image_transform(array, operation, gain=gain, taps=taps)
+    output = apply_image_transform(
+        array,
+        operation,
+        gain=gain,
+        taps=taps,
+        function=function,
+        parameters=parameters,
+    )
     return build_screen_record(
         record_type="lab_metrics",
         canonical_inputs={"metric_family": "image_transform"},
@@ -369,6 +553,8 @@ def transform_record(
             "operation": operation,
             "gain": gain,
             "taps": taps,
+            "function": function,
+            "parameters": dict(parameters) if parameters is not None else None,
             "input_shape": list(array.shape),
             "output_shape": list(output.shape),
             "output_min": float(output.min()),

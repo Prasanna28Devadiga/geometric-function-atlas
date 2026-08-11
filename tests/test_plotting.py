@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from xml.etree import ElementTree
 
 import pytest
 
@@ -83,6 +84,13 @@ def test_coefficient_plot_accepts_raw_coefficients(tmp_path: Path) -> None:
     assert text.count('<rect class="bar"') == 3
 
 
+def test_coefficient_plot_is_well_formed_xml(tmp_path: Path) -> None:
+    output = tmp_path / "bars.xml.svg"
+    write_coefficient_plot(output, coefficients=(1.0, 0.25))
+
+    ElementTree.parse(output)
+
+
 def test_real_part_plot_writes_heatmap(tmp_path: Path) -> None:
     output = tmp_path / "realpart.svg"
     result = write_real_part_plot(output, coefficients=(1.0,))
@@ -93,12 +101,28 @@ def test_real_part_plot_writes_heatmap(tmp_path: Path) -> None:
     assert "negative" in text or "Re" in text
 
 
+def test_real_part_plot_is_well_formed_xml_and_names_its_quantity(tmp_path: Path) -> None:
+    output = tmp_path / "realpart.xml.svg"
+    write_real_part_plot(output, coefficients=(1.0,), grid=16)
+
+    ElementTree.parse(output)
+    text = output.read_text(encoding="utf-8")
+    assert "Re(z f'(z) / f(z))" in text
+
+
 def test_phase_plot_writes_portrait(tmp_path: Path) -> None:
     output = tmp_path / "phase.svg"
     result = write_phase_plot(output, coefficients=(0.25,))
     text = result.output.read_text(encoding="utf-8")
     assert "<svg" in text
     assert "phase" in text.lower()
+
+
+def test_phase_plot_is_well_formed_xml(tmp_path: Path) -> None:
+    output = tmp_path / "phase.xml.svg"
+    write_phase_plot(output, coefficients=(0.25,), grid=16)
+
+    ElementTree.parse(output)
 
 
 def test_write_plot_dispatches_on_kind(tmp_path: Path) -> None:

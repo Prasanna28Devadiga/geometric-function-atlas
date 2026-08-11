@@ -26,6 +26,17 @@ def test_readme_uses_operation_language_not_public_release_phases() -> None:
     assert "gfa plot sine --order 12 --output sine-domain.svg" in readme
 
 
+def test_readme_states_snapshot_acquisition_and_lab_scope() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "no canonical snapshot URL is bundled" in readme
+    assert "user-supplied HTTPS database and matching manifest" in readme
+    assert "five named registry functions" in readme
+    assert "benchmark metrics, never security claims" in readme
+    assert "does not claim analytic" in readme
+    assert "conformal-warp parity" in readme
+
+
 def test_public_docs_do_not_expose_internal_phase_nomenclature() -> None:
     public_docs = (
         ROOT / "README.md",

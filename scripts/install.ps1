@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$ReleaseWheel = "https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.1/geometric_function_atlas-0.1.1-py3-none-any.whl"
+$ReleaseWheel = "https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.2.0/geometric_function_atlas-0.2.0-py3-none-any.whl"
 $PackageSpec = if ($env:GFA_PACKAGE_SPEC) { $env:GFA_PACKAGE_SPEC } else { $ReleaseWheel }
 $PythonVersion = if ($env:GFA_PYTHON_VERSION) { $env:GFA_PYTHON_VERSION } else { "3.12" }
 $UvInstallDir = if ($env:UV_INSTALL_DIR) { $env:UV_INSTALL_DIR } else { Join-Path $HOME ".local\bin" }

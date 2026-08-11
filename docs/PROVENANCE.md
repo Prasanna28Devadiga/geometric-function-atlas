@@ -98,6 +98,10 @@ The original registry repository is treated as a research artifact and source of
 Registry data is not package code and is never bundled into the wheel. A snapshot
 manifest is the identity boundary: it records the dataset version, decompressed
 SQLite byte count and SHA-256, required application tables, and row populations.
+There is no canonical snapshot URL bundled with this software. When a user
+acquires a snapshot from an independently published source, the manifest may
+preserve that HTTPS `source_url`; the database URL and manifest URL remain
+caller-supplied inputs rather than an implied package release asset.
 Compressed assets additionally carry their own byte count and SHA-256. Installation
 verifies the compressed asset, enforces compressed/decompressed resource limits,
 opens the result with SQLite read-only and immutable flags, and checks both
@@ -108,3 +112,10 @@ snapshot: row populations and required tables are checked as well. Snapshot fact
 paper claims, evidence records, and application associations remain observations
 from the selected dataset. They do not by themselves establish a theorem,
 application effectiveness, or literature novelty.
+
+Certificate replay has a separate evidence boundary: lookup confirms the
+requested versioned record exists; replay checks the stored candidate is
+attained and is consistent with the declared upper bound; only a source record
+with an explicit sharpness proof receives
+`proven_exact_under_declared_assumptions`. A non-sharp record can therefore
+report a certified upper-bound enclosure without being labelled sharp.
