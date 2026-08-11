@@ -49,6 +49,39 @@ CLI rational parameters use a bounded signed-integer or `integer/integer`
 grammar. Exponent notation is intentionally unsupported, and rational
 components are capped before symbolic arithmetic begins.
 
+## Directed-radius snapshot and certificate replay
+
+The package ships two immutable data artifacts:
+
+- `radii_snapshot.json`, a 702-row directed snapshot from source commit
+  `cf0b2b0a3539ccc7ea9dcae679afd1cd0471b5bd`; and
+- `radius_certificate_fixture.json`, the eight-row reviewed source crosswalk
+  from `73515129716c70d4287e2e228d15633e6ccb45f2`.
+
+The SHA-256 values are recorded in `geometric_function_atlas.version` and are
+checked before the catalog is loaded. Provenance locators use stable artifact
+names and row/lane identifiers rather than checkout paths. A radius is always
+identified as `source->target`; lookup never silently swaps that direction.
+
+Radius status is evidence taxonomy, not a claim that every stored number has a
+proof. The five statuses are `touch_proven_exact`, `closed_form_confirmed`,
+`trivial_containment`, `unidentified`, and `audit_required`. The first two
+describe different strengths of radius evidence; `trivial_containment` is a
+separate route; `unidentified` is an open closed-form question; and
+`audit_required` is quarantined. The typed record retains branch/domain
+assumptions, the global-containment route, contact/attainment wording, and
+reconciliation status without collapsing them into one boolean.
+
+Only the eight reviewed certificate lanes are replayable. Replay uses a
+package-owned, bounded SymPy implementation of the recorded inverse,
+positive-majorant, boundary-contact, and monotonicity identities. It does not
+import the research repository and never evaluates a candidate as Python code.
+Malformed expressions, wrong direction, missing evidence, source/hash
+mismatch, and resource exhaustion fail closed; only all required replay steps
+passing yields `certified: true`. A candidate that parses but differs from the
+reviewed exact expression is reported as `candidate_mismatch`, not as a new
+radius.
+
 ## Migration from the research artifact
 
 The original registry repository is treated as a research artifact and source of candidate algorithms/data. Code is not copied wholesale. Each migrated operation receives:

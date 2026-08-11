@@ -1,0 +1,331 @@
+{
+  "artifact_id": "gft-radius-certificate-source-map",
+  "rows": [
+    {
+      "assumptions": [
+        "Normalized Ma-Minda classes S*(1+sin z) and S*(2/(1+exp(-z))).",
+        "A Schwarz witness omega has omega(0)=0 and |omega(z)|<1; dilation uses Schwarz's lemma.",
+        "The principal target inverse is log(w/(2-w)), with inverse branch fixed by inv(1)=0.",
+        "The declared radius is the largest r for the closed disk |z|<=r; strict class inclusion is obtained for |z|<r."
+      ],
+      "baked_status": "touch_proven_exact",
+      "claim_label": "machine-proven exact inclusion radius; external literature comparison remains a review claim",
+      "contact_and_attainment": "Positive real axis z=r; 2*atanh(sin r)=1. Equality is attained by the Ma-Minda extremal Schwarz witness omega(z)=z and the standard dilation argument.",
+      "decimal": "0.480381079133729448604886289963232005609691792423076398821175",
+      "direction": "sine->sigmoid",
+      "exact_candidate": "asin((E-1)/(E+1))",
+      "global_containment_route": "Exact symbolic derivative/identity route: candidate match, composition collapse, |cos(x+iy)|^2 identity, nonnegative sinh^2 remainder, and threshold equality.",
+      "inverse_branch_and_domain": "psi(z)=2*atanh(sin z), principal atanh branch on the certified disk; verifier uses x+iy decomposition and r=asin((E-1)/(E+1)).",
+      "lane_id": "radius-sine-to-sigmoid",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = log((1+sin)/(1-sin))",
+          "log((1+sin)/(1-sin)) = 2*atanh(sin)",
+          "d/dz atanh(sin z) = sec z",
+          "|cos(x+iy)|^2 = cos^2 x + sinh^2 y",
+          "ineq remainder = sinh^2 b (>=0)",
+          "2*artanh(sin r*) = 1"
+        ],
+        "steps_verified": 7,
+        "verifier": "verify_global_max_axis_symbolic('sine','sigmoid','asin((E-1)/(E+1)'))"
+      },
+      "reconciliation_status": "CANDIDATE_IMPROVE",
+      "sharpness_status": "exact global discharge locally proven; literature/usefulness/sign-off not cleared",
+      "source_class": "sine",
+      "source_locator": {
+        "generator": "gft/maminda.py:70-80",
+        "inverse_and_chain_registry": "gft/radius.py:136-140,953-956",
+        "proof_document": "data/proofs/RADIUS_SINE_SIGMOID.md:5-20,24-74",
+        "regression_test": "tests/test_radius_proof.py::test_keystone_is_machine_proven"
+      },
+      "target_class": "sigmoid"
+    },
+    {
+      "assumptions": [
+        "Normalized Ma-Minda classes S*(1+sin z) and S*(1+tanh z).",
+        "Schwarz witness and dilation assumptions as in the sine->sigmoid lane.",
+        "Principal logarithmic target inverse branch is fixed at inv(1)=0.",
+        "Closed-disk boundary is used for the global maximum and open-disk radius convention for class inclusion."
+      ],
+      "baked_status": "closed_form_confirmed",
+      "claim_label": "machine-proven exact inclusion radius; no literature novelty claim",
+      "contact_and_attainment": "Positive real axis z=r; atanh(sin r)=1, equivalently sin r=tanh(1). Extremal omega(z)=z supplies equality.",
+      "decimal": "0.865769483239658624289601846191844441379679199248760099611848",
+      "direction": "sine->tanh",
+      "exact_candidate": "asin(tanh(1))",
+      "global_containment_route": "Exact x+iy modulus identity and nonnegative sinh^2 remainder; threshold atanh(sin r)=1.",
+      "inverse_branch_and_domain": "psi(z)=atanh(sin z), with the tanh target inverse represented by one-half log((1+sin z)/(1-sin z)); principal branch on the certified disk.",
+      "lane_id": "radius-sine-to-tanh",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = 1/2*log((1+sin)/(1-sin))",
+          "log((1+sin)/(1-sin)) = 1*atanh(sin)",
+          "d/dz atanh(sin z) = sec z",
+          "|cos(x+iy)|^2 = cos^2 x + sinh^2 y",
+          "ineq remainder = sinh^2 b (>=0)",
+          "1*artanh(sin r*) = 1"
+        ],
+        "steps_verified": 7,
+        "verifier": "verify_global_max_axis_symbolic('sine','tanh','asin(tanh(1))')"
+      },
+      "reconciliation_status": "NO_EXTRACTED_CLAIM",
+      "sharpness_status": "exact global discharge locally proven; literature/usefulness/sign-off not cleared",
+      "source_class": "sine",
+      "source_locator": {
+        "generator": "gft/maminda.py:70-84",
+        "inverse_and_chain_registry": "gft/radius.py:136-143,953-956",
+        "proof_document": "data/proofs/RADIUS_SINE_TANH.md:5-59",
+        "regression_test": "tests/test_radius_proof.py::test_sine_tanh_is_machine_proven"
+      },
+      "target_class": "tanh"
+    },
+    {
+      "assumptions": [
+        "Crescent source is z+sqrt(1+z^2); lemniscate target is sqrt(1+z).",
+        "Principal sqrt branch is fixed by sqrt(1)=1 and the target inverse is w^2-1.",
+        "The source-to-target composition is evaluated on |z|<=r with the displayed branch domain.",
+        "Standard Ma-Minda dilation transfers the inclusion boundary contact to a sharp class radius."
+      ],
+      "baked_status": "touch_proven_exact",
+      "claim_label": "machine-proven exact inclusion radius; no literature novelty claim",
+      "contact_and_attainment": "Positive real axis z=r; psi(r)=1. Extremal omega(z)=z attains the target boundary.",
+      "decimal": "0.35355339059327376220042218105242451964241796884423701829417",
+      "direction": "crescent->lemniscate",
+      "exact_candidate": "sqrt(2)/4",
+      "global_containment_route": "Exact elementary bound on |psi|, monotonicity of the positive-axis bound B(r), and exact threshold B(sqrt(2)/4)=1.",
+      "inverse_branch_and_domain": "psi(z)=2z(z+sqrt(1+z^2)); principal sqrt on the certified disk, with the triangle inequality |sqrt(1+z^2)|<=sqrt(1+|z|^2).",
+      "lane_id": "radius-crescent-to-lemniscate",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = 2z(z + sqrt(1+z^2))",
+          "|sqrt(1+z^2)| <= sqrt(1+|z|^2) (triangle ineq)",
+          "B'(r) = 2(r+sqrt(1+r^2)) + 2r(1 + r/sqrt(1+r^2))",
+          "B(sqrt(2)/4) = 1"
+        ],
+        "steps_verified": 5,
+        "verifier": "verify_global_max_axis_symbolic('crescent','lemniscate','sqrt(2)/4')"
+      },
+      "reconciliation_status": "NO_EXTRACTED_CLAIM",
+      "sharpness_status": "exact global discharge locally proven; literature/usefulness/sign-off not cleared",
+      "source_class": "crescent",
+      "source_locator": {
+        "generator": "gft/maminda.py:64,75",
+        "inverse_and_chain_registry": "gft/radius.py:133,139,953-958",
+        "proof_document": "data/proofs/RADIUS_CRESCENT_LEMNISCATE.md:5-66",
+        "regression_test": "tests/test_radius_proof.py::test_crescent_lemniscate_is_machine_proven"
+      },
+      "target_class": "lemniscate"
+    },
+    {
+      "assumptions": [
+        "Classical starlike source and lemniscate target use the registered principal inverse.",
+        "The disk is |z|<=r<1/3, so 1-z does not cross its principal denominator branch.",
+        "The triangle inequality |1-z|>=1-|z| supplies the global angular bound.",
+        "Ma-Minda extremal/dilation supplies sharpness after the target boundary is reached."
+      ],
+      "baked_status": "touch_proven_exact",
+      "claim_label": "machine-proven exact inclusion radius; no literature novelty claim",
+      "contact_and_attainment": "Positive real axis z=r; psi(r)=1. Extremal omega(z)=z attains equality.",
+      "decimal": "0.171572875253809902396622551580603842860656249246103853646641",
+      "direction": "starlike->lemniscate",
+      "exact_candidate": "3-2*sqrt(2)",
+      "global_containment_route": "Triangle-inequality reduction to g(r)=4r/(1-r)^2, exact positive derivative, and g(3-2*sqrt(2))=1.",
+      "inverse_branch_and_domain": "psi(z)=4z/(1-z)^2; denominator nonzero on the certified disk and target inverse branch fixed by inv(1)=0.",
+      "lane_id": "radius-starlike-to-lemniscate",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = 4z/(1-z)^2",
+          "|1-z| >= 1-|z| (triangle ineq)",
+          "g'(r) = 4(1+r)/(1-r)^3 (>0)",
+          "g(3-2*sqrt(2)) = 1"
+        ],
+        "steps_verified": 5,
+        "verifier": "verify_global_max_axis_symbolic('starlike','lemniscate','3 - 2*sqrt(2)')"
+      },
+      "reconciliation_status": "NO_EXTRACTED_CLAIM",
+      "sharpness_status": "exact global discharge locally proven; literature/usefulness/sign-off not cleared",
+      "source_class": "starlike",
+      "source_locator": {
+        "generator": "gft/maminda.py:62,64",
+        "inverse_and_chain_registry": "gft/radius.py:123-134,953-959",
+        "proof_document": "data/proofs/RADIUS_STARLIKE_LEMNISCATE.md:5-58",
+        "regression_test": "tests/test_radius_proof.py::test_starlike_lemniscate_is_machine_proven"
+      },
+      "target_class": "lemniscate"
+    },
+    {
+      "assumptions": [
+        "Order-alpha source uses alpha=1/2 and the registered crescent inverse.",
+        "The rational composition denominator stays nonzero on the certified disk.",
+        "The angular maximum is reduced by the exact affine-in-cos(theta) inequality in the verifier.",
+        "Ma-Minda extremal/dilation is the sharpness mechanism."
+      ],
+      "baked_status": "touch_proven_exact",
+      "claim_label": "machine-proven exact inclusion radius; no literature novelty claim",
+      "contact_and_attainment": "Positive real axis z=r; the angular maximum is at z=+r and psi(r)=1. Extremal omega(z)=z attains equality.",
+      "decimal": "0.58578643762690495119831127579030192143032812462305192682332",
+      "direction": "order_0.5->crescent",
+      "exact_candidate": "2-sqrt(2)",
+      "global_containment_route": "Exact polynomial inequality in cos(theta), positive slope in cos(theta), endpoint reduction, and exact F(2-sqrt(2))=0.",
+      "inverse_branch_and_domain": "psi(z)=(2z-z^2)/(2(1-z)); target membership is |psi(z)|<=1 on |z|<=r.",
+      "lane_id": "radius-order-half-to-crescent",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = (2z-z^2)/(2(1-z))",
+          "|psi|<=1 <=> (r^4-4) + 4r cos t (2-r^2) <= 0",
+          "slope 4r(2-r^2) > 0 on (0, r*) => max at z = +r",
+          "F(0) = -4 < 0",
+          "F'(r) = 4(r-1)(r-1-sqrt(3))(r-1+sqrt(3))",
+          "F(2-sqrt(2)) = 0"
+        ],
+        "steps_verified": 7,
+        "verifier": "verify_global_max_axis_symbolic('order_0.5','crescent','2 - sqrt(2)')"
+      },
+      "reconciliation_status": "NO_EXTRACTED_CLAIM",
+      "sharpness_status": "exact global discharge locally proven; literature/usefulness/sign-off not cleared",
+      "source_class": "order_0.5",
+      "source_locator": {
+        "generator": "gft/radius.py:123-140",
+        "inverse_and_chain_registry": "gft/radius.py:953-960",
+        "proof_document": "data/proofs/RADIUS_ORDER_HALF_CRESCENT.md:5-74",
+        "regression_test": "tests/test_radius_proof.py::test_order_half_crescent_is_machine_proven"
+      },
+      "target_class": "crescent"
+    },
+    {
+      "assumptions": [
+        "Exponential source is exp(z), order-1/2 target is 1+z/(1-z).",
+        "Principal exponential/logarithmic branches are used on the disk |z|<=log(2).",
+        "Series triangle inequality bounds |1-exp(-z)| by exp(|z|)-1.",
+        "Sharpness is by positive-axis contact and Ma-Minda dilation, but literature provenance is general-known rather than novel."
+      ],
+      "baked_status": "touch_proven_exact",
+      "claim_label": "machine-proven exact radius; standard Ma-Minda order-alpha inclusion provenance",
+      "contact_and_attainment": "Positive real axis z=r; 1-exp(-r)=1/2. Extremal omega(z)=z attains equality.",
+      "decimal": "0.69314718055994530941723212145817656807550013436025525412068",
+      "direction": "exponential->order_0.5",
+      "exact_candidate": "log(2)",
+      "global_containment_route": "Series triangle inequality, monotonic B'(r)=exp(r)>0, and B(log(2))=1.",
+      "inverse_branch_and_domain": "psi(z)=1-exp(-z); principal branch is entire for exp and target inverse branch inv(1)=0.",
+      "lane_id": "radius-exponential-to-order-half",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = 1 - exp(-z)",
+          "|1-exp(-z)| <= exp(|z|)-1 (series triangle inequality)",
+          "B'(r) = exp(r) > 0",
+          "B(log(2)) = 1"
+        ],
+        "steps_verified": 5,
+        "verifier": "verify_global_max_axis_symbolic('exponential','order_0.5','log(2)')"
+      },
+      "reconciliation_status": "KNOWN_GENERAL",
+      "sharpness_status": "exact global discharge locally proven; reconciled as a general-theorem instance",
+      "source_class": "exponential",
+      "source_locator": {
+        "generator": "gft/maminda.py:66,126",
+        "inverse_and_chain_registry": "gft/radius.py:126,134,953-961",
+        "proof_document": "data/proofs/RADIUS_EXPONENTIAL_ORDER_HALF.md:5-49",
+        "regression_test": "tests/test_radius_proof.py::test_exponential_order_half_is_machine_proven"
+      },
+      "target_class": "order_0.5"
+    },
+    {
+      "assumptions": [
+        "Exponential source and lemniscate target use principal square-root/inverse branches.",
+        "On |z|<=log(2)/2, |Im(z)|<pi/2, so the principal identity sqrt(exp(2z))=exp(z) is valid.",
+        "Series triangle inequality controls |exp(2z)-1| globally on the disk.",
+        "Boundary contact plus Ma-Minda dilation supplies sharpness; no novelty claim is made."
+      ],
+      "baked_status": "touch_proven_exact",
+      "claim_label": "machine-proven exact radius; literature clearance is separate",
+      "contact_and_attainment": "Positive real axis z=r; exp(2r)-1=1. Extremal omega(z)=z attains equality.",
+      "decimal": "0.34657359027997265470861606072908828403775006718012762706034",
+      "direction": "exponential->lemniscate",
+      "exact_candidate": "log(2)/2",
+      "global_containment_route": "Principal-branch identity, series triangle inequality, monotonic B'(r)=2exp(2r)>0, and B(log(2)/2)=1.",
+      "inverse_branch_and_domain": "psi(z)=exp(2z)-1; principal sqrt branch is justified by |Im(z)|<=|z|<pi/2.",
+      "lane_id": "radius-exponential-to-lemniscate",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = exp(2z) - 1",
+          "|Im(z)| <= |z| <= log(2)/2 < pi/2; Re(exp(z)) > 0 and principal sqrt(exp(2z)) = exp(z)",
+          "|exp(2z)-1| <= exp(2|z|)-1 (series triangle inequality)",
+          "B'(r) = 2*exp(2r) > 0",
+          "B(log(2)/2) = 1"
+        ],
+        "steps_verified": 6,
+        "verifier": "verify_global_max_axis_symbolic('exponential','lemniscate','log(2)/2')"
+      },
+      "reconciliation_status": "NO_EXTRACTED_CLAIM",
+      "sharpness_status": "exact global discharge locally proven; literature/usefulness/sign-off not cleared",
+      "source_class": "exponential",
+      "source_locator": {
+        "generator": "gft/maminda.py:64,66",
+        "inverse_and_chain_registry": "gft/radius.py:133-134,953-962",
+        "proof_document": "data/proofs/RADIUS_EXPONENTIAL_LEMNISCATE.md:5-51",
+        "regression_test": "tests/test_radius_proof.py::test_exponential_lemniscate_is_machine_proven"
+      },
+      "target_class": "lemniscate"
+    },
+    {
+      "assumptions": [
+        "Classical starlike source and order-3/4 target use the registered rational inverse.",
+        "The denominator 1+3z is nonzero on |z|<=1/7, including the boundary contact.",
+        "The exact angular identity reduces the boundary maximum to the positive real axis.",
+        "This is a fixed-parameter instance of the order-alpha theorem pattern, not a new theorem claim."
+      ],
+      "baked_status": "touch_proven_exact",
+      "claim_label": "machine-proven exact radius; standard Ma-Minda order-alpha inclusion provenance",
+      "contact_and_attainment": "Positive real axis z=r; psi(r)=1. Extremal omega(z)=z attains equality.",
+      "decimal": "0.142857142857142857142857142857142857142857142857142857142857",
+      "direction": "starlike->order_0.75",
+      "exact_candidate": "1/7",
+      "global_containment_route": "Exact denominator modulus identity 6r(1+cos t)>=0, monotonic g'(r)>0, and g(1/7)=1.",
+      "inverse_branch_and_domain": "psi(z)=4z/(1+3z); rational branch is regular on the certified closed disk.",
+      "lane_id": "radius-starlike-to-order-three-quarters",
+      "machine_certificate": {
+        "status": "proven",
+        "steps": [
+          "candidate matches registered exact radius",
+          "psi = 4z/(1+3z)",
+          "|1+3r*exp(I*t)|^2 - (1-3r)^2 = 6r(1+cos(t))",
+          "6r(1+cos(t)) = 12r*cos(t/2)^2 >= 0",
+          "g'(r) = 4/(1-3r)^2 > 0",
+          "g(1/7) = 1"
+        ],
+        "steps_verified": 6,
+        "verifier": "verify_global_max_axis_symbolic('starlike','order_0.75','1/7')"
+      },
+      "reconciliation_status": "KNOWN_GENERAL",
+      "sharpness_status": "exact global discharge locally proven; reconciled as a general-theorem instance",
+      "source_class": "starlike",
+      "source_locator": {
+        "generator": "gft/maminda.py:62,127",
+        "inverse_and_chain_registry": "gft/radius.py:123-127,953-963",
+        "proof_document": "data/proofs/RADIUS_STARLIKE_ORDER_THREE_QUARTERS.md:5-48",
+        "regression_test": "tests/test_radius_proof.py::test_starlike_order_three_quarters_is_machine_proven"
+      },
+      "target_class": "order_0.75"
+    }
+  ],
+  "schema_version": "1.0.0",
+  "source_snapshot": {
+    "commit": "cf0b2b0a3539ccc7ea9dcae679afd1cd0471b5bd",
+    "crosswalk_commit": "73515129716c70d4287e2e228d15633e6ccb45f2",
+    "repository": "gft-registry"
+  }
+}

@@ -55,7 +55,7 @@ include-package-data = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-geometric_function_atlas = ["py.typed", "schema/*.json"]
+geometric_function_atlas = ["py.typed", "schema/*.json", "data/*.json"]
 
 [tool.setuptools.dynamic]
 version = { attr = "geometric_function_atlas.version.__version__" }

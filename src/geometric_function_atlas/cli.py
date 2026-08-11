@@ -33,6 +33,12 @@ from .contracts import (
 from .counterexamples import find_counterexample, verify_counterexample
 from .fekete_szego import fekete_szego
 from .plotting import write_plot
+from .radii import (
+    RadiusStatus,
+    list_radii,
+    radius,
+    verify_radius_certificate,
+)
 from .snapshot import (
     RegistrySnapshot,
     install_snapshot,
@@ -178,6 +184,60 @@ def _verify_counterexample(args: argparse.Namespace) -> None:
         f"Counterexample condition: value {comparison} {result.threshold:g}",
     ]
     _write_utf8("\n".join(lines))
+
+
+def _radii(args: argparse.Namespace) -> None:
+    rows = list_radii(source=args.source, target=args.target, status=args.status)
+    payload = [row.to_dict() for row in rows]
+    if args.json:
+        _write(payload, as_json=True)
+        return
+    for row in rows:
+        value = row.value_exact or row.value_decimal or "unavailable"
+        print(f"{row.direction}: {value} [{row.status.value}]")
+        print(f"  {row.status_label}")
+
+
+def _radius(args: argparse.Namespace) -> None:
+    result = radius(args.source, args.target)
+    _write(result.to_dict(), as_json=args.json)
+
+
+class _CommandFailure(RuntimeError):
+    """Internal bridge from a structured replay failure to a CLI exit code."""
+
+    def __init__(self, state: str, payload: dict[str, Any]) -> None:
+        self.state = state
+        self.payload = payload
+        super().__init__(state)
+
+
+def _verify_radius_certificate(args: argparse.Namespace) -> None:
+    result = verify_radius_certificate(
+        args.source,
+        args.target,
+        candidate=args.candidate,
+        dps=args.dps,
+        max_steps=args.max_steps,
+    )
+    payload = result.to_dict()
+    if not args.json:
+        print(
+            f"{result.status.upper()}: {result.direction}"
+            + (f" — {result.error}" if result.error else "")
+        )
+        for step in result.steps:
+            print(f"  {'PASS' if step.verified else 'FAIL'} {step.name}")
+    if result.certified:
+        if args.json:
+            _write(payload, as_json=True)
+        return
+    state = (
+        result.failure_state.value
+        if result.failure_state is not None
+        else FailureState.UNRESOLVED.value
+    )
+    raise _CommandFailure(state, payload)
 
 
 def _snapshot_manifest(args: argparse.Namespace) -> str | None:
@@ -806,6 +866,37 @@ def _parser() -> argparse.ArgumentParser:
     counterexample.add_argument("--json", action="store_true", help="emit JSON")
     counterexample.set_defaults(handler=_verify_counterexample)
 
+    radii = subparsers.add_parser("radii", help="list directed inclusion radii")
+    radii.add_argument("--source")
+    radii.add_argument("--target")
+    radii.add_argument(
+        "--status",
+        choices=[status.value for status in RadiusStatus],
+    )
+    radii.add_argument("--json", action="store_true", help="emit JSON")
+    radii.set_defaults(handler=_radii)
+
+    one_radius = subparsers.add_parser(
+        "radius", help="show one directed inclusion radius"
+    )
+    one_radius.add_argument("source")
+    one_radius.add_argument("target")
+    one_radius.add_argument("--json", action="store_true", help="emit JSON")
+    one_radius.set_defaults(handler=_radius)
+
+    replay = subparsers.add_parser(
+        "verify-radius-certificate",
+        aliases=["verify-radius"],
+        help="replay a reviewed exact directed-radius certificate",
+    )
+    replay.add_argument("source")
+    replay.add_argument("target")
+    replay.add_argument("--candidate")
+    replay.add_argument("--dps", type=int, default=50)
+    replay.add_argument("--max-steps", type=int, default=128)
+    replay.add_argument("--json", action="store_true", help="emit JSON")
+    replay.set_defaults(handler=_verify_radius_certificate)
+
     classes = subparsers.add_parser("classes", help="list Ma-Minda classes")
     classes.add_argument("--json", action="store_true", help="emit JSON")
     classes.set_defaults(handler=_classes)
@@ -1144,7 +1235,12 @@ def _main(argv: Sequence[str] | None) -> int:
         TypeError,
         ValueError,
         ImportError,
+        _CommandFailure,
     ) as exc:
+        if isinstance(exc, _CommandFailure):
+            if getattr(args, "json", False):
+                _write(exc.payload, as_json=True)
+            return EXIT_CODES[exc.state]
         state = _failure_state(exc)
         if getattr(args, "json", False):
             payload = failure_payload(state, str(exc))

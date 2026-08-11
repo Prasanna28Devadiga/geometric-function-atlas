@@ -72,12 +72,16 @@ _DAG_FUNCTIONS = {
     "Abs",
     "Max",
     "Pi",
+    "acosh",
+    "asin",
     "asinh",
     "atan",
+    "atanh",
     "cos",
     "cosh",
     "exp",
     "log",
+    "pi",
     "sin",
     "sinh",
     "tanh",
@@ -1043,8 +1047,10 @@ def _validate_expression_dag(dag: Any, *, required_roots: tuple[str, ...]) -> No
                 for item in args
             ):
                 raise ValueError("expression DAG args must be a list of node ids")
-            if op in {"add", "mul", "function"} and not args:
+            if op in {"add", "mul"} and not args:
                 raise ValueError("expression DAG operation requires arguments")
+            if op == "function" and not args and node["name"] not in {"Pi", "pi"}:
+                raise ValueError("expression DAG function requires arguments")
             if op == "pow" and len(args) != 2:
                 raise ValueError("expression DAG power requires two arguments")
             if op == "function" and node["name"] not in _DAG_FUNCTIONS:
@@ -1107,12 +1113,20 @@ def _decode_expression_dag(
     functions = {
         "Abs": sp.Abs,
         "Max": sp.Max,
+        "Pi": lambda: sp.pi,
+        "acosh": sp.acosh,
+        "asin": sp.asin,
+        "asinh": sp.asinh,
+        "atan": sp.atan,
+        "atanh": sp.atanh,
         "cos": sp.cos,
         "cosh": sp.cosh,
         "exp": sp.exp,
         "log": sp.log,
+        "pi": lambda: sp.pi,
         "sin": sp.sin,
         "sinh": sp.sinh,
+        "tanh": sp.tanh,
     }
     decoded: dict[str, sp.Expr] = {}
     visiting: set[str] = set()

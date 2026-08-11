@@ -198,3 +198,51 @@ def test_cli_json_argument_parse_failures_are_structured() -> None:
     payload = json.loads(completed.stdout)
     assert payload["failure_state"] == "invalid_input"
     assert completed.stderr == ""
+
+
+def test_radii_command_lists_the_typed_snapshot() -> None:
+    completed = run_cli("radii", "--status", "audit_required", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert len(payload) == 12
+    assert {row["status"] for row in payload} == {"audit_required"}
+    assert all(row["direction"] for row in payload)
+
+
+def test_radius_command_preserves_direction_and_exact_value() -> None:
+    completed = run_cli("radius", "sine", "sigmoid", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["canonical_inputs"] == {"inner": "sine", "target": "sigmoid"}
+    assert payload["exact_expressions"]["radius"] == "asin((E-1)/(E+1))"
+    assert payload["provenance_detail"]["crosswalk_commit"]
+
+
+def test_verify_radius_certificate_command_replays_the_exact_chain() -> None:
+    completed = run_cli(
+        "verify-radius-certificate", "sine", "sigmoid", "--json"
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["status"] == "proven"
+    assert payload["certified"] is True
+    assert all(step["verified"] for step in payload["steps"])
+
+
+def test_verify_radius_certificate_command_uses_fail_closed_exit_codes() -> None:
+    completed = run_cli(
+        "verify-radius-certificate",
+        "sine",
+        "sigmoid",
+        "--candidate",
+        "asinh((E-1)/(E+1))",
+        "--json",
+    )
+
+    assert completed.returncode == 4
+    payload = json.loads(completed.stdout)
+    assert payload["status"] == "candidate_mismatch"
+    assert payload["certified"] is False
