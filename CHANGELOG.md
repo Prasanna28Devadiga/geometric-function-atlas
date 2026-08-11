@@ -2,6 +2,28 @@
 
 All notable changes to Geometric Function Atlas are recorded here.
 
+## Unreleased
+
+### Added
+
+- Tiered function verification (`screen` / `symbolic` / `rigorous`) for
+  normalized functions from coefficients or preconstructed SymPy closed
+  forms, with explicit epistemic labels that never present a numerical
+  screen as a proof.
+- Ma–Minda class operations: admissibility checks, membership screens,
+  containment screens, and exact extremal coefficients. Screens are labelled
+  as screens unless a certified theorem is attached.
+- Counterexample witness search: grid search locates a candidate violation
+  and interval arithmetic certifies the final point.
+- Website plot reproduction as dependency-free SVG: conformal domain grids,
+  coefficient magnitudes, real-part heatmaps, and phase portraits.
+- Optional application labs behind the `lab` extra: Cryptography Lab S-box
+  construction and benchmark metrics with deterministic AES and identity
+  anchors, and Image Lab quality metrics and convolution transforms on
+  deterministic generated arrays. Crypto outputs are benchmark metrics,
+  never security claims; image outputs are empirical.
+- `lab` extra and CI coverage for the optional labs.
+
 ## 0.1.1 — 2026-08-10
 
 Contract-integrity repair release.
@@ -31,7 +53,7 @@ First software release.
 
 ### Scope
 
-This release does not include registry search, radius-certificate replay, plots,
-image or cryptography labs, mutable registry data, literature novelty decisions,
-or PyPI publication. Those remain outside this software release and may be
-addressed in future package work.
+This release does not include registry search, radius-certificate replay,
+mutable registry data, literature novelty decisions, or PyPI publication.
+Plots, the application labs, and the remaining website capabilities were
+added after this release.

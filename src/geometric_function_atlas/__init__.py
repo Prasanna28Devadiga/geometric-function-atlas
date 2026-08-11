@@ -1,6 +1,16 @@
 """Public API for reproducible Geometric Function Atlas computations."""
 
 from .catalog import get_generator, list_generators
+from .classes import (
+    ClassAdmissibilityResult,
+    ClassContainmentResult,
+    ClassMembershipResult,
+    class_admissibility,
+    class_containment_screen,
+    class_extremal_coefficients,
+    class_member_screen,
+    list_classes,
+)
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
 from .contracts import (  # noqa: F401
     RESULT_SCHEMA_VERSION,
@@ -20,7 +30,12 @@ from .contracts import (  # noqa: F401
     validate_error_payload,
     validate_result_payload,
 )
-from .counterexamples import CounterexampleResult, verify_counterexample
+from .counterexamples import (
+    CounterexampleResult,
+    WitnessSearchResult,
+    find_counterexample,
+    verify_counterexample,
+)
 from .fekete_szego import FeketeSzegoResult, fekete_szego
 from .implementation_registry import (  # noqa: F401
     get_trusted_implementation,
@@ -31,28 +46,55 @@ from .models import Z as z
 from .plotting import (
     ConformalGrid,
     DomainPlotResult,
+    PlotResult,
     conformal_grid,
     generator_function_coefficients,
+    write_coefficient_plot,
     write_domain_plot,
+    write_phase_plot,
+    write_plot,
+    write_real_part_plot,
 )
+from .records import RecordError, build_screen_record, validate_screen_record
+from .verify import FunctionVerificationResult, verify_function
 from .version import __version__
 
 __all__ = [
+    "ClassAdmissibilityResult",
+    "ClassContainmentResult",
+    "ClassMembershipResult",
     "ConformalGrid",
     "CounterexampleResult",
     "DomainPlotResult",
     "FeketeSzegoResult",
+    "FunctionVerificationResult",
     "Generator",
     "GeneratorSeriesResult",
+    "PlotResult",
+    "RecordError",
+    "WitnessSearchResult",
     "__version__",
+    "build_screen_record",
+    "class_admissibility",
+    "class_containment_screen",
+    "class_extremal_coefficients",
+    "class_member_screen",
     "conformal_grid",
     "fekete_szego",
+    "find_counterexample",
     "generator_function_coefficients",
     "generator_series",
     "get_generator",
+    "list_classes",
     "list_generators",
     "taylor_coefficients",
+    "validate_screen_record",
     "verify_counterexample",
+    "verify_function",
+    "write_coefficient_plot",
     "write_domain_plot",
+    "write_phase_plot",
+    "write_plot",
+    "write_real_part_plot",
     "z",
 ]

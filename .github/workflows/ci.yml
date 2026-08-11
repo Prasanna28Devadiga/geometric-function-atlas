@@ -26,10 +26,10 @@ jobs:
         with:
           version: "0.12.3"
           enable-cache: false
-      - run: uv sync --extra test --locked
-      - run: uv run --frozen --extra test python -W error -m pytest -q
-      - run: uv run --frozen --extra test python -m ruff check src tests scripts
-      - run: uv run --frozen --extra test python -m mypy src --ignore-missing-imports
+      - run: uv sync --extra test --extra lab --locked
+      - run: uv run --frozen --extra test --extra lab python -W error -m pytest -q
+      - run: uv run --frozen --extra test --extra lab python -m ruff check src tests scripts
+      - run: uv run --frozen --extra test --extra lab python -m mypy src --ignore-missing-imports
 
   distribution:
     name: Distribution and managed-Python install

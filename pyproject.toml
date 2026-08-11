@@ -41,6 +41,7 @@ Issues = "https://github.com/Prasanna28Devadiga/geometric-function-atlas/issues"
 [project.optional-dependencies]
 test = ["jsonschema>=4.23", "mypy>=1.15", "pytest>=8", "ruff>=0.16"]
 build = ["build>=1.2", "twine>=5"]
+lab = ["numpy>=1.24"]
 
 [project.scripts]
 geometric-function-atlas = "geometric_function_atlas.cli:main"

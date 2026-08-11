@@ -38,8 +38,8 @@ from .contracts import (
 )
 from .models import Generator, Z
 from .records import build_screen_record
-from .version import SOURCE_ARTIFACT_COMMIT
 from .verify import _exact_float
+from .version import SOURCE_ARTIFACT_COMMIT
 
 MAX_EXTREMAL_ORDER = 24
 _REFERENCE = (
@@ -101,7 +101,7 @@ def class_admissibility(
     *,
     n_theta: int = 120,
     radii: tuple[float, ...] = (0.3, 0.6, 0.9, 0.99),
-) -> "ClassAdmissibilityResult":
+) -> ClassAdmissibilityResult:
     """Check the Ma–Minda admissibility conditions for one class.
 
     Exact: ``phi(0) = 1`` and ``phi'(0)`` real and positive. Screens with
@@ -306,7 +306,7 @@ def class_member_screen(
     grid_theta: int = 24,
     max_r: float = 0.95,
     n_boundary: int = 720,
-) -> "ClassMembershipResult":
+) -> ClassMembershipResult:
     """Screen ``f in S*(phi)``: sample ``z f'/f`` on a grid and test whether
     every value lies inside the sampled boundary of ``phi(D)``."""
 
@@ -429,7 +429,7 @@ def class_containment_screen(
     n_inner: int = 180,
     r_inner: float = 0.99,
     n_outer: int = 720,
-) -> "ClassContainmentResult":
+) -> ClassContainmentResult:
     """Screen ``phi_inner(D) subset phi_outer(D)`` by winding numbers.
 
     By subordination transitivity this is the same screen as
@@ -444,7 +444,7 @@ def class_containment_screen(
     inside = [_winding_number(point, outer_curve) == 1 for point in inner_points]
     fraction = sum(inside) / len(inside)
     contained = all(inside)
-    margin = float("nan")
+    margin: float | None = None
     witness: complex | None = None
     if contained:
         sampled = outer_curve[::4]
@@ -488,7 +488,7 @@ class ClassContainmentResult:
     outer: str
     contained: bool
     fraction_inside: float
-    margin: float
+    margin: float | None
     witness_w: tuple[float, float] | None
     verification_report: VerificationReport
 

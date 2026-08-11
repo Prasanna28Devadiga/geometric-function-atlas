@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import sympy as sp
 import pytest
+import sympy as sp
 
 from geometric_function_atlas.classes import (
     class_admissibility,
@@ -109,4 +109,14 @@ def test_containment_screen_symmetric_for_identical_classes() -> None:
 def test_containment_record_is_closed() -> None:
     record = class_containment_screen("exponential", "starlike").to_dict()
     assert record["record_type"] == "class_containment"
+    validate_screen_record(record)
+
+
+def test_failed_containment_record_is_closed_without_nan() -> None:
+    # The non-contained margin must serialize as null, never NaN, so the
+    # closed JSON record remains machine-readable.
+    record = class_containment_screen("starlike", "exponential").to_dict()
+    assert record["details"]["contained"] is False
+    assert record["details"]["margin"] is None
+    assert record["details"]["witness_w"] is not None
     validate_screen_record(record)

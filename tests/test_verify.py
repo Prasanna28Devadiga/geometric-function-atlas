@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import sympy as sp
 import pytest
+import sympy as sp
 
 from geometric_function_atlas.contracts import (
-    CheckStatus,
     InvalidInputError,
     ResourceLimitError,
 )
@@ -47,6 +46,16 @@ def test_symbolic_tier_proves_convex_and_univalent_by_implication() -> None:
     result = verify_function(coefficients=[0.25], property="convex", max_cost="symbolic")
     assert result.outcome == "proven"
     assert result.details["convex_sum"] == "1"
+
+
+def test_symbolic_tier_record_serializes_without_nan() -> None:
+    # The symbolic tier has no grid margin; its record must serialize as a
+    # closed JSON payload with min_margin null (NaN breaks the JSON contract).
+    result = verify_function(coefficients=[0.25], property="starlike", max_cost="symbolic")
+    assert result.min_margin is None
+    record = result.to_dict()
+    assert record["details"]["min_margin"] is None
+    validate_screen_record(record)
 
 
 def test_symbolic_tier_is_inconclusive_for_undecided_truncation() -> None:

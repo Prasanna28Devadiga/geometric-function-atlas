@@ -19,6 +19,7 @@ from .contracts import (
     build_result_payload,
 )
 from .models import canonical_expression_dag
+from .records import build_screen_record
 from .version import COUNTEREXAMPLE_FIXTURE_ID
 
 
@@ -305,4 +306,253 @@ def verify_counterexample(
         interval_upper=upper,
         threshold=threshold,
         certified=certified,
+    )
+
+
+def _poly_float(coefficients: Sequence[float], z: complex) -> complex:
+    """Horner evaluation of a power series whose first entry is the constant term."""
+
+    if not coefficients:
+        return 0.0 + 0.0j
+    result: complex = coefficients[-1]
+    for coefficient in reversed(coefficients[:-1]):
+        result = result * z + coefficient
+    return result
+
+
+def _fpolys(coefficients: Sequence[float]) -> tuple[
+    list[float], list[float], list[float], list[float]
+]:
+    """Power-basis coefficient lists for f, f', f'', f''' of
+    ``f(z) = z + sum_{n>=2} a_n z^n`` (real coefficients)."""
+
+    values = [float(value) for value in coefficients]
+    n_max = len(values) + 1
+    f = [0.0, 1.0] + values
+    fp = [1.0] + [degree * values[degree - 2] for degree in range(2, n_max + 1)]
+    fpp = [
+        degree * (degree - 1) * values[degree - 2]
+        for degree in range(2, n_max + 1)
+    ]
+    fppp = [
+        degree * (degree - 1) * (degree - 2) * values[degree - 2]
+        for degree in range(3, n_max + 1)
+    ]
+    return f, fp, fpp, fppp
+
+
+def _float_screen_value(
+    property_name: str, coefficients: tuple[float, ...], z: complex
+) -> float:
+    """Float evaluation of the pointwise criterion at one point."""
+
+    f, fp, fpp, fppp = _fpolys(coefficients)
+    fp_value = _poly_float(fp, z)
+    if property_name == "starlike":
+        f_value = _poly_float(f, z)
+        if abs(f_value) < 1e-300:
+            return float("nan")
+        return (z * fp_value / f_value).real
+    if abs(fp_value) < 1e-300:
+        return float("nan")
+    one_minus = 1.0 - (z.real**2 + z.imag**2)
+    if property_name == "becker_univalent":
+        return one_minus * abs(_poly_float(fpp, z) / fp_value)
+    fpp_value = _poly_float(fpp, z)
+    fppp_value = _poly_float(fppp, z)
+    schwarzian = fppp_value / fp_value - 1.5 * (fpp_value / fp_value) ** 2
+    return one_minus**2 * abs(schwarzian)
+
+
+def _worst_grid_point(
+    property_name: str,
+    coefficients: tuple[float, ...],
+    *,
+    grid_r: int = 120,
+    grid_theta: int = 180,
+    max_r: float = 0.99,
+) -> tuple[complex, float]:
+    """Float grid search for the most-violating point of a criterion."""
+
+    worst_value: float | None = None
+    worst_z: complex | None = None
+    for r_index in range(grid_r):
+        radius = 0.05 + (max_r - 0.05) * r_index / max(grid_r - 1, 1)
+        for t_index in range(grid_theta):
+            theta = 2 * math.pi * t_index / grid_theta
+            z = complex(radius * math.cos(theta), radius * math.sin(theta))
+            value = _float_screen_value(property_name, coefficients, z)
+            if not math.isfinite(value):
+                continue
+            if worst_value is None or (
+                value < worst_value
+                if property_name == "starlike"
+                else value > worst_value
+            ):
+                worst_value = value
+                worst_z = z
+    if worst_z is None or worst_value is None:
+        raise UnresolvedError(
+            "grid search produced no finite evaluations for the criterion"
+        )
+    return worst_z, worst_value
+
+
+_SEARCH_THRESHOLDS = {
+    "starlike": 0.0,
+    "becker_univalent": 1.0,
+    "nehari_univalent": 2.0,
+}
+
+
+@dataclass(frozen=True, slots=True)
+class WitnessSearchResult:
+    """Outcome of a grid search followed by interval certification."""
+
+    property: str
+    coefficients: tuple[float, ...]
+    certified: bool
+    point: tuple[float, float] | None
+    interval_lower: float | None
+    interval_upper: float | None
+    threshold: float
+    margin: float | None
+    screen_value: float
+    grid_points: int
+
+    def to_dict(self) -> dict[str, Any]:
+        exact_coefficients = tuple(
+            sp.sstr(_exact_float(value)) for value in self.coefficients
+        )
+        evidence = "certified_enclosure" if self.certified else "numerical_screen"
+        checks = (
+            VerificationCheck(
+                name="grid_search_screened",
+                checked="float grid search for the most-violating point",
+                expected="a finite candidate point on the grid",
+                observed=(
+                    f"screen value {self.screen_value:g} at "
+                    f"{self.point[0]:g},{self.point[1]:g}"
+                    if self.point is not None
+                    else "no finite candidate"
+                ),
+                status=CheckStatus.PASS,
+                scope="float grid search (not a proof)",
+            ),
+            VerificationCheck(
+                name="interval_certified",
+                checked="certified interval enclosure at the candidate point",
+                expected="threshold-separated enclosure",
+                observed=(
+                    f"certified={self.certified}, margin={self.margin:g}"
+                    if self.margin is not None
+                    else "unresolved"
+                ),
+                status=CheckStatus.PASS,
+                scope="mpmath interval arithmetic at the exact binary64 point",
+            ),
+        )
+        return build_screen_record(
+            record_type="witness_search",
+            canonical_inputs={
+                "property": self.property,
+                "coefficients": list(exact_coefficients),
+            },
+            method="grid_search_then_interval_certification",
+            evidence_kind=evidence,
+            tier="rigorous",
+            assumptions=(
+                "f(z) is the supplied finite polynomial",
+                "the grid locates a candidate; interval arithmetic certifies only the final point",
+                "a certified violation for a truncation is about the truncation",
+            ),
+            source_references=(
+                "gft.pointwise find_and_certify parity at source commit acee553",
+            ),
+            verification=VerificationReport(checks=checks),
+            details={
+                "certified": self.certified,
+                "point": None if self.point is None else list(self.point),
+                "interval_lower": self.interval_lower,
+                "interval_upper": self.interval_upper,
+                "threshold": self.threshold,
+                "margin": self.margin,
+                "screen_value": self.screen_value,
+                "grid_points": self.grid_points,
+            },
+        )
+
+
+def find_counterexample(
+    coefficients: Sequence[float],
+    *,
+    property: str = "starlike",
+    witness_hint: tuple[float, float] | None = None,
+    grid_r: int = 120,
+    grid_theta: int = 180,
+) -> WitnessSearchResult:
+    """Search for a violation point and certify it in interval arithmetic.
+
+    ``coefficients`` are ``[a2, a3, ...]`` for
+    ``f(z) = z + a2*z**2 + ...``. A float grid locates the most-violating
+    point; the final verdict is certified only when the interval enclosure at
+    that exact point clears the threshold. ``witness_hint``, when supplied,
+    is tried before the grid candidate.
+    """
+
+    supported = {"starlike", "becker_univalent", "nehari_univalent"}
+    if property not in supported:
+        allowed = ", ".join(sorted(supported))
+        raise ValueError(f"property must be one of: {allowed}")
+
+    values = _validated_coefficients(coefficients)
+    grid_point, screen_value = _worst_grid_point(
+        property, values, grid_r=grid_r, grid_theta=grid_theta
+    )
+    candidates: list[tuple[float, float]] = []
+    if witness_hint is not None:
+        real, imaginary = _validated_point(witness_hint)
+        candidates.append((real, imaginary))
+    candidates.append((grid_point.real, grid_point.imag))
+
+    threshold = _SEARCH_THRESHOLDS[property]
+    best: dict[str, Any] | None = None
+    for real, imaginary in candidates:
+        try:
+            lower, upper, evaluated_threshold, certified = (
+                _evaluate_counterexample_interval(values, real, imaginary, property)
+            )
+        except (UnresolvedError, ZeroDivisionError, ValueError, ArithmeticError):
+            continue
+        margin = (
+            threshold - upper if property == "starlike" else lower - threshold
+        )
+        candidate = {
+            "certified": certified,
+            "point": (real, imaginary),
+            "lower": lower,
+            "upper": upper,
+            "margin": margin,
+            "threshold": evaluated_threshold,
+        }
+        if certified or best is None:
+            best = candidate
+        if certified:
+            break
+    if best is None:
+        raise UnresolvedError(
+            "no candidate point could be evaluated in interval arithmetic"
+        )
+
+    return WitnessSearchResult(
+        property=property,
+        coefficients=values,
+        certified=bool(best["certified"]),
+        point=best["point"],
+        interval_lower=best["lower"],
+        interval_upper=best["upper"],
+        threshold=best["threshold"],
+        margin=best["margin"],
+        screen_value=screen_value,
+        grid_points=grid_r * grid_theta,
     )

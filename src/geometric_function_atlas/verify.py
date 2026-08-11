@@ -135,7 +135,7 @@ def _horner(coefficients: tuple[float, ...], z: complex) -> complex:
 
     if not coefficients:
         return z
-    result = coefficients[-1]
+    result: complex = coefficients[-1]
     for coefficient in reversed(coefficients[:-1]):
         result = result * z + coefficient
     return (result * z + 1.0) * z
@@ -166,7 +166,7 @@ def _poly_value(coefficients: tuple[float, ...], z: complex) -> complex:
 
     if not coefficients:
         return 0.0
-    result = coefficients[-1]
+    result: complex = coefficients[-1]
     for coefficient in reversed(coefficients[:-1]):
         result = result * z + coefficient
     return result
@@ -329,7 +329,7 @@ class FunctionVerificationResult:
     details: dict[str, Any]
     witness_point: tuple[float, float] | None = None
     certified: bool = False
-    min_margin: float = 0.0
+    min_margin: float | None = None
     exact_coefficients: tuple[str, ...] = ()
 
     @builtins.property
@@ -572,7 +572,7 @@ def _symbolic_verdict(
         evidence_kind=evidence_kind,
         verification_report=VerificationReport(checks=(_finite_check(), c01_check, convex_check)),
         details=details,
-        min_margin=float("nan"),
+        min_margin=None,
         exact_coefficients=exact_coefficients,
     )
 

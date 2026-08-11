@@ -44,6 +44,18 @@ To reproduce an immutable release exactly, pin its version:
 uv tool install --managed-python --python 3.12 geometric-function-atlas==0.1.1
 ```
 
+## Optional labs
+
+The Cryptography Lab and Image Lab operations need NumPy. Install the package
+with the `lab` extra:
+
+```bash
+uv tool install --with "numpy>=1.24" https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.1/geometric_function_atlas-0.1.1-py3-none-any.whl
+```
+
+Crypto outputs are benchmark metrics, never security claims; image outputs are
+empirical.
+
 ## Remove
 
 ```bash

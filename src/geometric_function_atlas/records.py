@@ -18,9 +18,7 @@ from enum import Enum
 from typing import Any
 
 from .contracts import (
-    CheckStatus,
     FailureState,
-    VerificationCheck,
     VerificationReport,
     _json_value,
     _validate_report,
@@ -222,13 +220,15 @@ def validate_screen_record(record: Mapping[str, Any]) -> None:
     if record["verification"]["success"]:
         if failure_state is not None:
             raise RecordError("successful record failure_state must be null")
-    elif failure_state is None:
+    elif (
+        failure_state is None
+        and record["evidence_kind"] != "numerical_screen"
+    ):
         # A numerical screen may legitimately conclude a negative finding
         # ("not admissible", "not a member", "not contained"); that is a
         # completed operation, not an operation failure. Non-screen records
         # remain fail-closed.
-        if record["evidence_kind"] != "numerical_screen":
-            raise RecordError("failed record must declare a failure_state")
+        raise RecordError("failed record must declare a failure_state")
     for check in record["verification"]["checks"]:
         if check["status"] == "fail" and not check["failure_reason"]:
             raise RecordError("failed verification checks require a failure_reason")
