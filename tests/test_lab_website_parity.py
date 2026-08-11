@@ -96,3 +96,33 @@ console.log(JSON.stringify(api.ssim(a, b, 8, 8)));
     )
 
     assert package_ssim == pytest.approx(website_ssim, abs=1e-6)
+
+
+@pytest.mark.parametrize("height,width", [(5, 3), (7, 5)])
+def test_package_gmsd_matches_website_on_odd_dimensions(height: int, width: int) -> None:
+    _require_website_lab()
+    rng = np.random.default_rng(20260811 + height + width)
+    reference = rng.random((height, width, 3))
+    test = rng.random((height, width, 3))
+    package_gmsd = image_metrics(reference, test)["GMSD"]
+
+    def channel_values(channel: int, array: Any) -> str:
+        return json.dumps(array[..., channel].ravel().tolist())
+
+    website_gmsd = float(
+        _node_json(
+            f"""
+const a = new api.Img({width}, {height});
+const b = new api.Img({width}, {height});
+a.r = new Float32Array({channel_values(0, reference)});
+a.g = new Float32Array({channel_values(1, reference)});
+a.b = new Float32Array({channel_values(2, reference)});
+b.r = new Float32Array({channel_values(0, test)});
+b.g = new Float32Array({channel_values(1, test)});
+b.b = new Float32Array({channel_values(2, test)});
+console.log(JSON.stringify(api.gmsd(a, b, {width}, {height})));
+"""
+        )
+    )
+
+    assert package_gmsd == pytest.approx(website_gmsd, abs=1e-6)

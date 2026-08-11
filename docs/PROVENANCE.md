@@ -129,8 +129,11 @@ both a finite generated benchmark set and an immutable 435-row website metric
 snapshot; snapshot rows are reported metrics, not S-box values, and
 paper-reported columns are not recomputed S-boxes.
 
-The Image Lab accepts finite 2D or RGB arrays and applies the named coefficient
-derived kernels with the website's one-reflection boundary index. Color SSIM
-matches the website's clipped 7x7-window luminance calculation; it is not a
-per-channel score. Image metrics and transforms are empirical statistics and
-convolutions, not analytic image-domain or conformal-warp results.
+The Image Lab accepts finite, non-empty 2D (`H×W`) or RGB (`H×W×3`) arrays and
+applies the named coefficient-derived kernels with the website's one-reflection
+boundary index. Color SSIM matches the website's clipped 7×7-window luminance
+calculation; it is not a per-channel score. GMSD uses the website's 2×2
+prefilter and discards a trailing odd row or column, so its package parity
+includes accepted odd-sized inputs. Image metrics and transforms are empirical
+statistics and convolutions, not analytic image-domain or conformal-warp
+results.

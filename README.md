@@ -100,8 +100,10 @@ provable cryptographic security. `leaderboard(scope="website")` and
 `gfa crypto-lab leaderboard --scope website` replay the immutable 435-row
 website metric snapshot; those rows contain reported metrics, not S-box values,
 and are not a new security ranking. The image lab is likewise an empirical
-transform/metric sandbox. It exposes the finite coefficient-derived filter
-subset used by the website's named functions, but does not claim analytic
+transform/metric sandbox. It accepts finite, non-empty 2D (`H×W`) or RGB
+(`H×W×3`) arrays and exposes the finite coefficient-derived filter subset used
+by the website's named functions. GMSD mirrors the website's 2×2 prefilter,
+including its treatment of odd-sized inputs; the package does not claim analytic
 special-function or conformal-warp parity.
 
 ## Python API

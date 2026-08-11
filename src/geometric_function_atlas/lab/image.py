@@ -23,8 +23,21 @@ def _as_float_array(array: Any, *, label: str = "array") -> np.ndarray:
         values = np.asarray(array, dtype=float)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"{label} must be a numeric array") from exc
-    if values.ndim not in (2, 3):
-        raise ValueError(f"{label} must be a 2D or 3D array")
+    valid_shape = (
+        values.ndim == 2
+        and values.shape[0] > 0
+        and values.shape[1] > 0
+    ) or (
+        values.ndim == 3
+        and values.shape[0] > 0
+        and values.shape[1] > 0
+        and values.shape[2] == 3
+    )
+    if not valid_shape:
+        raise ValueError(
+            f"{label} must be a non-empty 2D or RGB array "
+            "with shape HxW or HxWx3"
+        )
     if not np.all(np.isfinite(values)):
         raise ValueError(f"{label} must contain only finite values")
     return values
@@ -133,18 +146,24 @@ def _to_luma_255(image: np.ndarray) -> np.ndarray:
 
 
 def _downsample2(a: np.ndarray) -> np.ndarray:
-    """2x2 average prefilter with nearest-edge padding, then downsample by 2."""
+    """Website-compatible 2x2 average prefilter and downsample by 2.
 
-    padded = np.pad(a, ((0, 1), (0, 1)), mode="edge")
-    height, width = padded.shape
+    The browser implementation only visits complete 2x2 blocks. For an odd
+    height or width its trailing row or column is therefore discarded rather
+    than replicated at the boundary.
+    """
+
+    height, width = a.shape
     even_h = height - (height % 2)
     even_w = width - (width % 2)
-    top = padded[:even_h:2, :even_w:2]
+    if even_h == 0 or even_w == 0:
+        return np.empty((even_h // 2, even_w // 2), dtype=float)
+    top = a[:even_h:2, :even_w:2]
     return (
         top
-        + padded[1 : even_h + 1 : 2, :even_w:2]
-        + padded[:even_h:2, 1 : even_w + 1 : 2]
-        + padded[1 : even_h + 1 : 2, 1 : even_w + 1 : 2]
+        + a[1:even_h:2, :even_w:2]
+        + a[:even_h:2, 1:even_w:2]
+        + a[1:even_h:2, 1:even_w:2]
     ) / 4.0
 
 
@@ -193,6 +212,8 @@ def gmsd(reference: np.ndarray, test: np.ndarray, c: float = 170.0) -> float:
 
     r = _downsample2(_to_luma_255(reference))
     t = _downsample2(_to_luma_255(test))
+    if r.size == 0:
+        return float("nan")
     hx = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]], dtype=float) / 3.0
     hy = hx.T
     mr = np.sqrt(_convolve(r, hx) ** 2 + _convolve(r, hy) ** 2)
@@ -529,8 +550,9 @@ def transform_record(
         VerificationReport,
     )
 
+    values = _as_float_array(array, label="array")
     output = apply_image_transform(
-        array,
+        values,
         operation,
         gain=gain,
         taps=taps,
@@ -555,7 +577,7 @@ def transform_record(
                 VerificationCheck(
                     name="shape_preserved",
                     checked="output shape matches the input",
-                    expected=str(tuple(array.shape)),
+                    expected=str(tuple(values.shape)),
                     observed=str(tuple(output.shape)),
                     status=CheckStatus.PASS,
                     scope="transform execution",
@@ -578,7 +600,7 @@ def transform_record(
             "taps": taps,
             "function": function,
             "parameters": dict(parameters) if parameters is not None else None,
-            "input_shape": list(array.shape),
+            "input_shape": list(values.shape),
             "output_shape": list(output.shape),
             "output_min": float(output.min()),
             "output_max": float(output.max()),

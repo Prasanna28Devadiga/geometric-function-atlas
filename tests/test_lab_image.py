@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from typing import Any
 
 import pytest
@@ -46,6 +48,73 @@ def test_perturbed_image_has_finite_deteriorating_metrics() -> None:
 def test_shape_mismatch_is_rejected() -> None:
     with pytest.raises(ValueError, match="same shape"):
         image_metrics(np.zeros((4, 4)), np.zeros((8, 8)))
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [
+        (4,),
+        (4, 4, 1),
+        (4, 4, 2),
+        (4, 4, 4),
+        (0, 4),
+        (4, 0),
+        (0, 4, 3),
+        (4, 0, 3),
+    ],
+)
+def test_image_metrics_rejects_non_2d_or_rgb_inputs(shape: tuple[int, ...]) -> None:
+    image = np.zeros(shape)
+
+    with pytest.raises(ValueError, match="2D or RGB"):
+        image_metrics(image, image)
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [(4,), (4, 4, 1), (4, 4, 2), (4, 4, 4), (0, 4), (4, 0), (0, 4, 3)],
+)
+def test_image_transform_rejects_non_2d_or_rgb_inputs(shape: tuple[int, ...]) -> None:
+    with pytest.raises(ValueError, match="2D or RGB"):
+        apply_image_transform(np.zeros(shape), "smooth")
+
+
+def test_valid_rgb_transform_remains_supported() -> None:
+    image = np.full((4, 4, 3), 0.5)
+
+    output = apply_image_transform(image, "smooth")
+
+    assert output.shape == image.shape
+    assert np.allclose(output, image)
+
+
+def test_image_lab_cli_rejects_non_rgb_input_without_traceback(tmp_path) -> None:
+    reference = tmp_path / "reference.npy"
+    test = tmp_path / "test.npy"
+    np.save(reference, np.zeros((4, 4, 4)))
+    np.save(test, np.zeros((4, 4, 4)))
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "geometric_function_atlas",
+            "image-lab",
+            "metrics",
+            "--ref",
+            str(reference),
+            "--test",
+            str(test),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 2
+    assert "reference must be a non-empty 2D or RGB array" in completed.stderr
+    assert "Traceback" not in completed.stderr
+    assert completed.stdout == ""
 
 
 def test_smooth_transform_preserves_shape_and_bounds() -> None:

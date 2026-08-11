@@ -53,6 +53,10 @@ full radius discovery, OCR/literature harvesting, and deployment remain outside
 ordinary package commands. Their absence is an explicit boundary, not a
 release-stage label.
 
+Image Lab parity covers finite, non-empty 2D (`H×W`) and RGB (`H×W×3`) inputs.
+For GMSD, the package mirrors the website's 2×2 prefilter exactly, including
+discarding trailing rows or columns on odd-sized inputs.
+
 ## Website panel
 
 Each implemented scientific item should display a small **Run locally** panel,
