@@ -7,6 +7,7 @@ installed console module end to end, including the `--json` envelope.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
 import sys
@@ -27,6 +28,8 @@ def run_cli(*args: str) -> subprocess.CompletedProcess[str]:
 
 
 def test_crypto_construct_accepts_json_flag() -> None:
+    if importlib.util.find_spec("numpy") is None:
+        pytest.skip("crypto lab requires the optional numpy dependency")
     completed = run_cli("crypto-lab", "construct", "cardioid", "--json")
 
     assert completed.returncode == 0, completed.stderr
@@ -34,6 +37,16 @@ def test_crypto_construct_accepts_json_flag() -> None:
     assert payload["details"]["label"] == "constructed:cardioid:keyed"
     assert payload["details"]["NL_min"] >= 0
     assert payload["novelty_claim"] is False
+
+
+def test_crypto_construct_fails_closed_without_lab_extra() -> None:
+    if importlib.util.find_spec("numpy") is not None:
+        pytest.skip("base-install isolation check only applies without numpy")
+    completed = run_cli("crypto-lab", "construct", "cardioid", "--json")
+
+    assert completed.returncode == 3
+    payload = json.loads(completed.stdout)
+    assert payload["failure_state"] == "unsupported"
 
 
 def test_broken_pipe_on_stdout_exits_quietly_with_io_code(

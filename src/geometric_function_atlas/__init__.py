@@ -26,6 +26,8 @@ from .classes import (
     class_containment_screen,
     class_extremal_coefficients,
     class_member_screen,
+)
+from .classes import (
     list_classes as list_screen_classes,
 )
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
@@ -73,7 +75,6 @@ from .plotting import (
     write_plot,
     write_real_part_plot,
 )
-from .records import RecordError, build_screen_record, validate_screen_record
 from .radii import (
     RadiusCertificate,
     RadiusProvenance,
@@ -82,8 +83,10 @@ from .radii import (
     RadiusStatus,
     list_radii,
     radius,
+    replay_radius_certificate,
     verify_radius_certificate,
 )
+from .records import RecordError, build_screen_record, validate_screen_record
 from .snapshot import (
     Application,
     Counterexample,
@@ -108,7 +111,11 @@ from .snapshot import (
     SnapshotVerification,
     VerificationRun,
     install_snapshot,
+)
+from .snapshot import (
     snapshot_info as registry_snapshot_info,
+)
+from .snapshot import (
     verify_snapshot as verify_registry_snapshot,
 )
 from .verify import FunctionVerificationResult, verify_function
@@ -126,28 +133,28 @@ __all__ = [
     "Counterexample",
     "CounterexampleResult",
     "DomainPlotResult",
-    "ExactExpressionError",
     "Evidence",
+    "ExactExpressionError",
     "Fact",
-    "FeketeSzegoResult",
     "FamilyDetail",
+    "FeketeSzegoResult",
     "FunctionFamily",
     "FunctionInstance",
     "FunctionVerificationResult",
     "Generator",
     "GeneratorSeriesResult",
+    "Paper",
+    "PaperClaim",
+    "PaperDetail",
     "PlotResult",
+    "PropertyImplication",
     "RadiusCertificate",
     "RadiusProvenance",
     "RadiusRecord",
     "RadiusReplayResult",
     "RadiusStatus",
-    "Paper",
-    "PaperClaim",
-    "PaperDetail",
-    "PropertyImplication",
-    "RegistrySnapshot",
     "RecordError",
+    "RegistrySnapshot",
     "SearchResult",
     "SnapshotError",
     "SnapshotInfo",
@@ -164,13 +171,13 @@ __all__ = [
     "class_admissibility",
     "class_containment_screen",
     "class_extremal_coefficients",
-    "class_member_screen",
     "class_info",
+    "class_member_screen",
     "coefficient_bound",
     "conformal_grid",
+    "expansion",
     "fekete_szego",
     "find_counterexample",
-    "expansion",
     "generator_function_coefficients",
     "generator_series",
     "get_generator",
@@ -186,18 +193,19 @@ __all__ = [
     "radius",
     "reconciliation",
     "references",
+    "registry_snapshot_info",
+    "replay_radius_certificate",
     "snapshot_info",
     "snapshot_payload",
     "snapshot_verify",
-    "registry_snapshot_info",
     "taylor_coefficients",
     "validate_screen_record",
-    "verify_counterexample",
-    "verify_snapshot",
-    "verify_function",
-    "verify_radius_certificate",
     "validate_snapshot_payload",
     "verify_certificate",
+    "verify_counterexample",
+    "verify_function",
+    "verify_radius_certificate",
+    "verify_snapshot",
     "write_coefficient_plot",
     "write_domain_plot",
     "write_phase_plot",

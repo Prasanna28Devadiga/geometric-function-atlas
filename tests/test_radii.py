@@ -4,6 +4,8 @@ import json
 from dataclasses import replace
 
 import pytest
+import sympy as sp
+from jsonschema import Draft202012Validator
 
 from geometric_function_atlas import (
     FailureState,
@@ -14,7 +16,13 @@ from geometric_function_atlas import (
     replay_radius_certificate,
     verify_radius_certificate,
 )
-from geometric_function_atlas.contracts import ResourceLimitError
+from geometric_function_atlas.contracts import (
+    ResourceLimitError,
+    _decode_expression_dag,
+    load_result_schema,
+    validate_result_payload,
+)
+from geometric_function_atlas.models import canonical_expression_dag
 
 EXPECTED_COUNTS = {
     RadiusStatus.TOUCH_PROVEN_EXACT: 323,
@@ -51,6 +59,31 @@ def test_directed_lookup_keeps_exact_identity_and_review_metadata() -> None:
     assert payload["exact_expressions"]["radius"] == record.value_exact
     assert payload["exact_expression_dag"]["roots"]["radius"]
     assert payload["novelty_claim"] is False
+
+
+def test_radius_exact_dag_round_trips_through_closed_decoder() -> None:
+    payload = radius("sine", "sigmoid").to_dict()
+    dag = payload["exact_expression_dag"]
+
+    decoded = _decode_expression_dag(dag, required_roots=("radius",))
+
+    assert canonical_expression_dag(decoded) == dag
+
+
+def test_radius_payload_is_validated_by_the_public_result_contract() -> None:
+    payload = radius("sine", "sigmoid").to_dict()
+
+    validate_result_payload(payload)
+    Draft202012Validator(load_result_schema()).validate(payload)
+
+
+def test_every_radius_snapshot_payload_is_closed_and_schema_valid() -> None:
+    validator = Draft202012Validator(load_result_schema())
+
+    for record in list_radii():
+        payload = record.to_dict()
+        validate_result_payload(payload)
+        validator.validate(payload)
 
 
 def test_reverse_direction_is_a_different_lookup() -> None:
@@ -90,6 +123,19 @@ def test_replay_reports_inexact_candidate_as_invalid_input() -> None:
     assert result.status == "invalid_input"
     assert result.certified is False
     assert result.failure_state is FailureState.INVALID_INPUT
+
+
+def test_reviewed_radius_replay_does_not_use_string_sympify(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def forbidden(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("radius replay must not call sympify on a string")
+
+    monkeypatch.setattr(sp, "sympify", forbidden)
+    result = verify_radius_certificate("sine", "sigmoid")
+
+    assert result.status == "proven"
+    assert result.certified is True
 
 
 def test_replay_rejects_wrong_direction_and_candidate_substitution() -> None:

@@ -23,6 +23,7 @@ import sympy as sp
 from .contracts import FailureState, InvalidInputError, ResourceLimitError
 from .models import canonical_expression_dag, validate_exact_expression
 from .version import (
+    GENERATOR_CATALOG_VERSION,
     RADIUS_CROSSWALK_COMMIT,
     RADIUS_FIXTURE_ID,
     RADIUS_FIXTURE_SHA256,
@@ -59,6 +60,13 @@ RADIUS_STATUS_LABELS = {
     RadiusStatus.TRIVIAL_CONTAINMENT: "trivial containment phi1(D) subset phi2(D), r = 1",
     RadiusStatus.UNIDENTIFIED: "high-precision radius (60 digits), no closed form identified (open)",
     RadiusStatus.AUDIT_REQUIRED: "symbolic touch check FAILED — quarantined, not a result",
+}
+_CONTRACT_EVIDENCE_STATUS = {
+    RadiusStatus.TOUCH_PROVEN_EXACT: "proven_exact_under_declared_assumptions",
+    RadiusStatus.CLOSED_FORM_CONFIRMED: "certified_enclosure",
+    RadiusStatus.TRIVIAL_CONTAINMENT: "proven_exact_under_declared_assumptions",
+    RadiusStatus.UNIDENTIFIED: "unresolved",
+    RadiusStatus.AUDIT_REQUIRED: "corrupt_artifact",
 }
 RECONCILABLE_STATUSES = frozenset(
     {
@@ -175,12 +183,13 @@ class RadiusRecord:
     def to_dict(self) -> dict[str, Any]:
         """Return deterministic JSON data without executable expression strings."""
 
-        exact = {"radius": self.value_exact}
+        exact: dict[str, str | None] = {"radius": None}
         dag: dict[str, Any] | None = None
         if self.value_exact is not None:
             try:
                 expression = _parse_exact_expression(self.value_exact)
                 dag = canonical_expression_dag({"radius": expression})
+                exact["radius"] = self.value_exact
             except (InvalidInputError, TypeError, ValueError):
                 # Some snapshot rows intentionally retain a CAS display such
                 # as CRootOf(...) without promoting it to a package-owned
@@ -196,12 +205,13 @@ class RadiusRecord:
             "exact_expressions": exact,
             "exact_expression_dag": dag,
             "method": "directed_radius_snapshot",
-            "evidence_status": self.status.value,
-            "computational_status": self.status.value,
+            "evidence_status": _CONTRACT_EVIDENCE_STATUS[self.status],
+            "computational_status": _CONTRACT_EVIDENCE_STATUS[self.status],
             "assumptions": list(self.assumptions),
             "source_references": list(self.provenance.source_references),
             "package_version": __version__,
             "artifact_versions": {
+                "generator_catalog": GENERATOR_CATALOG_VERSION,
                 "radius_snapshot": RADIUS_SNAPSHOT_ID,
                 "source_commit": self.provenance.source_snapshot_commit,
                 "fixture_or_proof": self.provenance.fixture_id,
@@ -212,7 +222,18 @@ class RadiusRecord:
             "verification": {
                 "status": "skipped",
                 "success": False,
-                "checks": [],
+                "checks": [
+                    {
+                        "name": "radius_certificate_replay",
+                        "checked": "exact directed-radius certificate replay",
+                        "expected": "not invoked for a snapshot lookup",
+                        "observed": "skipped",
+                        "status": "skip",
+                        "scope": "snapshot lookup only; no sharpness promotion",
+                        "failure_reason": None,
+                        "required": True,
+                    }
+                ],
             },
             "provenance": "built_in",
             "direction": self.direction,
@@ -331,8 +352,140 @@ _ALLOWED_NAMES: dict[str, Any] = {
     "tan": sp.tan,
     "tanh": sp.tanh,
 }
-_IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*", flags=re.ASCII)
-_ALLOWED_CHARS = re.compile(r"^[A-Za-z0-9_+*/()., ^-]+$", flags=re.ASCII)
+
+_RADIUS_TOKEN = re.compile(
+    r"""
+    \s*(?:
+        (?P<int>[0-9]+)
+      | (?P<name>[A-Za-z_][A-Za-z0-9_]*)
+      | (?P<op>\*\*|[+*/()^-])
+    )""",
+    re.VERBOSE | re.ASCII,
+)
+
+
+class _RadiusExpressionParser:
+    """Parse the bounded radius grammar without evaluating source text."""
+
+    def __init__(self, text: str) -> None:
+        self._text = text
+        self._tokens: list[tuple[str, str]] = []
+        position = 0
+        while position < len(text):
+            match = _RADIUS_TOKEN.match(text, position)
+            if match is None or match.end() == position:
+                raise InvalidInputError(
+                    f"radius candidate contains unsupported syntax at offset {position}"
+                )
+            position = match.end()
+            kind = match.lastgroup
+            assert kind is not None
+            self._tokens.append((kind, match.group(kind)))
+        if not self._tokens:
+            raise InvalidInputError("radius candidate must not be empty")
+        self._index = 0
+
+    def _peek(self) -> tuple[str, str] | None:
+        if self._index >= len(self._tokens):
+            return None
+        return self._tokens[self._index]
+
+    def _take(self, kind: str | None = None) -> tuple[str, str] | None:
+        token = self._peek()
+        if token is None or (kind is not None and token[0] != kind):
+            return None
+        self._index += 1
+        return token
+
+    def _expect(self, kind: str) -> tuple[str, str]:
+        token = self._take(kind)
+        if token is None:
+            raise InvalidInputError(f"radius candidate expected {kind!r}")
+        return token
+
+    def parse(self) -> sp.Expr:
+        value = self._expression(0)
+        if self._peek() is not None:
+            raise InvalidInputError("radius candidate has trailing syntax")
+        return value
+
+    def _expression(self, depth: int) -> sp.Expr:
+        if depth > 32:
+            raise ResourceLimitError("radius candidate nesting is too deep")
+        value = self._term(depth + 1)
+        while (token := self._peek()) is not None and token[0] == "op" and token[1] in {"+", "-"}:
+            operator = self._take("op")
+            assert operator is not None
+            right = self._term(depth + 1)
+            value = value + right if operator[1] == "+" else value - right
+        return value
+
+    def _term(self, depth: int) -> sp.Expr:
+        value = self._factor(depth + 1)
+        while (token := self._peek()) is not None and token[0] == "op" and token[1] in {"*", "/"}:
+            operator = self._take("op")
+            assert operator is not None
+            right = self._factor(depth + 1)
+            if operator[1] == "*":
+                value = value * right
+            else:
+                if right == 0:
+                    raise InvalidInputError("radius candidate divides by zero")
+                value = value / right
+        return value
+
+    def _factor(self, depth: int) -> sp.Expr:
+        if depth > 32:
+            raise ResourceLimitError("radius candidate nesting is too deep")
+        value = self._atom(depth + 1)
+        token = self._peek()
+        if token is not None and token[0] == "op" and token[1] in {"**", "^"}:
+            self._take("op")
+            exponent = self._factor(depth + 1)
+            value = value**exponent
+        return value
+
+    def _atom(self, depth: int) -> sp.Expr:
+        if depth > 32:
+            raise ResourceLimitError("radius candidate nesting is too deep")
+        token = self._peek()
+        if token is None:
+            raise InvalidInputError("radius candidate ended unexpectedly")
+        kind, text = token
+        if kind == "int":
+            self._take("int")
+            if len(text) > 128:
+                raise ResourceLimitError("radius candidate integer is too large")
+            return sp.Integer(text)
+        if kind == "name":
+            self._take("name")
+            if text == "E":
+                return sp.E
+            if text == "pi":
+                return sp.pi
+            function = _ALLOWED_NAMES.get(text)
+            if function is None or not callable(function):
+                raise InvalidInputError(f"radius candidate contains unknown name: {text}")
+            opening = self._take("op")
+            if opening is None or opening[1] != "(":
+                raise InvalidInputError(f"radius function {text} must have one argument")
+            argument = self._expression(depth + 1)
+            closing = self._take("op")
+            if closing is None or closing[1] != ")":
+                raise InvalidInputError(f"radius function {text} is missing ')' ")
+            return function(argument)
+        if kind == "op" and text == "(":
+            self._take("op")
+            value = self._expression(depth + 1)
+            closing = self._take("op")
+            if closing is None or closing[1] != ")":
+                raise InvalidInputError("radius candidate is missing ')' ")
+            return value
+        if kind == "op" and text in {"+", "-"}:
+            self._take("op")
+            value = self._factor(depth + 1)
+            return value if text == "+" else -value
+        raise InvalidInputError(f"radius candidate has unexpected token: {text}")
 
 
 def _parse_exact_expression(value: str) -> sp.Expr:
@@ -344,17 +497,11 @@ def _parse_exact_expression(value: str) -> sp.Expr:
         raise ResourceLimitError(
             f"radius candidate must be at most {MAX_CANDIDATE_LENGTH} characters"
         )
-    if not _ALLOWED_CHARS.fullmatch(value):
-        raise InvalidInputError("radius candidate contains unsupported characters")
-    names = set(_IDENTIFIER.findall(value))
-    unknown = names - set(_ALLOWED_NAMES)
-    if unknown:
-        raise InvalidInputError(
-            f"radius candidate contains unknown names: {sorted(unknown)}"
-        )
     try:
-        expression = sp.sympify(value.replace("^", "**"), locals=_ALLOWED_NAMES)
-    except (SyntaxError, TypeError, ValueError) as exc:
+        expression = _RadiusExpressionParser(value).parse()
+    except (InvalidInputError, ResourceLimitError):
+        raise
+    except (TypeError, ValueError, ArithmeticError) as exc:
         raise InvalidInputError("radius candidate is not a valid exact expression") from exc
     if not isinstance(expression, sp.Expr):
         raise InvalidInputError("radius candidate is not a scalar exact expression")

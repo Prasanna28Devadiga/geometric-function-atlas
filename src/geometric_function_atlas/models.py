@@ -126,6 +126,10 @@ def _dag_key(expression: sp.Basic) -> tuple[Any, ...]:
         return ("symbol", "z")
     if isinstance(expression, sp.Float):
         raise TypeError("expression DAG cannot contain floating-point values")
+    if expression == sp.E:
+        # SymPy represents Euler's constant as ``exp(1)`` with the internal
+        # function name ``Exp1``.  Emit the public, decoder-supported opcode.
+        return ("function", "exp", (("integer", "1"),))
     if isinstance(expression, sp.Add):
         return ("add", tuple(sorted(_dag_key(arg) for arg in expression.args)))
     if isinstance(expression, sp.Mul):

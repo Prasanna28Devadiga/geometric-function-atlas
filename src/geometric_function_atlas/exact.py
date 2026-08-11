@@ -4,10 +4,10 @@ The Geometric Function Atlas certificate corpus stores exact constants as
 compact strings such as ``(48 + 8*pi**2)/(3*pi**4)`` or ``9/2 - 3*sqrt(2)``.
 This module turns those strings into SymPy expressions **without** calling
 ``sympify``/``parse_expr`` (general SymPy string parsing is eval-based) and
-without admitting caller-controlled symbols, function calls, decimals, or
-scientific notation. Only the exact-arithmetic subset used by the baked
-corpus is accepted: non-negative integers, ``pi``, ``sqrt(...)``, ``+ - * / **``
-and parentheses.
+without admitting caller-controlled symbols, decimals, or scientific notation.
+Only the closed exact-arithmetic subset used by the baked corpus is accepted:
+non-negative integers, ``pi``, ``E``, the explicitly allow-listed ``sqrt`` and
+``asin`` calls, and ``+ - * / **`` with parentheses.
 """
 
 from __future__ import annotations
@@ -25,8 +25,8 @@ _TOKEN = re.compile(
     r"""
     \s*(?:
         (?P<int>[0-9]+)
-      | (?P<pi>pi)
-      | (?P<sqrt>sqrt)
+      | (?P<constant>pi|E)
+      | (?P<function>sqrt|asin)
       | (?P<op>\*\*|[+*/()\-])
     )""",
     re.VERBOSE,
@@ -161,19 +161,23 @@ class _Parser:
                     f"integer in {self._text!r} exceeds the {MAX_INTEGER_BITS}-bit bound"
                 )
             return sp.Integer(integer)
-        if kind == "pi":
-            self._take("pi")
-            return sp.pi
-        if kind == "sqrt":
-            self._take("sqrt")
+        if kind == "constant":
+            self._take("constant")
+            return sp.pi if text == "pi" else sp.E
+        if kind == "function":
+            self._take("function")
             opening = self._take("op")
             if opening is None or opening[1] != "(":
-                raise ExactExpressionError(f"sqrt must be followed by '(' in {self._text!r}")
+                raise ExactExpressionError(
+                    f"{text} must be followed by '(' in {self._text!r}"
+                )
             inner = self._expression(depth + 1)
             closing = self._take("op")
             if closing is None or closing[1] != ")":
-                raise ExactExpressionError(f"missing ')' after sqrt in {self._text!r}")
-            return sp.sqrt(sp.expand(inner))
+                raise ExactExpressionError(
+                    f"missing ')' after {text} in {self._text!r}"
+                )
+            return sp.sqrt(sp.expand(inner)) if text == "sqrt" else sp.asin(sp.expand(inner))
         if kind == "op":
             if text == "(":
                 self._take("op")
@@ -198,10 +202,10 @@ class _Parser:
 def parse_exact_expression(text: str) -> sp.Expr:
     """Parse a baked exact constant into a SymPy expression.
 
-    The grammar is closed: non-negative integers, ``pi``, ``sqrt(expr)``,
-    ``+ - * / **`` and parentheses. Decimal, scientific, symbolic, and
-    function-call forms are rejected. ``text`` must be a plain string with a
-    bounded length.
+    The grammar is closed: non-negative integers, ``pi``, ``E``, the
+    allow-listed ``sqrt(expr)`` and ``asin(expr)`` calls, ``+ - * / **`` and
+    parentheses. Decimal, scientific, symbolic, and unknown function-call forms
+    are rejected. ``text`` must be a plain string with a bounded length.
     """
 
     if not isinstance(text, str):

@@ -18,6 +18,7 @@ import tempfile
 import urllib.parse
 import urllib.request
 from collections.abc import Mapping
+from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
 from shutil import which
@@ -884,6 +885,7 @@ class RegistrySnapshot:
         parsed_manifest = _manifest_for(snapshot_path, manifest)
         if parsed_manifest is not None:
             verify_snapshot(snapshot_path, manifest=parsed_manifest, max_bytes=max_bytes, raise_on_error=True)
+        connection: sqlite3.Connection | None = None
         try:
             connection = sqlite3.connect(_file_uri(snapshot_path), uri=True)
             connection.row_factory = sqlite3.Row
@@ -891,11 +893,14 @@ class RegistrySnapshot:
             connection.execute("PRAGMA foreign_keys=ON")
             connection.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone()
         except sqlite3.Error as exc:
+            if connection is not None:
+                connection.close()
             raise SnapshotIntegrityError(f"cannot open immutable SQLite snapshot: {exc}") from exc
         return cls(snapshot_path, connection, parsed_manifest)
 
     @classmethod
     def _unchecked_connection(cls, path: Path) -> sqlite3.Connection:
+        connection: sqlite3.Connection | None = None
         try:
             connection = sqlite3.connect(_file_uri(path), uri=True)
             connection.row_factory = sqlite3.Row
@@ -903,6 +908,8 @@ class RegistrySnapshot:
             connection.execute("SELECT 1 FROM sqlite_master LIMIT 1").fetchone()
             return connection
         except sqlite3.Error as exc:
+            if connection is not None:
+                connection.close()
             raise SnapshotIntegrityError(f"cannot open immutable SQLite snapshot: {exc}") from exc
 
     def close(self) -> None:
@@ -1418,7 +1425,7 @@ def verify_snapshot(
         errors.append(f"snapshot not found: {snapshot_path}")
     else:
         try:
-            with RegistrySnapshot._unchecked_connection(snapshot_path) as connection:
+            with closing(RegistrySnapshot._unchecked_connection(snapshot_path)) as connection:
                 header = connection.execute("SELECT name FROM sqlite_master LIMIT 1").fetchone()
                 checks["sqlite_header"] = "pass" if header is not None else "fail"
                 quick = str(connection.execute("PRAGMA quick_check").fetchone()[0])
@@ -1543,6 +1550,8 @@ def _decompress_zstd(source: Path, destination: Path, *, max_bytes: int) -> None
         stderr=subprocess.PIPE,
     )
     total = 0
+    stderr = ""
+    return_code: int | None = None
     try:
         with destination.open("wb") as stream:
             assert process.stdout is not None
@@ -1556,11 +1565,18 @@ def _decompress_zstd(source: Path, destination: Path, *, max_bytes: int) -> None
         stderr = process.stderr.read().decode("utf-8", "replace") if process.stderr else ""
         return_code = process.wait()
     except SnapshotResourceLimitError:
+        process.kill()
+        process.wait()
         raise
     except OSError as exc:
         process.kill()
         process.wait()
         raise SnapshotIntegrityError(f"cannot write decompressed snapshot: {exc}") from exc
+    finally:
+        if process.stdout is not None:
+            process.stdout.close()
+        if process.stderr is not None:
+            process.stderr.close()
     if return_code != 0:
         raise SnapshotIntegrityError(f"Zstandard decompression failed: {stderr.strip() or return_code}")
 

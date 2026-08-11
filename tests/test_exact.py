@@ -37,6 +37,13 @@ def test_parse_sqrt_expression() -> None:
     assert _equals(parse_exact_expression("sqrt(2)/2"), sp.sqrt(2) / 2)
 
 
+def test_parse_reviewed_radius_expression() -> None:
+    assert _equals(
+        parse_exact_expression("asin((E-1)/(E+1))"),
+        sp.asin((sp.E - 1) / (sp.E + 1)),
+    )
+
+
 def test_parse_compound_rational_kr_value() -> None:
     assert _equals(
         parse_exact_expression("9/2 - 3*sqrt(2)"),

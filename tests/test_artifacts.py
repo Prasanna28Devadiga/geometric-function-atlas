@@ -452,7 +452,7 @@ def test_all_cli_snapshot_payloads_validate_against_the_shipped_schema() -> None
         ("reconciliation",),
         ("references",),
         ("verify-certificate", "starlike__fekete_szego_mu1"),
-        ("snapshot", "verify"),
+        ("artifact-snapshot", "verify"),
     )
     for command in commands:
         payload = _payload_for(command)

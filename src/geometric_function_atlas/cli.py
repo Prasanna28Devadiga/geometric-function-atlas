@@ -660,15 +660,23 @@ def _find_counterexample(args: argparse.Namespace) -> None:
 
 
 def _plot(args: argparse.Namespace) -> None:
+    kind = args.kind
+    generator = args.generator
+    if kind not in {"domain", "coefficients", "real-part", "phase"}:
+        if kind is not None and generator is None:
+            generator = kind
+        kind = "domain"
+    if kind is None:
+        kind = "domain"
     coefficients = None
     if args.coefficients is not None:
         coefficients = tuple(
             _comma_separated_numbers(args.coefficients, label="coefficients")
         )
     result = write_plot(
-        args.kind,
+        kind,
         args.output,
-        generator=args.generator,
+        generator=generator,
         coefficients=coefficients,
         order=args.order,
         grid=args.grid,
@@ -677,9 +685,9 @@ def _plot(args: argparse.Namespace) -> None:
         spokes=args.spokes,
     )
     print(f"Wrote {result.output}")
-    print(f"Kind: {args.kind}")
+    print(f"Kind: {kind}")
     print(f"Model: {result.approximation}")
-    if args.kind == "domain":
+    if kind == "domain":
         print("Scope: visualization of a finite Taylor polynomial; not a proof of the full image domain")
     else:
         print("Scope: sampled numerical visualization; not a proof")
@@ -852,7 +860,11 @@ def _artifact_emit(
     )
     payload = _artifact_data.snapshot_payload(
         result_type=result_type,
-        canonical_inputs=canonical_inputs or {},
+        canonical_inputs={
+            key: value
+            for key, value in (canonical_inputs or {}).items()
+            if value is not None
+        },
         record=record,
         evidence_status=evidence_status,
         assumptions=_ARTIFACT_ASSUMPTIONS,
@@ -1130,7 +1142,11 @@ def _parser() -> argparse.ArgumentParser:
     plot = subparsers.add_parser(
         "plot", help="write an SVG plot (domain, coefficients, real-part, phase)"
     )
-    plot.add_argument("kind", choices=["domain", "coefficients", "real-part", "phase"])
+    plot.add_argument(
+        "kind",
+        nargs="?",
+        help="plot kind, or a generator name for the domain convenience form",
+    )
     plot.add_argument("generator", nargs="?", help="built-in generator")
     plot.add_argument("--coefficients", help="advanced: comma-separated a2,a3,...")
     plot.add_argument("--order", type=int, default=12)

@@ -38,7 +38,12 @@ def test_public_docs_do_not_expose_internal_phase_nomenclature() -> None:
 
     for path in public_docs:
         text = path.read_text(encoding="utf-8")
-        assert re.search(r"\bphase(?:s)?\b", text, re.IGNORECASE) is None, path
+        assert re.search(
+            r"(?:^\s*#{1,6}\s+Phase\b|\bPhase\s+[123]\b|"
+            r"\bLater\s+phases?\b|\brelease\s+phase\b)",
+            text,
+            re.IGNORECASE | re.MULTILINE,
+        ) is None, path
 
 
 def test_readme_computation_examples_execute() -> None:
