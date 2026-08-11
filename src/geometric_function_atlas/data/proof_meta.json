@@ -1,0 +1,143 @@
+{
+ "functionals": {
+  "fekete_szego_mu0.5": [
+   "Fekete–Szegő (μ=½)",
+   "|a_3-\\tfrac12 a_2^{2}|"
+  ],
+  "fekete_szego_mu1": [
+   "Fekete–Szegő (μ=1)",
+   "|a_3-a_2^{2}|"
+  ],
+  "hankel2_2": [
+   "Hankel H₂(2)",
+   "|a_2a_4-a_3^{2}|"
+  ],
+  "hankel3_1": [
+   "Hankel H₃(1)",
+   "|H_{3}(1)|"
+  ],
+  "inv_a3": [
+   "Inverse coeff. |A₃|",
+   "|A_3|=|2a_2^{2}-a_3|"
+  ],
+  "inv_a4": [
+   "Inverse coeff. |A₄|",
+   "|A_4|"
+  ],
+  "log_gamma2": [
+   "Logarithmic γ₂",
+   "|\\gamma_2|"
+  ],
+  "log_gamma3": [
+   "Logarithmic γ₃",
+   "|\\gamma_3|"
+  ],
+  "zalcman_a2a3_a4": [
+   "Gen. Zalcman (2,3)",
+   "|a_2a_3-a_4|"
+  ],
+  "zalcman_a2a4_a5": [
+   "Gen. Zalcman (2,4)",
+   "|a_2a_4-a_5|"
+  ],
+  "zalcman_a3sq_a5": [
+   "Zalcman (n=3)",
+   "|a_3^{2}-a_5|"
+  ]
+ },
+ "known": [
+  {
+   "citation": "Kumar & Verma 2025 (Filomat)",
+   "class_key": "bean_tanh",
+   "functional_key": "hankel2_2"
+  },
+  {
+   "citation": "Lee, Ravichandran & Supramaniam 2013 (#455)",
+   "class_key": "lemniscate",
+   "functional_key": "hankel2_2"
+  },
+  {
+   "citation": "Banga & Sivaprasad Kumar 2020 (Math. Slovaca; #294)",
+   "class_key": "lemniscate",
+   "functional_key": "hankel3_1"
+  },
+  {
+   "citation": "Banga & Sivaprasad Kumar 2020 (Math. Slovaca; #294)",
+   "class_key": "lemniscate",
+   "functional_key": "zalcman_a3sq_a5"
+  },
+  {
+   "citation": "Riaz, Raza & Thomas 2022 (Forum Math.)",
+   "class_key": "sigmoid",
+   "functional_key": "hankel2_2"
+  },
+  {
+   "citation": "Fekete–Szegő 1933 (classical)",
+   "class_key": "starlike",
+   "functional_key": "fekete_szego_mu1"
+  },
+  {
+   "citation": "Kowalczyk–Lecko–Thomas 2022",
+   "class_key": "starlike",
+   "functional_key": "hankel3_1"
+  },
+  {
+   "citation": "Reduces to Fekete–Szegő (μ=2); |A₃| ≤ 5 sharp for S*",
+   "class_key": "starlike",
+   "functional_key": "inv_a3"
+  },
+  {
+   "citation": "|γₙ| ≤ 1/n for S* (classical)",
+   "class_key": "starlike",
+   "functional_key": "log_gamma2"
+  },
+  {
+   "citation": "Generalized Zalcman, Ravichandran–Verma 2016",
+   "class_key": "starlike",
+   "functional_key": "zalcman_a2a3_a4"
+  },
+  {
+   "citation": "Generalized Zalcman, Ravichandran–Verma 2016",
+   "class_key": "starlike",
+   "functional_key": "zalcman_a2a4_a5"
+  },
+  {
+   "citation": "Krushkal (Zalcman conjecture, n=3)",
+   "class_key": "starlike",
+   "functional_key": "zalcman_a3sq_a5"
+  }
+ ],
+ "lemmas": {
+  "bisection-partition": {
+   "cite": "Exact dyadic subdivision.",
+   "plain": "Boxes are bisected at exactly representable midpoints; the union of the certified leaf boxes is provably the entire domain.",
+   "title": "The box partition is complete"
+  },
+  "extremal-second-variation": {
+   "cite": "Local second-variation at the attaining member.",
+   "plain": "At the recognised extremal Schur parameters the functional is a strict local maximum and the certified upper bound equals that attained value.",
+   "title": "The constant is sharp at the extremal"
+  },
+  "fekete-szego-single-harmonic": {
+   "cite": "Keogh & Merkes (1969), single-angle Schur reduction.",
+   "plain": "For the Fekete–Szegő functional the reduced problem has one free angle and the functional is affine in it, so its maximum is |A| + |C| exactly.",
+   "title": "Sharp in closed form (single-harmonic reduction)"
+  },
+  "ieee754-forward-error": {
+   "cite": "IEEE-754 rounding; standard interval arithmetic.",
+   "plain": "Every float64 operation in the interval evaluation is widened by its IEEE-754 forward-error bound, so each computed interval rigorously encloses the true real value.",
+   "title": "Floating-point arithmetic is sound"
+  },
+  "rotation-reduction": {
+   "cite": "Elementary weight homogeneity.",
+   "plain": "The functional is weight-homogeneous under rotation, so its maximum is attained on the rotation-normalised slice (gamma_0 >= 0 real).",
+   "title": "Rotation normalisation"
+  },
+  "schur-onto-coefficient-body": {
+   "cite": "Schur 1917; Foias–Frazho; Simon, OPUC.",
+   "plain": "The Schur recursion maps the closed polydisc exactly onto the admissible coefficient vectors of the class. Ranging the Schur parameters over the polydisc sweeps every member's coefficients.",
+   "title": "Schur parametrisation is exact"
+  }
+ },
+ "schema_version": 1
+}

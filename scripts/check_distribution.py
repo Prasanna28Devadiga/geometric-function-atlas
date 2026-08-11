@@ -40,6 +40,24 @@ def _assert_common(names: list[str], *, archive: Path) -> None:
     assert "geometric_function_atlas/schema/error.schema.json" in joined, (
         f"{archive.name} is missing the error schema"
     )
+    assert "geometric_function_atlas/schema/snapshot-manifest.schema.json" in joined, (
+        f"{archive.name} is missing the snapshot manifest schema"
+    )
+    for data_artifact in (
+        "data/manifest.json",
+        "data/classes.json",
+        "data/expansions.json",
+        "data/bounds.json",
+        "data/certificates.json",
+        "data/open_problems.json",
+        "data/proof_meta.json",
+        "data/reconciliation.json",
+        "data/crypto_lab_leaderboard.json",
+        "data/references.md",
+    ):
+        assert f"geometric_function_atlas/{data_artifact}" in joined, (
+            f"{archive.name} is missing baked artifact {data_artifact}"
+        )
 
 
 def check_wheel(archive: Path) -> None:
@@ -70,8 +88,11 @@ def check_sdist(archive: Path) -> None:
     assert any(name.endswith("/scripts/install.ps1") for name in names)
     assert any(name.endswith("/scripts/check_distribution.py") for name in names)
     assert any(name.endswith("/scripts/check_clean_install.py") for name in names)
+    assert any(name.endswith("/scripts/check_uv_tool_install.py") for name in names)
     assert any(name.endswith("/.github/workflows/ci.yml") for name in names)
     assert any(name.endswith("/CHANGELOG.md") for name in names)
+    assert any(name.endswith("/docs/assets/sine-domain.svg") for name in names)
+    assert any(name.endswith("/docs/assets/polynomial.svg") for name in names)
     assert not any(name.endswith("/docs/RELEASE_SCOPE.md") for name in names)
 
 

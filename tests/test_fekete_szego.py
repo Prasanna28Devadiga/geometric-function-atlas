@@ -37,7 +37,7 @@ def test_result_serializes_without_losing_exact_values() -> None:
     assert payload["value_decimal"] == "0.5000000000000000"
     assert payload["method"] == "ma_minda_fekete_szego_closed_form"
     assert payload["novelty_claim"] is False
-    assert payload["package_version"] == "0.1.1"
+    assert payload["package_version"] == "0.2.0"
     assert payload["artifact_versions"]["generator_catalog"]
     json.dumps(payload)
 

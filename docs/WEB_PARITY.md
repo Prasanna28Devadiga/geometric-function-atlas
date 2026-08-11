@@ -1,26 +1,33 @@
 # Website → package parity
 
 The package is the local reproduction layer for the Geometric Function Atlas website.
-Each scientific webpage action should eventually have one short `gfa` command and a
-Python function backed by the same implementation. A separate GUI is out of scope.
+Each capability represented in this table has one short `gfa` command and a
+Python function backed by the same implementation. Browser-only panels and a
+separate GUI are out of scope.
 
 | Website capability | Local package interface | State |
 |---|---|---|
-| Browse/search function families | `gfa search`, `gfa family` | planned |
-| Inspect facts, instances, evidence, and verification runs | `gfa facts`, `gfa evidence` | planned |
+| Browse/search function families | `gfa generators`, `gfa classes` | **available** |
+| Inspect facts, instances, evidence, and verification runs | `gfa verify`, `gfa class-check` | **available** |
 | Re-check a supplied counterexample witness | `gfa verify-counterexample` | **available** |
-| Verify a function from a closed form or coefficients | `gfa verify` | planned |
+| Verify a function from a closed form or coefficients | `gfa verify` | **available** |
+| Search for a violation and certify it | `gfa find-counterexample` | **available** |
 | Reproduce generator Taylor coefficients | `gfa coefficients` | **available** |
 | Reproduce Fekete–Szegő values and bounds | `gfa fekete-szego` | **available** |
-| Query other coefficient bounds and expansions | `gfa coefficient-bound`, `gfa expansion` | planned |
-| Reproduce function-domain and coefficient plots | `gfa plot` | planned |
-| Query or recompute directed inclusion radii | `gfa radius` | planned |
-| Re-run a stored proof or certificate | `gfa verify-certificate` | planned |
-| Compare classes, hierarchy, and applications | `gfa compare`, `gfa applications` | planned |
-| Inspect papers and reconciliation records | `gfa papers`, `gfa reconciliation` | planned |
-| Reproduce Image Lab transformations | `gfa image-lab` | planned |
-| Reproduce Cryptography Lab metrics | `gfa crypto-lab` | planned |
-| Report registry snapshot statistics | `gfa stats` | planned |
+| Query other coefficient bounds and expansions | `gfa coefficient-bound`, `gfa expansion` | available |
+| Reproduce function-domain and coefficient plots | `gfa plot` | **available** |
+| Query, identify, audit, or bounded-recompute directed inclusion radii | `gfa radius`, `gfa radius-identify`, `gfa radius-audit`, `gfa radius-recompute`, `gfa radius-attainment` | available |
+| Re-run a stored proof or certificate | `gfa verify-certificate` | available |
+| Compare classes and hierarchy | `gfa compare` | **available** |
+| Inspect class application tags | `gfa applications` | available |
+| Inspect papers and reconciliation records | `gfa papers`, `gfa reconciliation` | available |
+| Export citation formats | `gfa citation` | **available** |
+| Query legacy functions, paper facets, and tags | `gfa function`, `gfa functions`, `gfa paper-facets`, `gfa tags` | **available** |
+| Export domain plots as SVG, PNG, or TikZ | `gfa plot domain ... --output ...` | **available** |
+| Replay the website's 435-row cryptography metric snapshot | `gfa crypto-lab leaderboard --scope website` | **available** (reported metrics only; no S-box payload) |
+| Reproduce the Image Lab's finite coefficient-derived filters and metrics | `gfa image-lab` | **available** (lab extra; no analytic or conformal-warp claim) |
+| Reproduce Cryptography Lab benchmark metrics | `gfa crypto-lab` | **available** (lab extra; no security claim) |
+| Report registry snapshot statistics | `gfa stats` | available |
 
 ## Completion rule
 
@@ -32,9 +39,23 @@ A row is complete only when:
 4. the output clearly distinguishes a proof, a certified enclosure, a numerical
    screen, and an unresolved result.
 
-The registry database remains a separately versioned snapshot. Snapshot selection,
-provenance, and integrity checks may be handled internally; ordinary users should not
-need to understand those details to run a command.
+The registry database remains a separately versioned snapshot. The package does
+not bundle it and does not currently publish a canonical snapshot URL. Users
+provide the database and matching manifest explicitly; `gfa snapshot install`
+verifies hashes, populations, and SQLite integrity before installation, while
+paper facets can search citation metadata as well as claims and tags.
+
+The package ships the complete lightweight parity surface represented by this
+table: deterministic generator/class computations, SVG visualizations, baked
+scientific-artifact queries and certificate replay, directed-radius queries and
+reviewed replay, and local immutable-snapshot queries. Heavy proof search,
+full radius discovery, OCR/literature harvesting, and deployment remain outside
+ordinary package commands. Their absence is an explicit boundary, not a
+release-stage label.
+
+Image Lab parity covers finite, non-empty 2D (`H×W`) and RGB (`H×W×3`) inputs.
+For GMSD, the package mirrors the website's 2×2 prefilter exactly, including
+discarding trailing rows or columns on odd-sized inputs.
 
 ## Website panel
 

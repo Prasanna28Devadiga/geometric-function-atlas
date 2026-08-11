@@ -50,6 +50,32 @@ assert counterexample_payload["schema_version"] == 1
 assert counterexample_payload["result_type"] == "counterexample_verification"
 assert counterexample_payload["verification"]["success"] is True
 gfa.validate_result_payload(counterexample_payload)
+
+# Baked scientific artifacts must ship inside the wheel and resolve
+# fail-closed from the installed package.
+artifact_snapshot = gfa.snapshot_verify()
+assert artifact_snapshot["files_verified"] == 8
+assert artifact_snapshot["checks"]["success"] is True
+
+expansion = gfa.expansion("starlike")
+assert expansion["class_key"] == "starlike"
+assert expansion["phi_coeffs_latex"]
+assert expansion["coeffs"][0]["n"] == 2
+
+bound = gfa.coefficient_bound("starlike", "fekete_szego_mu1")
+assert bound["sharp"] is True
+assert bound["value_exact"] == "1"
+
+gallery = gfa.list_proofs()
+assert gallery["count"] == 306
+proof = gfa.get_proof("starlike__fekete_szego_mu1")
+assert proof["status"] == "PROVED"
+replay = gfa.verify_certificate("starlike__fekete_szego_mu1")
+assert replay["matched"] is True
+
+plot = gfa.write_domain_plot("sine.svg", generator="sine", order=3)
+assert plot.output.name == "sine.svg"
+assert "<svg" in open("sine.svg", encoding="utf-8").read()
 """
 
 
@@ -124,6 +150,25 @@ def main(argv: list[str] | None = None) -> int:
         )
         if not json.loads(counterexample.stdout)["certified"]:
             raise AssertionError("installed gfa command did not certify the witness")
+        plot_path = neutral / "sine.svg"
+        plot = subprocess.run(
+            [
+                str(script),
+                "plot",
+                "sine",
+                "--order",
+                "3",
+                "--output",
+                str(plot_path),
+            ],
+            cwd=neutral,
+            check=True,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "PYTHONPATH": ""},
+        )
+        if not plot_path.is_file() or "not a proof of the full image domain" not in plot.stdout:
+            raise AssertionError("installed gfa command did not generate the plot")
         try:
             invalid = subprocess.run(
                 [

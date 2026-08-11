@@ -2,6 +2,42 @@
 
 All notable changes to Geometric Function Atlas are recorded here.
 
+## 0.2.0 — 2026-08-11
+
+### Added
+
+- Tiered function verification (`screen` / `symbolic` / `rigorous`) for
+  normalized functions from coefficients or preconstructed SymPy closed
+  forms, with explicit epistemic labels that never present a numerical
+  screen as a proof.
+- Ma–Minda class operations: admissibility checks, membership screens,
+  containment screens, and exact extremal coefficients. Screens are labelled
+  as screens unless a certified theorem is attached.
+- Counterexample witness search: grid search locates a candidate violation
+  and interval arithmetic certifies the final point.
+- Website plot reproduction as dependency-free SVG: conformal domain grids,
+  coefficient magnitudes, real-part heatmaps, and phase portraits.
+- Optional application labs behind the `lab` extra: Cryptography Lab S-box
+  construction and benchmark metrics with deterministic AES and identity
+  anchors, and Image Lab quality metrics and convolution transforms on
+  deterministic generated arrays. Crypto outputs are benchmark metrics,
+  never security claims; image outputs are empirical.
+- `lab` extra and CI coverage for the optional labs.
+- Python 3.10-compatible typing in the snapshot module and neutral-install
+  checks for the public CLI.
+- Certificate replay records that distinguish artifact lookup, candidate
+  attainment, upper-bound consistency/certification, and independently proven
+  sharpness. Non-sharp source records remain `certified_enclosure`.
+- Citation-aware paper facets (`journal`, `doi`, `citation`) and optional
+  acquisition URLs preserved in snapshot manifests.
+- Bounded directed-radius recompute, identification, audit, and attainment CLI
+  commands; Image Lab convolution now uses the website's reflected boundary
+  indexing rather than edge replication.
+- Valid 3x3, 5x5, and 7x7 image-lab tap handling and XML-valid SVG metadata.
+- Correct signed Walsh LAT output, an immutable 435-row website crypto metric
+  snapshot, exact website Image Lab boundary/luminance-SSIM semantics, and
+  direct package-to-website lab regression probes.
+
 ## 0.1.1 — 2026-08-10
 
 Contract-integrity repair release.
@@ -31,6 +67,7 @@ First software release.
 
 ### Scope
 
-This release does not include registry search, radius-certificate replay, plots,
-image or cryptography labs, mutable registry data, literature novelty decisions,
-or PyPI publication. Those remain separate future phases.
+This release does not include registry search, radius-certificate replay,
+mutable registry data, literature novelty decisions, or PyPI publication.
+Plots, the application labs, and the remaining website capabilities were
+added after this release.

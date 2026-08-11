@@ -43,7 +43,7 @@ def test_ci_dependency_resolution_is_locked_and_cache_free() -> None:
     assert "-latest" not in workflow
     assert 'version: "0.12.3"' in workflow
     assert "enable-cache: false" in workflow
-    assert "uv sync --extra test --locked" in workflow
+    assert "uv sync --extra test --extra lab --locked" in workflow
     assert "uv sync --extra test --extra build --locked" in workflow
     assert workflow.count("uv run --frozen") >= 8
 

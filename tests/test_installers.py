@@ -23,7 +23,7 @@ def test_posix_installer_uses_uv_as_a_managed_python_tool(tmp_path: Path) -> Non
     fake_uv.chmod(0o755)
     fake_gfa = tool_bin / "gfa"
     fake_gfa.write_text(
-        "#!/bin/sh\nprintf 'geometric-function-atlas 0.1.1\\n'\n",
+        "#!/bin/sh\nprintf 'geometric-function-atlas 0.2.0\\n'\n",
         encoding="utf-8",
     )
     fake_gfa.chmod(0o755)
@@ -48,7 +48,7 @@ def test_posix_installer_uses_uv_as_a_managed_python_tool(tmp_path: Path) -> Non
     assert "tool install --managed-python --python 3.12 --force local-wheel.whl" in invocations
     assert "tool update-shell" in invocations
     assert "tool dir --bin" in invocations
-    assert "geometric-function-atlas 0.1.1" in completed.stdout
+    assert "geometric-function-atlas 0.2.0" in completed.stdout
 
 
 def test_windows_installer_has_the_same_managed_python_contract() -> None:
@@ -67,8 +67,8 @@ def test_windows_installer_has_the_same_managed_python_contract() -> None:
 def test_installers_default_to_the_latest_github_release_wheel() -> None:
     release_wheel = (
         "https://github.com/Prasanna28Devadiga/geometric-function-atlas/"
-        "releases/download/v0.1.1/"
-        "geometric_function_atlas-0.1.1-py3-none-any.whl"
+        "releases/download/v0.2.0/"
+        "geometric_function_atlas-0.2.0-py3-none-any.whl"
     )
 
     posix = (ROOT / "scripts" / "install.sh").read_text(encoding="utf-8")
@@ -91,3 +91,13 @@ def test_ci_uses_only_free_public_standard_runners_without_persistent_storage() 
     assert "enable-cache: true" not in workflow
     assert "enable-cache: false" in workflow
     assert 'branches: [main, "release/**"]' not in workflow
+
+
+def test_clean_install_smoke_covers_the_plotting_operation() -> None:
+    smoke = (ROOT / "scripts" / "check_clean_install.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "write_domain_plot" in smoke
+    assert '"plot"' in smoke
+    assert "not a proof of the full image domain" in smoke

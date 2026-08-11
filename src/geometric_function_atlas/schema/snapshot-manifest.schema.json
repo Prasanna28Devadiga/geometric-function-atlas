@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geometric-function-atlas.org/schema/snapshot-manifest-1.json",
+  "title": "Geometric Function Atlas immutable registry snapshot manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_schema_version", "dataset_version", "database"],
+  "properties": {
+    "manifest_schema_version": {"const": 1},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "source_url": {"type": "string", "format": "uri", "pattern": "^https?://"},
+    "database": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "bytes", "sha256", "application_tables", "row_counts"],
+      "properties": {
+        "filename": {"type": "string", "pattern": "^[^/\\\\]+$", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "application_tables": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "row_counts": {
+          "type": "object",
+          "additionalProperties": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "compressed_asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "bytes", "sha256"],
+      "properties": {
+        "filename": {"type": "string", "pattern": "^[^/\\\\]+$", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+      }
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"commit": {"type": "string", "minLength": 1}}
+    }
+  }
+}

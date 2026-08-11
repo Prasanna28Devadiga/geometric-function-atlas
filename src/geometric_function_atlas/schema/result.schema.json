@@ -12,7 +12,7 @@
   ],
   "properties": {
     "schema_version": {"const": 1},
-    "result_type": {"enum": ["generator_series", "fekete_szego", "counterexample_verification"]},
+    "result_type": {"enum": ["generator_series", "fekete_szego", "counterexample_verification", "radius", "certificate_replay", "classes", "coefficient_bound", "expansion", "open_problems", "proof", "proofs", "reconciliation", "references", "snapshot_verify"]},
     "canonical_inputs": {
       "type": "object", "additionalProperties": false,
       "properties": {
@@ -23,7 +23,16 @@
         "target": {"type": "string", "minLength": 1},
         "property": {"type": "string", "minLength": 1},
         "coefficients": {"type": "array", "items": {"type": "string", "minLength": 1}},
-        "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}}
+        "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
+        "class_key": {"type": "string", "minLength": 1},
+        "functional_key": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "kind": {"type": "string", "minLength": 1},
+        "search": {"type": "string"},
+        "status": {"type": "string"},
+        "raw": {"type": "boolean"},
+        "category": {"type": "string"},
+        "action": {"type": "string"}
       }
     },
     "exact_expressions": {
@@ -36,11 +45,17 @@
         "value": {"type": "string", "minLength": 1},
         "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
         "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
-        "threshold": {"type": "string", "minLength": 1}
+        "threshold": {"type": "string", "minLength": 1},
+        "radius": {"type": ["string", "null"], "minLength": 1},
+        "bound": {"type": "string", "minLength": 1},
+        "candidate": {"type": "string", "minLength": 1},
+        "functional_value": {"type": "string", "minLength": 1},
+        "phi_coeffs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "count": {"type": "string", "minLength": 1}
       }
     },
     "exact_expression_dag": {
-      "type": "object", "additionalProperties": false,
+      "type": ["object", "null"], "additionalProperties": false,
       "required": ["version", "nodes", "roots"],
       "properties": {
         "version": {"const": 1},
@@ -58,12 +73,18 @@
             "value": {"type": "string", "pattern": "^n[0-9]+$"},
             "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^n[0-9]+$"}},
             "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "pattern": "^n[0-9]+$"}},
-            "threshold": {"type": "string", "pattern": "^n[0-9]+$"}
+            "threshold": {"type": "string", "pattern": "^n[0-9]+$"},
+            "radius": {"type": "string", "pattern": "^n[0-9]+$"},
+            "bound": {"type": "string", "pattern": "^n[0-9]+$"},
+            "candidate": {"type": "string", "pattern": "^n[0-9]+$"},
+            "functional_value": {"type": "string", "pattern": "^n[0-9]+$"},
+            "phi_coeffs": {"type": "array", "items": {"type": "string", "pattern": "^n[0-9]+$"}},
+            "count": {"type": "string", "pattern": "^n[0-9]+$"}
           }
         }
       }
     },
-    "method": {"enum": ["exact_symbolic_taylor_series", "ma_minda_fekete_szego_closed_form", "certified_point_interval_evaluation"]},
+    "method": {"enum": ["exact_symbolic_taylor_series", "ma_minda_fekete_szego_closed_form", "certified_point_interval_evaluation", "directed_radius_snapshot", "exact_schur_extremal_replay", "baked_class_catalog_lookup", "baked_coefficient_bound_lookup", "baked_expansion_lookup", "baked_open_problems_query", "baked_proof_detail_lookup", "baked_proof_gallery_query", "baked_reconciliation_query", "baked_references_document", "baked_snapshot_integrity_verification"]},
     "evidence_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
     "computational_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
     "assumptions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
@@ -87,15 +108,34 @@
     "mu": {"type": "string", "minLength": 1},
     "B1": {"type": "string", "minLength": 1},
     "B2": {"type": "string", "minLength": 1},
-    "value_exact": {"type": "string", "minLength": 1},
-    "value_decimal": {"type": "string", "minLength": 1},
+    "value_exact": {"type": ["string", "null"], "minLength": 1},
+    "value_decimal": {"type": ["string", "null"], "minLength": 1},
     "theorem_reference": {"type": "string", "minLength": 1},
     "property": {"enum": ["starlike", "becker_univalent", "nehari_univalent"]},
     "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
     "interval": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string", "minLength": 1}},
     "threshold": {"type": "string", "minLength": 1},
     "certified": {"type": "boolean"},
-    "direction": {"enum": ["disproves", "not_disproved", "violates_criterion", "not_violated"]}
+    "direction": {"type": "string", "minLength": 1},
+    "inner": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "value_float": {"type": ["number", "null"]},
+    "touch_angle": {"type": ["number", "null"]},
+    "mode": {"type": ["string", "null"]},
+    "status": {"type": "string", "minLength": 1},
+    "status_label": {"type": "string", "minLength": 1},
+    "reconcilable": {"type": "boolean"},
+    "global_touch_validated": {"type": ["boolean", "null"]},
+    "symbolic_touch": {"type": ["string", "null"]},
+    "inverse_branch_and_domain": {"type": "string", "minLength": 1},
+    "global_containment_route": {"type": "string", "minLength": 1},
+    "contact_and_attainment": {"type": "string", "minLength": 1},
+    "sharpness_status": {"type": "string", "minLength": 1},
+    "reconciliation_status": {"type": ["string", "null"]},
+    "claim_label": {"type": "string", "minLength": 1},
+    "provenance_detail": {"$ref": "#/$defs/json_value"},
+    "certificate": {"$ref": "#/$defs/json_value"},
+    "record": {"$ref": "#/$defs/json_value"}
   },
   "$defs": {
     "json_value": {
@@ -113,7 +153,7 @@
         {"type": "object", "additionalProperties": false, "required": ["id", "op", "numerator", "denominator"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "rational"}, "numerator": {"type": "string", "pattern": "^[+-]?[0-9]+$"}, "denominator": {"type": "string", "pattern": "^\\+?(?:[1-9][0-9]*)$"}}},
         {"type": "object", "additionalProperties": false, "required": ["id", "op", "value"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "symbol"}, "value": {"const": "z"}}},
         {"type": "object", "additionalProperties": false, "required": ["id", "op", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"enum": ["add", "mul", "pow"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}},
-        {"type": "object", "additionalProperties": false, "required": ["id", "op", "name", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "function"}, "name": {"enum": ["Abs", "Max", "cos", "cosh", "exp", "log", "sin", "sinh"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}}
+        {"type": "object", "additionalProperties": false, "required": ["id", "op", "name", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "function"}, "name": {"enum": ["Abs", "Max", "Pi", "acosh", "asin", "asinh", "atan", "atanh", "cos", "cosh", "exp", "log", "pi", "sin", "sinh", "tanh"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}}
       ]
     },
     "verification_check": {
@@ -127,7 +167,7 @@
         "status": {"enum": ["pass", "fail", "skip"]},
         "scope": {"type": "string", "minLength": 1},
         "failure_reason": {"type": ["string", "null"]},
-        "required": {"const": true}
+        "required": {"type": "boolean"}
       },
       "allOf": [
         {"if": {"properties": {"status": {"const": "fail"}}, "required": ["status"]}, "then": {"properties": {"failure_reason": {"type": "string", "minLength": 1}}}},
@@ -264,9 +304,48 @@
       }
     },
     {
+      "if": {"properties": {"result_type": {"const": "radius"}}, "required": ["result_type"]},
+      "then": {
+        "required": ["inner", "target", "direction", "value_exact", "value_decimal", "status", "status_label", "reconcilable", "inverse_branch_and_domain", "global_containment_route", "contact_and_attainment", "sharpness_status", "claim_label", "provenance_detail", "certificate"],
+        "properties": {
+          "method": {"const": "directed_radius_snapshot"},
+          "failure_state": {"type": "null"},
+          "canonical_inputs": {"required": ["inner", "target"], "maxProperties": 2},
+          "exact_expressions": {"required": ["radius"], "maxProperties": 1},
+          "exact_expression_dag": {"anyOf": [{"type": "null"}, {"properties": {"roots": {"required": ["radius"], "maxProperties": 1}}}]},
+          "verification": {
+            "properties": {
+              "status": {"const": "skipped"},
+              "success": {"const": false},
+              "checks": {
+                "minItems": 1,
+                "maxItems": 1,
+                "contains": {"properties": {"name": {"const": "radius_certificate_replay"}, "status": {"const": "skip"}, "required": {"const": true}}, "required": ["name", "status", "required"]}
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"not": {"properties": {"result_type": {"const": "radius"}}, "required": ["result_type"]}},
+      "then": {
+        "properties": {
+          "exact_expression_dag": {"type": "object"},
+          "value_exact": {"type": "string", "minLength": 1},
+          "value_decimal": {"type": "string", "minLength": 1},
+          "direction": {"enum": ["disproves", "not_disproved", "violates_criterion", "not_violated"]}
+        }
+      }
+    },
+    {
       "if": {"properties": {"verification": {"properties": {"success": {"const": true}}}}, "required": ["verification"]},
       "then": {"properties": {"failure_state": {"type": "null"}}},
-      "else": {"required": ["failure_state"], "properties": {"failure_state": {"type": "string"}}}
+      "else": {
+        "if": {"properties": {"result_type": {"const": "radius"}}, "required": ["result_type"]},
+        "then": {},
+        "else": {"required": ["failure_state"], "properties": {"failure_state": {"type": "string"}}}
+      }
     }
   ]
 }

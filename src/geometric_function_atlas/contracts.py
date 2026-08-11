@@ -23,6 +23,8 @@ from .version import (
     FEKETE_FIXTURE_ID,
     GENERATOR_CATALOG_VERSION,
     GENERATOR_FIXTURE_ID,
+    RADIUS_FIXTURE_ID,
+    RADIUS_SOURCE_COMMIT,
     SOURCE_ARTIFACT_COMMIT,
     __version__,
 )
@@ -34,6 +36,7 @@ _RESULT_TYPES = {
     "counterexample_verification",
     "generator_series",
     "fekete_szego",
+    "radius",
 }
 _PROVENANCE_STATES = {"built_in", "caller_supplied"}
 _REQUIRED_ARTIFACT_KEYS = {"generator_catalog", "source_commit", "fixture_or_proof"}
@@ -68,7 +71,24 @@ _OPERATION_CHECKS = {
     },
 }
 _DAG_OPS = {"integer", "rational", "symbol", "add", "mul", "pow", "function"}
-_DAG_FUNCTIONS = {"Abs", "Max", "cos", "cosh", "exp", "log", "sin", "sinh"}
+_DAG_FUNCTIONS = {
+    "Abs",
+    "Max",
+    "Pi",
+    "acosh",
+    "asin",
+    "asinh",
+    "atan",
+    "atanh",
+    "cos",
+    "cosh",
+    "exp",
+    "log",
+    "pi",
+    "sin",
+    "sinh",
+    "tanh",
+}
 _DAG_ID_PATTERN = re.compile(r"n[0-9]+", flags=re.ASCII)
 _INTEGER_PATTERN = re.compile(r"[+-]?[0-9]+", flags=re.ASCII)
 _DENOMINATOR_PATTERN = re.compile(r"\+?[0-9]+", flags=re.ASCII)
@@ -324,7 +344,7 @@ def build_result_payload(
     literature_status: LiteratureStatus | str = LiteratureStatus.NOT_ASSESSED,
     failure_state: FailureState | str | None = None,
 ) -> dict[str, Any]:
-    """Build the stable envelope while retaining Phase-1 legacy fields."""
+    """Build the stable envelope while retaining established result fields."""
 
     status = LiteratureStatus(literature_status)
     failure = None if failure_state is None else FailureState(failure_state)
@@ -439,6 +459,24 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
         "threshold",
         "certified",
         "direction",
+        "inner",
+        "target",
+        "value_float",
+        "touch_angle",
+        "mode",
+        "status",
+        "status_label",
+        "reconcilable",
+        "global_touch_validated",
+        "symbolic_touch",
+        "inverse_branch_and_domain",
+        "global_containment_route",
+        "contact_and_attainment",
+        "sharpness_status",
+        "reconciliation_status",
+        "claim_label",
+        "provenance_detail",
+        "certificate",
     }
     _check_mapping_keys(payload, allowed, "result")
     missing = required - payload.keys()
@@ -485,6 +523,7 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
             "point",
             "interval",
             "threshold",
+            "radius",
         },
         "exact_expressions",
     )
@@ -530,8 +569,26 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
         "property",
         "threshold",
         "direction",
+        "inner",
+        "target",
+        "mode",
+        "status",
+        "status_label",
+        "symbolic_touch",
+        "inverse_branch_and_domain",
+        "global_containment_route",
+        "contact_and_attainment",
+        "sharpness_status",
+        "reconciliation_status",
+        "claim_label",
     }
     for key in string_fields & payload.keys():
+        if (
+            payload["result_type"] == "radius"
+            and key in {"value_exact", "value_decimal", "mode", "symbolic_touch", "reconciliation_status"}
+            and payload[key] is None
+        ):
+            continue
         if not isinstance(payload[key], str) or not payload[key]:
             raise TypeError(f"{key} must be a non-empty string")
     if "order" in payload and (
@@ -569,10 +626,15 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
             "interval",
             "threshold",
         ),
+        "radius": ("radius",),
     }[payload["result_type"]]
-    _validate_expression_dag(
-        payload["exact_expression_dag"], required_roots=required_roots
-    )
+    if payload["result_type"] == "radius" and payload["exact_expression_dag"] is None:
+        if payload["exact_expressions"].get("radius") is not None:
+            raise ValueError("radius payload without a DAG must not declare an exact expression")
+    else:
+        _validate_expression_dag(
+            payload["exact_expression_dag"], required_roots=required_roots
+        )
     _validate_report(payload["verification"])
     _validate_operation_contract(payload)
     _validate_authoritative_operation(payload)
@@ -585,9 +647,9 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
     if payload["verification"]["success"]:
         if failure_state is not None:
             raise ValueError("successful result failure_state must be null")
-    elif failure_state is None:
+    elif failure_state is None and payload["result_type"] != "radius":
         raise ValueError("failed result must declare a failure_state")
-    elif payload["computational_status"] != failure_state:
+    elif failure_state is not None and payload["computational_status"] != failure_state:
         raise ValueError("failed result computational_status must match failure_state")
 
 
@@ -644,10 +706,71 @@ def _check_mapping_keys(
         raise ValueError(f"{label} contains unexpected keys: {sorted(unknown)}")
 
 
+def _validate_radius_operation_contract(payload: Mapping[str, Any]) -> None:
+    """Validate the directed-radius record without promoting its evidence."""
+
+    canonical_inputs = payload["canonical_inputs"]
+    exact_expressions = payload["exact_expressions"]
+    if set(canonical_inputs) != {"inner", "target"}:
+        raise ValueError("radius canonical_inputs must contain exactly inner and target")
+    if set(exact_expressions) != {"radius"}:
+        raise ValueError("radius exact_expressions must contain exactly radius")
+    for key in ("inner", "target"):
+        _require_non_empty_string(canonical_inputs[key], f"canonical_inputs.{key}")
+        if payload.get(key) != canonical_inputs[key]:
+            raise ValueError(f"{key} does not match canonical_inputs.{key}")
+    if payload.get("direction") != f"{canonical_inputs['inner']}->{canonical_inputs['target']}":
+        raise ValueError("radius direction does not match canonical inputs")
+    if payload["exact_expression_dag"] is not None:
+        if payload.get("value_exact") != exact_expressions["radius"]:
+            raise ValueError("value_exact does not match exact_expressions.radius")
+    elif exact_expressions["radius"] is not None:
+        raise ValueError("radius payload without a DAG must not declare an exact expression")
+
+    status = payload.get("status")
+    evidence_by_status = {
+        "touch_proven_exact": "proven_exact_under_declared_assumptions",
+        "closed_form_confirmed": "certified_enclosure",
+        "trivial_containment": "proven_exact_under_declared_assumptions",
+        "unidentified": "unresolved",
+        "audit_required": "corrupt_artifact",
+    }
+    if status not in evidence_by_status:
+        raise ValueError("radius status is not a package-owned value")
+    if payload["evidence_status"] != evidence_by_status[status]:
+        raise ValueError("radius evidence status does not match the stored radius status")
+    if payload["method"] != "directed_radius_snapshot":
+        raise ValueError("radius method is not package-owned")
+    if payload["provenance"] != "built_in":
+        raise ValueError("radius provenance must be built_in")
+    if payload["artifact_versions"]["generator_catalog"] != GENERATOR_CATALOG_VERSION:
+        raise ValueError("radius generator catalog artifact identity is not package-owned")
+    if payload["artifact_versions"]["source_commit"] != RADIUS_SOURCE_COMMIT:
+        raise ValueError("radius source commit artifact identity is not package-owned")
+    fixture = payload["artifact_versions"]["fixture_or_proof"]
+    if fixture != RADIUS_FIXTURE_ID and not fixture.startswith("gft-radius-snapshot:"):
+        raise ValueError("radius fixture artifact identity is not package-owned")
+    if payload["verification"]["status"] != "skipped" or payload["verification"]["success"]:
+        raise ValueError("radius snapshot records must remain un-replayed")
+    checks = payload["verification"]["checks"]
+    if len(checks) != 1 or checks[0]["name"] != "radius_certificate_replay":
+        raise ValueError("radius verification must declare one skipped replay check")
+    if checks[0]["status"] != CheckStatus.SKIP.value:
+        raise ValueError("radius snapshot replay check must be skipped")
+    if payload["exact_expression_dag"] is None:
+        if exact_expressions["radius"] is not None:
+            raise ValueError("radius payload without a DAG must not declare an exact expression")
+    elif not isinstance(exact_expressions["radius"], str) or not exact_expressions["radius"]:
+        raise ValueError("radius exact expression must be a string when a DAG is present")
+
+
 def _validate_operation_contract(payload: Mapping[str, Any]) -> None:
     """Require operation-specific inputs and preserve legacy-field consistency."""
 
     result_type = payload["result_type"]
+    if result_type == "radius":
+        _validate_radius_operation_contract(payload)
+        return
     operation_fields = {
         "generator_series": {
             "generator",
@@ -1030,8 +1153,10 @@ def _validate_expression_dag(dag: Any, *, required_roots: tuple[str, ...]) -> No
                 for item in args
             ):
                 raise ValueError("expression DAG args must be a list of node ids")
-            if op in {"add", "mul", "function"} and not args:
+            if op in {"add", "mul"} and not args:
                 raise ValueError("expression DAG operation requires arguments")
+            if op == "function" and not args and node["name"] not in {"Pi", "pi"}:
+                raise ValueError("expression DAG function requires arguments")
             if op == "pow" and len(args) != 2:
                 raise ValueError("expression DAG power requires two arguments")
             if op == "function" and node["name"] not in _DAG_FUNCTIONS:
@@ -1094,12 +1219,20 @@ def _decode_expression_dag(
     functions = {
         "Abs": sp.Abs,
         "Max": sp.Max,
+        "Pi": lambda: sp.pi,
+        "acosh": sp.acosh,
+        "asin": sp.asin,
+        "asinh": sp.asinh,
+        "atan": sp.atan,
+        "atanh": sp.atanh,
         "cos": sp.cos,
         "cosh": sp.cosh,
         "exp": sp.exp,
         "log": sp.log,
+        "pi": lambda: sp.pi,
         "sin": sp.sin,
         "sinh": sp.sinh,
+        "tanh": sp.tanh,
     }
     decoded: dict[str, sp.Expr] = {}
     visiting: set[str] = set()
@@ -1146,9 +1279,11 @@ def _decode_expression_dag(
 
 
 def _validate_authoritative_operation(payload: Mapping[str, Any]) -> None:
-    """Recompute successful Phase-1 values from the exact DAG, never its printer."""
+    """Recompute successful exact values from the exact DAG, never its printer."""
 
     result_type = payload["result_type"]
+    if result_type == "radius" and payload["exact_expression_dag"] is None:
+        return
     required_roots = {
         "generator_series": ("generator", "coefficients"),
         "fekete_szego": ("generator", "B1", "B2", "value"),
@@ -1158,6 +1293,7 @@ def _validate_authoritative_operation(payload: Mapping[str, Any]) -> None:
             "interval",
             "threshold",
         ),
+        "radius": ("radius",),
     }[result_type]
     roots = _decode_expression_dag(
         payload["exact_expression_dag"],
@@ -1168,6 +1304,8 @@ def _validate_authoritative_operation(payload: Mapping[str, Any]) -> None:
     }
     if canonical_expression_dag(expressions) != payload["exact_expression_dag"]:
         raise ValueError("expression DAG is not canonical")
+    if result_type == "radius":
+        return
     if not payload["verification"]["success"]:
         return
 

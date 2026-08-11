@@ -1,0 +1,1675 @@
+{
+ "conjectures": [
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "bell",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "4/9",
+   "candidate_float": 0.4444444444444444,
+   "candidate_kind": "rational",
+   "class_key": "cardioid",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.4444444444444444
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "cardioid_exp",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "cissoid_diocles",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "crescent",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "9/49",
+   "candidate_float": 0.1836734693877551,
+   "candidate_kind": "rational",
+   "class_key": "epicycloid_6",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.1836734693877551
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "exponential",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A0.5_B-0.5",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A0.75_B-0.25",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "9/16",
+   "candidate_float": 0.5625,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A1_B-0.5",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.5625
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A1_B0",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "limacon_0.5",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/2",
+   "candidate_float": 0.5,
+   "candidate_kind": "rational",
+   "class_key": "limacon_0.707",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.5
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "nephroid",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "nonconvex_sec",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "9/16",
+   "candidate_float": 0.5625,
+   "candidate_kind": "rational",
+   "class_key": "order_0.25",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.5625
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "order_0.5",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "parabolic",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.16425571607494938
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "petal_arcsinh",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "sine",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1",
+   "candidate_float": 1.0,
+   "candidate_kind": "rational",
+   "class_key": "starlike",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 1.0
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "strip_arctan",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "strongly_0.5",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "9/16",
+   "candidate_float": 0.5625,
+   "candidate_kind": "rational",
+   "class_key": "strongly_0.75",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.5625
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "tanh",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^2",
+   "functional_key": "hankel2_2",
+   "m": 3,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/36",
+   "candidate_float": 0.027777777777777776,
+   "candidate_kind": "rational",
+   "class_key": "bean_tanh",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.027777777777777776
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "bell",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "cardioid",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.19753086419753085
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "cardioid_exp",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "cissoid_diocles",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/36",
+   "candidate_float": 0.027777777777777776,
+   "candidate_kind": "rational",
+   "class_key": "cosh_sqrt",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.027777777777777776
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "crescent",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/16",
+   "candidate_float": 0.0625,
+   "candidate_kind": "rational",
+   "class_key": "epicycloid_3",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.0625
+  },
+  {
+   "candidate_exact": "4/49",
+   "candidate_float": 0.08163265306122448,
+   "candidate_kind": "rational",
+   "class_key": "epicycloid_6",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.08163265306122448
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "exponential",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "four_leaf",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.07716049382716049
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A0.5_B-0.5",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A0.75_B-0.25",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A1_B-0.5",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A1_B0",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/36",
+   "candidate_float": 0.027777777777777776,
+   "candidate_kind": "rational",
+   "class_key": "lemniscate",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.027777777777777776
+  },
+  {
+   "candidate_exact": "1/25",
+   "candidate_float": 0.04,
+   "candidate_kind": "rational",
+   "class_key": "limacon_0.3",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.04
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "limacon_0.5",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "2/9",
+   "candidate_float": 0.2222222222222222,
+   "candidate_kind": "rational",
+   "class_key": "limacon_0.707",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.2222222222222222
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "nephroid",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "nonconvex_sec",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "order_0.25",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "order_0.5",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/36",
+   "candidate_float": 0.027777777777777776,
+   "candidate_kind": "rational",
+   "class_key": "order_0.75",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.027777777777777776
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "parabolic",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.07300254047775527
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "petal_arcsinh",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "rational_kr",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.019063652805978878
+  },
+  {
+   "candidate_exact": "1/36",
+   "candidate_float": 0.027777777777777776,
+   "candidate_kind": "rational",
+   "class_key": "sigmoid",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.027777777777777776
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "sine",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "4/9",
+   "candidate_float": 0.4444444444444444,
+   "candidate_kind": "rational",
+   "class_key": "starlike",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.4444444444444444
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "strip_arctan",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/36",
+   "candidate_float": 0.027777777777777776,
+   "candidate_kind": "rational",
+   "class_key": "strongly_0.25",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.027777777777777776
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "strongly_0.5",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "strongly_0.75",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/9",
+   "candidate_float": 0.1111111111111111,
+   "candidate_kind": "rational",
+   "class_key": "tanh",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.1111111111111111
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "three_leaf",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "extremal_omega": "z^3",
+   "functional_key": "hankel3_1",
+   "m": 4,
+   "numeric_max": 0.07111111111111111
+  },
+  {
+   "candidate_exact": "1/8",
+   "candidate_float": 0.125,
+   "candidate_kind": "rational",
+   "class_key": "bean_tanh",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.125
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "bell",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.4849906191358646
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "cardioid",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 1.0102880658436213
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "cardioid_exp",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.5142045454544266
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "cissoid_diocles",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.36817738791347104
+  },
+  {
+   "candidate_exact": "1/8",
+   "candidate_float": 0.125,
+   "candidate_kind": "rational",
+   "class_key": "cosh_sqrt",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.125
+  },
+  {
+   "candidate_exact": "19/48",
+   "candidate_float": 0.3958333333333333,
+   "candidate_kind": "rational",
+   "class_key": "crescent",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.3958333333333333
+  },
+  {
+   "candidate_exact": "3/16",
+   "candidate_float": 0.1875,
+   "candidate_kind": "rational",
+   "class_key": "epicycloid_3",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.1875
+  },
+  {
+   "candidate_exact": "3/14",
+   "candidate_float": 0.21428571428571427,
+   "candidate_kind": "rational",
+   "class_key": "epicycloid_6",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.21428571428571427
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "exponential",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.3398876404483784
+  },
+  {
+   "candidate_exact": "5/24",
+   "candidate_float": 0.20833333333333334,
+   "candidate_kind": "rational",
+   "class_key": "four_leaf",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.20833333333333334
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "janowski_A0.5_B-0.5",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.3287202380950594
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "janowski_A0.75_B-0.25",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.26270833333248195
+  },
+  {
+   "candidate_exact": "21/16",
+   "candidate_float": 1.3125,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A1_B-0.5",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 1.3125
+  },
+  {
+   "candidate_exact": "1/4",
+   "candidate_float": 0.25,
+   "candidate_kind": "rational",
+   "class_key": "janowski_A1_B0",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.25
+  },
+  {
+   "candidate_exact": "1/8",
+   "candidate_float": 0.125,
+   "candidate_kind": "rational",
+   "class_key": "lemniscate",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.125
+  },
+  {
+   "candidate_exact": "3/20",
+   "candidate_float": 0.15,
+   "candidate_kind": "rational",
+   "class_key": "limacon_0.3",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.15
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "limacon_0.5",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.27867647056249717
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "limacon_0.707",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 1.1145833333333333
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "nephroid",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.3194444444444444
+  },
+  {
+   "candidate_exact": "1/3",
+   "candidate_float": 0.3333333333333333,
+   "candidate_kind": "rational",
+   "class_key": "nonconvex_sec",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.33333333333292453
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "order_0.25",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 1.1682692307682079
+  },
+  {
+   "candidate_exact": "8/17",
+   "candidate_float": 0.47058823529411764,
+   "candidate_kind": "rational",
+   "class_key": "order_0.5",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.47058823529371346
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "order_0.75",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.17025862068942754
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "parabolic",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.255494333804746
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "petal_arcsinh",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.26388888888888895
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "rational_kr",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.11185919437485758
+  },
+  {
+   "candidate_exact": "1/8",
+   "candidate_float": 0.125,
+   "candidate_kind": "rational",
+   "class_key": "sigmoid",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.125
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "sine",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.26388888888888895
+  },
+  {
+   "candidate_exact": "4",
+   "candidate_float": 4.0,
+   "candidate_kind": "rational",
+   "class_key": "starlike",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 4.0
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "strip_arctan",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.3194444444444444
+  },
+  {
+   "candidate_exact": "1/8",
+   "candidate_float": 0.125,
+   "candidate_kind": "rational",
+   "class_key": "strongly_0.25",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.125
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "strongly_0.5",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.3202614379080153
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "strongly_0.75",
+   "extremal_gammas": [],
+   "extremal_omega": null,
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 1.0817307692282179
+  },
+  {
+   "candidate_exact": null,
+   "candidate_float": null,
+   "candidate_kind": "numeric",
+   "class_key": "tanh",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0",
+    "0.0"
+   ],
+   "extremal_omega": "z",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.3194444444444444
+  },
+  {
+   "candidate_exact": "1/5",
+   "candidate_float": 0.2,
+   "candidate_kind": "rational",
+   "class_key": "three_leaf",
+   "extremal_gammas": [
+    "0.0",
+    "0.0",
+    "0.0",
+    "1.0"
+   ],
+   "extremal_omega": "z^4",
+   "functional_key": "zalcman_a3sq_a5",
+   "m": 4,
+   "numeric_max": 0.2
+  }
+ ],
+ "enclosures": [
+  {
+   "bound_exact": "1/16",
+   "bracket_hi": 0.0725,
+   "bracket_lo": 0.0625,
+   "candidate_exact": "1/16",
+   "candidate_float": 0.0625,
+   "candidate_method": "declared bound",
+   "class_key": "bean_tanh",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "bean_tanh__hankel2_2",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 0.01
+  },
+  {
+   "bound_exact": "1/16",
+   "bracket_hi": 0.0725,
+   "bracket_lo": 0.0625,
+   "candidate_exact": "1/16",
+   "candidate_float": 0.0625,
+   "candidate_method": "declared bound",
+   "class_key": "cosh_sqrt",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "cosh_sqrt__hankel2_2",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 0.01
+  },
+  {
+   "bound_exact": "5/32",
+   "bracket_hi": 0.16625,
+   "bracket_lo": 0.140625,
+   "candidate_exact": "9/64",
+   "candidate_float": 0.140625,
+   "candidate_method": "attained extremal ω=z² (bracket_lo); moment-SOS-confirmed",
+   "class_key": "epicycloid_3",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "epicycloid_3__hankel2_2",
+   "note": "Candidate = the rigorously attained extremal value (sharp.bracket_lo, at ω=z²), confirmed sharp by moment-SOS (gft/sos.py, cross-checked 3 ways) and equal to the general second-Hankel value (B₁/2)² for S*(φ) (Lee–Ravichandran–Supramaniam 2013). The earlier candidate equalled the loose B&B bound and exceeded (B₁/2)² — impossible as a sharp value. Rigorous enclosure (bound/slack) unchanged; exact-rational upper certificate still open (heavy box).",
+   "slack": 0.01
+  },
+  {
+   "bound_exact": "3/16",
+   "bracket_hi": 0.2075,
+   "bracket_lo": 0.1736111111111111,
+   "candidate_exact": "25/144",
+   "candidate_float": 0.1736111111111111,
+   "candidate_method": "attained extremal ω=z² (bracket_lo); moment-SOS-confirmed",
+   "class_key": "four_leaf",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "four_leaf__hankel2_2",
+   "note": "Candidate = the rigorously attained extremal value (sharp.bracket_lo, at ω=z²), confirmed sharp by moment-SOS (gft/sos.py, cross-checked 3 ways) and equal to the general second-Hankel value (B₁/2)² for S*(φ) (Lee–Ravichandran–Supramaniam 2013). The earlier candidate equalled the loose B&B bound and exceeded (B₁/2)² — impossible as a sharp value. Rigorous enclosure (bound/slack) unchanged; exact-rational upper certificate still open (heavy box).",
+   "slack": 0.02
+  },
+  {
+   "bound_exact": "1/16",
+   "bracket_hi": 0.0725,
+   "bracket_lo": 0.0625,
+   "candidate_exact": "1/16",
+   "candidate_float": 0.0625,
+   "candidate_method": "declared bound",
+   "class_key": "lemniscate",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "lemniscate__hankel2_2",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 0.01
+  },
+  {
+   "bound_exact": "3/32",
+   "bracket_hi": 0.11375,
+   "bracket_lo": 0.09,
+   "candidate_exact": "9/100",
+   "candidate_float": 0.09,
+   "candidate_method": "attained extremal ω=z² (bracket_lo); moment-SOS-confirmed",
+   "class_key": "limacon_0.3",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "limacon_0.3__hankel2_2",
+   "note": "Candidate = the rigorously attained extremal value (sharp.bracket_lo, at ω=z²), confirmed sharp by moment-SOS (gft/sos.py, cross-checked 3 ways) and equal to the general second-Hankel value (B₁/2)² for S*(φ) (Lee–Ravichandran–Supramaniam 2013). The earlier candidate equalled the loose B&B bound and exceeded (B₁/2)² — impossible as a sharp value. Rigorous enclosure (bound/slack) unchanged; exact-rational upper certificate still open (heavy box).",
+   "slack": 0.02
+  },
+  {
+   "bound_exact": "1/16",
+   "bracket_hi": 0.0825,
+   "bracket_lo": 0.0625,
+   "candidate_exact": "1/16",
+   "candidate_float": 0.0625,
+   "candidate_method": "declared bound",
+   "class_key": "order_0.75",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "order_0.75__hankel2_2",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 0.02
+  },
+  {
+   "bound_exact": "3/4 - sqrt(2)/2",
+   "bracket_hi": 0.05289321881345248,
+   "bracket_lo": 0.042893218813452476,
+   "candidate_exact": "3/4 - sqrt(2)/2",
+   "candidate_float": 0.042893218813452476,
+   "candidate_method": "declared bound",
+   "class_key": "rational_kr",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "rational_kr__hankel2_2",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 0.01
+  },
+  {
+   "bound_exact": "1/16",
+   "bracket_hi": 0.0725,
+   "bracket_lo": 0.0625,
+   "candidate_exact": "1/16",
+   "candidate_float": 0.0625,
+   "candidate_method": "declared bound",
+   "class_key": "sigmoid",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "sigmoid__hankel2_2",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 0.01
+  },
+  {
+   "bound_exact": "2",
+   "bracket_hi": 2.000001,
+   "bracket_lo": 2.0,
+   "candidate_exact": "2",
+   "candidate_float": 2.0,
+   "candidate_method": "declared bound",
+   "class_key": "starlike",
+   "extremal_gammas": [
+    "1.0",
+    "0.0",
+    "0.0"
+   ],
+   "functional_key": "zalcman_a2a3_a4",
+   "name": "starlike__zalcman_a2a3_a4",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 1e-06
+  },
+  {
+   "bound_exact": "1/16",
+   "bracket_hi": 0.0725,
+   "bracket_lo": 0.0625,
+   "candidate_exact": "1/16",
+   "candidate_float": 0.0625,
+   "candidate_method": "declared bound",
+   "class_key": "strongly_0.25",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "strongly_0.25__hankel2_2",
+   "note": "Candidate exact constant recognised from the certified bracket and matched to the attained extremal value. Not a proof; sharp closure requires the second-variation certificate.",
+   "slack": 0.01
+  },
+  {
+   "bound_exact": "1/6",
+   "bracket_hi": 0.18666666666666665,
+   "bracket_lo": 0.16,
+   "candidate_exact": "4/25",
+   "candidate_float": 0.16,
+   "candidate_method": "attained extremal ω=z² (bracket_lo); moment-SOS-confirmed",
+   "class_key": "three_leaf",
+   "extremal_gammas": [
+    "0.0",
+    "1.0",
+    "0.0"
+   ],
+   "functional_key": "hankel2_2",
+   "name": "three_leaf__hankel2_2",
+   "note": "Candidate = the rigorously attained extremal value (sharp.bracket_lo, at ω=z²), confirmed sharp by moment-SOS (gft/sos.py, cross-checked 3 ways) and equal to the general second-Hankel value (B₁/2)² for S*(φ) (Lee–Ravichandran–Supramaniam 2013). The earlier candidate equalled the loose B&B bound and exceeded (B₁/2)² — impossible as a sharp value. Rigorous enclosure (bound/slack) unchanged; exact-rational upper certificate still open (heavy box).",
+   "slack": 0.02
+  }
+ ],
+ "schema_version": 1
+}

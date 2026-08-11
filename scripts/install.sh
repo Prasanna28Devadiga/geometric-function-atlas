@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-release_wheel=https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.1.1/geometric_function_atlas-0.1.1-py3-none-any.whl
+release_wheel=https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.2.0/geometric_function_atlas-0.2.0-py3-none-any.whl
 package_spec=${GFA_PACKAGE_SPEC:-$release_wheel}
 python_version=${GFA_PYTHON_VERSION:-3.12}
 uv_install_dir=${UV_INSTALL_DIR:-"$HOME/.local/bin"}
