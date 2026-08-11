@@ -67,27 +67,27 @@ def pcc(reference: np.ndarray, test: np.ndarray) -> float:
 
 
 def _uniform_filter(a: np.ndarray, win: int) -> np.ndarray:
-    """2D mean filter with reflect padding (matches scipy's default)."""
+    """2D mean filter using the website's clipped edge windows."""
 
-    pad = win // 2
-    padded = np.pad(a, pad, mode="reflect").astype(float)
-    cumulative = np.cumsum(np.cumsum(padded, axis=0), axis=1)
-    height, width = a.shape
-    top = np.arange(height)[:, None]
-    left = np.arange(width)[None, :]
-    bottom = top + win - 1
-    right = left + win - 1
-    top_ok = top >= 1
-    left_ok = left >= 1
-    result = cumulative[bottom, right]
-    result = np.where(top_ok, result - cumulative[top - 1, right], result)
-    result = np.where(left_ok, result - cumulative[bottom, left - 1], result)
-    result = np.where(
-        top_ok & left_ok,
-        result + cumulative[top - 1, left - 1],
-        result,
+    if win < 1 or win % 2 != 1:
+        raise ValueError("win must be a positive odd integer")
+    integral = np.zeros((a.shape[0] + 1, a.shape[1] + 1), dtype=float)
+    integral[1:, 1:] = np.cumsum(
+        np.cumsum(a.astype(float), axis=0), axis=1
     )
-    return result / (win * win)
+    height, width = a.shape
+    radius = win // 2
+    top = np.maximum(np.arange(height) - radius, 0)[:, None]
+    bottom = np.minimum(np.arange(height) + radius, height - 1)[:, None] + 1
+    left = np.maximum(np.arange(width) - radius, 0)[None, :]
+    right = np.minimum(np.arange(width) + radius, width - 1)[None, :] + 1
+    total = (
+        integral[bottom, right]
+        - integral[top, right]
+        - integral[bottom, left]
+        + integral[top, left]
+    )
+    return total / ((bottom - top) * (right - left))
 
 
 def _ssim_channel(
@@ -112,23 +112,24 @@ def _ssim_channel(
 
 def ssim(reference: np.ndarray, test: np.ndarray, max_val: float = 1.0) -> float:
     if reference.ndim == 3:
-        return float(
-            np.mean(
-                [
-                    _ssim_channel(reference[..., c], test[..., c], max_val=max_val)
-                    for c in range(reference.shape[2])
-                ]
-            )
+        return _ssim_channel(
+            _to_luma(reference), _to_luma(test), max_val=max_val
         )
     return _ssim_channel(reference, test, max_val=max_val)
 
 
-def _to_luma_255(image: np.ndarray) -> np.ndarray:
+def _to_luma(image: np.ndarray) -> np.ndarray:
     if image.ndim == 3:
-        image = (
-            0.299 * image[..., 0] + 0.587 * image[..., 1] + 0.114 * image[..., 2]
+        return (
+            0.299 * image[..., 0]
+            + 0.587 * image[..., 1]
+            + 0.114 * image[..., 2]
         )
-    return image * 255.0
+    return image
+
+
+def _to_luma_255(image: np.ndarray) -> np.ndarray:
+    return _to_luma(image) * 255.0
 
 
 def _downsample2(a: np.ndarray) -> np.ndarray:
@@ -147,27 +148,43 @@ def _downsample2(a: np.ndarray) -> np.ndarray:
     ) / 4.0
 
 
-def _convolve(a: np.ndarray, kernel: np.ndarray) -> np.ndarray:
-    """Odd-sized correlation with the website's reflect boundary mode.
+def _website_reflect(index: int, length: int) -> int:
+    """Return one boundary index using ``static-site/lab.js::reflect``."""
 
-    The static Image Lab and its SciPy reference use ``mode="reflect"``:
-    boundary pixels are mirrored at the edge (the edge value is repeated in
-    the reflected sequence).  NumPy calls this convention ``symmetric``;
-    ``mode="edge"`` would silently change the transform at every boundary.
-    """
+    if index < 0:
+        index = -index - 1
+    if index >= length:
+        index = 2 * length - index - 1
+    return max(0, min(length - 1, index))
+
+
+def _convolve(a: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    """Odd-sized correlation with the website's one-reflection boundary mode."""
 
     if kernel.ndim != 2 or kernel.shape[0] != kernel.shape[1] or kernel.shape[0] % 2 != 1:
         raise ValueError("kernel must be a square array with odd side length")
     side = kernel.shape[0]
-    pad = side // 2
-    padded = np.pad(a, pad, mode="symmetric")
     result = np.zeros_like(a, dtype=float)
+    center = side // 2
+    row_indices = np.asarray(
+        [
+            [_website_reflect(y + row - center, a.shape[0]) for y in range(a.shape[0])]
+            for row in range(side)
+        ]
+    )
+    column_indices = np.asarray(
+        [
+            [_website_reflect(x + column - center, a.shape[1]) for x in range(a.shape[1])]
+            for column in range(side)
+        ]
+    )
     for row in range(side):
         for column in range(side):
-            result += (
-                kernel[row, column]
-                * padded[row : row + a.shape[0], column : column + a.shape[1]]
-            )
+            if kernel[row, column] == 0:
+                continue
+            result += kernel[row, column] * a[
+                row_indices[row][:, None], column_indices[column][None, :]
+            ]
     return result
 
 

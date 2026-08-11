@@ -900,7 +900,7 @@ def _crypto_lab(args: argparse.Namespace) -> None:
     if args.action == "leaderboard":
         from .lab import leaderboard
 
-        rows = list(leaderboard())
+        rows = list(leaderboard(scope=args.scope))
         if args.json:
             _write(rows, as_json=True)
         else:
@@ -1445,7 +1445,10 @@ def _parser() -> argparse.ArgumentParser:
     search.set_defaults(handler=_find_counterexample)
 
     plot = subparsers.add_parser(
-        "plot", help="write an SVG plot (domain, coefficients, real-part, phase)"
+        "plot",
+        help=(
+            "write a plot (SVG for every kind; domain also supports PNG/TikZ)"
+        ),
     )
     plot.add_argument(
         "kind",
@@ -1459,7 +1462,11 @@ def _parser() -> argparse.ArgumentParser:
     plot.add_argument("--radius", type=float, default=0.98)
     plot.add_argument("--rings", type=int, default=5)
     plot.add_argument("--spokes", type=int, default=12)
-    plot.add_argument("--output", required=True, help="output SVG path")
+    plot.add_argument(
+        "--output",
+        required=True,
+        help="output path (.svg; domain also accepts .png, .tikz, or .tex)",
+    )
     plot.set_defaults(handler=_plot)
 
     crypto_lab = subparsers.add_parser(
@@ -1495,7 +1502,13 @@ def _parser() -> argparse.ArgumentParser:
         crypto_view.add_argument("--json", action="store_true", help="emit JSON")
         crypto_view.set_defaults(handler=_crypto_lab)
     crypto_leaderboard = crypto_sub.add_parser(
-        "leaderboard", help="rank the finite named package/reference set"
+        "leaderboard", help="rank package metrics or replay the website snapshot"
+    )
+    crypto_leaderboard.add_argument(
+        "--scope",
+        choices=["package", "website"],
+        default="package",
+        help="use the package construction set or the bundled website metric snapshot",
     )
     crypto_leaderboard.add_argument("--json", action="store_true", help="emit JSON")
     crypto_leaderboard.set_defaults(handler=_crypto_lab)

@@ -74,6 +74,17 @@ def test_crypto_compare_reports_explicit_reference_deltas() -> None:
     assert "security" in payload["scope"]
 
 
+def test_crypto_website_leaderboard_scope_is_explicit() -> None:
+    if importlib.util.find_spec("numpy") is None:
+        pytest.skip("crypto lab requires the optional numpy dependency")
+    completed = run_cli("crypto-lab", "leaderboard", "--scope", "website", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert len(payload) == 435
+    assert payload[0]["source"] == "website_snapshot"
+
+
 def test_radius_recompute_audit_and_identify_cli_paths_are_bounded() -> None:
     recompute = run_cli("radius-recompute", "sine", "sigmoid", "--json")
     assert recompute.returncode == 0, recompute.stdout
@@ -347,6 +358,37 @@ def test_plot_command_writes_svg_phase_plot(tmp_path: Path) -> None:
     assert completed.returncode == 0, completed.stderr
     assert output.exists()
     assert "<svg" in output.read_text(encoding="utf-8")
+
+
+def test_plot_command_supports_website_domain_export_formats(tmp_path: Path) -> None:
+    for suffix in (".png", ".tikz"):
+        output = tmp_path / f"domain{suffix}"
+        completed = run_cli(
+            "plot",
+            "domain",
+            "sine",
+            "--rings",
+            "1",
+            "--spokes",
+            "1",
+            "--output",
+            str(output),
+        )
+
+        assert completed.returncode == 0, completed.stderr
+        assert output.is_file()
+
+
+def test_cli_help_lists_complete_supported_commands_and_plot_formats() -> None:
+    completed = run_cli("--help")
+    plot_help = run_cli("plot", "--help")
+
+    assert completed.returncode == 0
+    assert plot_help.returncode == 0
+    for command in ("citation", "function", "functions", "paper-facets", "tags"):
+        assert command in completed.stdout
+    assert ".png" in plot_help.stdout
+    assert ".tikz" in plot_help.stdout
 
 
 def test_lab_commands_fail_cleanly_without_numpy() -> None:

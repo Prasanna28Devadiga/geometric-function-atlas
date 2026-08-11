@@ -37,6 +37,21 @@ def test_readme_states_snapshot_acquisition_and_lab_scope() -> None:
     assert "conformal-warp parity" in readme
 
 
+def test_readme_lists_all_installed_commands_and_domain_export_formats() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    for command in (
+        "gfa citation",
+        "gfa function",
+        "gfa functions",
+        "gfa paper-facets",
+        "gfa tags",
+    ):
+        assert command in readme
+    assert "domain PNG" in readme
+    assert "domain TikZ" in readme
+
+
 def test_public_docs_do_not_expose_internal_phase_nomenclature() -> None:
     public_docs = (
         ROOT / "README.md",

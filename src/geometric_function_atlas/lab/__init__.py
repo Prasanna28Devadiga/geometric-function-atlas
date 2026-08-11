@@ -36,6 +36,7 @@ _CRYPTO_EXPORTS = frozenset(
         "sbox_structure",
         "sbox_metrics",
         "sbox_metrics_record",
+        "website_leaderboard",
     }
 )
 _IMAGE_EXPORTS = frozenset(

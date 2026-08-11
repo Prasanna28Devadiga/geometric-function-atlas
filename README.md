@@ -25,12 +25,13 @@ only panels and research-workspace workflows are explicit non-goals.
 | Screen membership of f in a class | `gfa class-member <key> --coefficients ...` | `class_member_screen()` |
 | Screen class containment | `gfa compare <inner> <outer>` | `class_containment_screen()` |
 | Exact extremal coefficients of a class | `gfa extremal-coefficients <key>` | `class_extremal_coefficients()` |
-| Reproduce website plots | `gfa plot <kind> <gen> --output out.svg` | `write_plot()` and friends |
+| Export citations | `gfa citation ...` | `citation_export()` |
+| Reproduce website plots | `gfa plot <kind> <gen> --output out.svg` (domain also supports PNG/TikZ) | `write_plot()` and friends |
 | Inspect/verify baked scientific artifacts | `gfa artifact-snapshot`, `gfa proofs`, `gfa expansion`, `gfa coefficient-bound`, `gfa reconciliation` | `snapshot_info()`, `list_proofs()`, `expansion()`, `coefficient_bound()`, `reconciliation()` |
 | Replay a baked exact certificate | `gfa verify-certificate <name>` | `verify_certificate()` |
 | Browse/replay directed inclusion radii | `gfa radii`, `gfa radius`, `gfa radius-recompute`, `gfa radius-identify`, `gfa radius-audit`, `gfa radius-attainment`, `gfa verify-radius-certificate` | `list_radii()`, `radius()`, `recompute_radius()`, `identify_radius()`, `audit_radius()`, `verify_radius_attainment()`, `verify_radius_certificate()` |
 | Verify/install an immutable registry snapshot | `gfa snapshot info|verify|install` | `verify_snapshot()`, `install_snapshot()`, `RegistrySnapshot.open()` |
-| Query snapshot statistics, families, papers, evidence, and applications | `gfa stats|search|families|family|facts|evidence|runs|papers|paper|applications` | `RegistrySnapshot.stats()`, `.search()`, `.families()`, `.family()`, `.facts()`, `.evidence()`, `.runs()`, `.papers()`, `.paper()`, `.applications()` |
+| Query snapshot statistics, families, papers, evidence, applications, legacy functions, facets, and tags | `gfa stats|search|families|family|facts|evidence|runs|papers|paper|applications|function|functions|paper-facets|tags` | `RegistrySnapshot.stats()`, `.search()`, `.families()`, `.family()`, `.facts()`, `.evidence()`, `.runs()`, `.papers()`, `.paper()`, `.applications()`, `.function()`, `.legacy_functions()`, `.paper_facets()`, `.tags()` |
 | Query aliases, hierarchy, and stored witnesses | `gfa aliases|normalize-class|hierarchy|counterexamples` | `RegistrySnapshot.aliases()`, `.normalize_class()`, `.hierarchy()`, `.counterexamples()` |
 | Cryptography Lab S-box metrics (optional) | `gfa crypto-lab ...` | `geometric_function_atlas.lab.*` |
 | Image Lab finite coefficient-derived filters, metrics, and transforms (optional) | `gfa image-lab ...` | `geometric_function_atlas.lab.*` |
@@ -92,9 +93,13 @@ uv tool install geometric-function-atlas --extra lab   # once published on PyPI
 uv tool install --with "numpy>=1.24" dist/geometric_function_atlas-*.whl
 ```
 
-The optional crypto lab deliberately covers five named registry functions and
-two deterministic S-box constructions. Its outputs are benchmark metrics, never security claims; invertibility and empirical comparisons do not amount to
-provable cryptographic security. The image lab is likewise an empirical
+The optional crypto lab covers five named registry functions and two
+deterministic S-box constructions. Its outputs are benchmark metrics, never
+security claims; invertibility and empirical comparisons do not amount to
+provable cryptographic security. `leaderboard(scope="website")` and
+`gfa crypto-lab leaderboard --scope website` replay the immutable 435-row
+website metric snapshot; those rows contain reported metrics, not S-box values,
+and are not a new security ranking. The image lab is likewise an empirical
 transform/metric sandbox. It exposes the finite coefficient-derived filter
 subset used by the website's named functions, but does not claim analytic
 special-function or conformal-warp parity.
@@ -410,16 +415,19 @@ gfa class-member exponential --coefficients "0.25,0.1"
 gfa compare exponential cardioid
 gfa extremal-coefficients exponential --order 8
 
-# Plots (SVG).
+# Plots (SVG for every kind; domain PNG and domain TikZ exports are also supported).
 gfa plot sine --order 12 --output sine-domain.svg
 gfa plot domain exponential --output /tmp/domain.svg
 gfa plot phase exponential --output /tmp/phase.svg
+gfa plot domain exponential --output /tmp/domain.png
+gfa plot domain exponential --output /tmp/domain.tikz
 
 # Optional labs (NumPy required).
 gfa crypto-lab metrics --reference aes
 gfa crypto-lab metrics --reference identity
 gfa crypto-lab metrics --sbox "25,1,47,..."          # 256 integers
 gfa crypto-lab construct cardioid
+gfa crypto-lab leaderboard --scope website
 gfa image-lab sample --output ref.npy --seed 0 --size 32
 gfa image-lab metrics --ref ref.npy --test ref.npy
 gfa image-lab transform --input ref.npy --output out.npy --operation edge
@@ -427,6 +435,17 @@ gfa image-lab transform --input ref.npy --output out.npy --operation edge
 
 The longer command name, `geometric-function-atlas`, is also supported. Add
 `--json` to result-printing commands when machine-readable output is useful.
+
+Snapshot citation and facet commands are local queries over the caller-supplied
+immutable snapshot:
+
+```bash
+gfa citation --key example --title "Example paper" --year 2024 --author "A. Author"
+gfa function legacy-sine --snapshot registry.sqlite --json
+gfa functions --snapshot registry.sqlite --tag image_processing --json
+gfa paper-facets --snapshot registry.sqlite --json
+gfa tags --snapshot registry.sqlite --category application --json
+```
 
 `--mu` accepts an exact signed integer or `integer/integer` fraction. Decimal
 and scientific notation are rejected so untrusted short inputs cannot trigger

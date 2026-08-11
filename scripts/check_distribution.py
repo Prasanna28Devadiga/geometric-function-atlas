@@ -52,6 +52,7 @@ def _assert_common(names: list[str], *, archive: Path) -> None:
         "data/open_problems.json",
         "data/proof_meta.json",
         "data/reconciliation.json",
+        "data/crypto_lab_leaderboard.json",
         "data/references.md",
     ):
         assert f"geometric_function_atlas/{data_artifact}" in joined, (

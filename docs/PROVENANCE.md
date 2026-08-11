@@ -114,8 +114,23 @@ from the selected dataset. They do not by themselves establish a theorem,
 application effectiveness, or literature novelty.
 
 Certificate replay has a separate evidence boundary: lookup confirms the
-requested versioned record exists; replay checks the stored candidate is
-attained and is consistent with the declared upper bound; only a source record
+requested versioned record exists; replay checks the stored candidate is attained
+and is consistent with the declared upper bound; only a source record
 with an explicit sharpness proof receives
 `proven_exact_under_declared_assumptions`. A non-sharp record can therefore
 report a certified upper-bound enclosure without being labelled sharp.
+
+## Optional application labs
+
+The Cryptography Lab exposes the website's finite S-box diagnostics. The LAT is
+the signed Walsh spectrum divided by two, with input-mask rows and output-mask
+columns; it is a diagnostic table and not a security proof. The package offers
+both a finite generated benchmark set and an immutable 435-row website metric
+snapshot; snapshot rows are reported metrics, not S-box values, and
+paper-reported columns are not recomputed S-boxes.
+
+The Image Lab accepts finite 2D or RGB arrays and applies the named coefficient
+derived kernels with the website's one-reflection boundary index. Color SSIM
+matches the website's clipped 7x7-window luminance calculation; it is not a
+per-channel score. Image metrics and transforms are empirical statistics and
+convolutions, not analytic image-domain or conformal-warp results.

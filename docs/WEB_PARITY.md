@@ -21,6 +21,10 @@ separate GUI are out of scope.
 | Compare classes and hierarchy | `gfa compare` | **available** |
 | Inspect class application tags | `gfa applications` | available |
 | Inspect papers and reconciliation records | `gfa papers`, `gfa reconciliation` | available |
+| Export citation formats | `gfa citation` | **available** |
+| Query legacy functions, paper facets, and tags | `gfa function`, `gfa functions`, `gfa paper-facets`, `gfa tags` | **available** |
+| Export domain plots as SVG, PNG, or TikZ | `gfa plot domain ... --output ...` | **available** |
+| Replay the website's 435-row cryptography metric snapshot | `gfa crypto-lab leaderboard --scope website` | **available** (reported metrics only; no S-box payload) |
 | Reproduce the Image Lab's finite coefficient-derived filters and metrics | `gfa image-lab` | **available** (lab extra; no analytic or conformal-warp claim) |
 | Reproduce Cryptography Lab benchmark metrics | `gfa crypto-lab` | **available** (lab extra; no security claim) |
 | Report registry snapshot statistics | `gfa stats` | available |

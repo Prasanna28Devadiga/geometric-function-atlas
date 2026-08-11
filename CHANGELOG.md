@@ -34,6 +34,9 @@ All notable changes to Geometric Function Atlas are recorded here.
   commands; Image Lab convolution now uses the website's reflected boundary
   indexing rather than edge replication.
 - Valid 3x3, 5x5, and 7x7 image-lab tap handling and XML-valid SVG metadata.
+- Correct signed Walsh LAT output, an immutable 435-row website crypto metric
+  snapshot, exact website Image Lab boundary/luminance-SSIM semantics, and
+  direct package-to-website lab regression probes.
 
 ## 0.1.1 — 2026-08-10
 

@@ -13,7 +13,11 @@ Requires the ``lab`` extra (numpy). Import this module lazily through
 
 from __future__ import annotations
 
+import json
+import math
 from collections.abc import Mapping
+from functools import lru_cache
+from importlib.resources import files
 from typing import Any
 
 import numpy as np
@@ -72,6 +76,13 @@ def _fwht(f01: np.ndarray) -> np.ndarray:
     """Walsh-Hadamard transform of (-1)^f for a boolean function."""
 
     values = 1 - 2 * f01.astype(np.int64)
+    return _walsh_hadamard(values)
+
+
+def _walsh_hadamard(values: np.ndarray) -> np.ndarray:
+    """Walsh-Hadamard transform of an already signed integer vector."""
+
+    values = values.astype(np.int64, copy=True)
     length = values.size
     step = 1
     while step < length:
@@ -181,7 +192,12 @@ def linear_probability(sbox: Any, spectra: np.ndarray | None = None) -> dict[str
 
 
 def linear_approximation_table(sbox: Any) -> tuple[tuple[int, ...], ...]:
-    """Return the browser explorer's WHT/2 linear approximation table."""
+    """Return the browser explorer's signed Walsh-spectrum/2 LAT.
+
+    Rows are input masks and columns are output masks. The component vector is
+    already in ``{-1, +1}``, so it must go directly through the WHT rather than
+    through the boolean ``{0, 1}`` conversion used by :func:`_fwht`.
+    """
 
     array = _as_array(sbox)
     table = np.empty((N, N), dtype=np.int64)
@@ -190,7 +206,7 @@ def linear_approximation_table(sbox: Any) -> tuple[tuple[int, ...], ...]:
             [1 - 2 * ((int((output_mask & int(value)).bit_count())) & 1) for value in array],
             dtype=np.int64,
         )
-        table[:, output_mask] = _fwht(values) // 2
+        table[:, output_mask] = _walsh_hadamard(values) // 2
     return tuple(tuple(int(value) for value in row) for row in table)
 
 
@@ -267,6 +283,7 @@ def compare_sbox(
     return {
         "metrics": metrics,
         "references": reference_metrics,
+        "paper_references": _paper_reference_metrics(),
         "delta": delta,
         "scope": (
             "Reference comparisons are empirical benchmark metrics only; they "
@@ -280,14 +297,24 @@ def leaderboard(
     boxes: Mapping[str, Any] | None = None,
     *,
     include_references: bool = True,
+    scope: str = "package",
 ) -> tuple[dict[str, Any], ...]:
-    """Rank a caller-selected or named finite set by average nonlinearity.
+    """Rank a finite set by average nonlinearity or return the website snapshot.
 
     Without ``boxes`` this evaluates the five named package constructions and
-    optionally AES/identity.  It intentionally does not claim parity with the
-    website's larger baked research sweep.
+    optionally AES/identity. With ``scope="website"`` it returns the bundled
+    435-row website metric snapshot instead; those rows contain reported metrics
+    and no S-box values.
     """
 
+    if scope == "website":
+        if boxes is not None or not include_references:
+            raise ValueError(
+                "website leaderboard scope does not accept boxes or reference options"
+            )
+        return website_leaderboard()
+    if scope != "package":
+        raise ValueError("scope must be 'package' or 'website'")
     if boxes is None:
         boxes = {
             name: construct_sbox(name)
@@ -317,6 +344,109 @@ _PHI_COEFFICIENTS: dict[str, list[float]] = {
     "quartic": [4 / 5, 0.0, 0.0, 1 / 5, 0.0, 0.0],
 }
 _CONSTRUCTION_FUNCTIONS = tuple(_PHI_COEFFICIENTS)
+
+
+@lru_cache(maxsize=1)
+def _website_crypto_payload() -> dict[str, Any]:
+    """Load the immutable website leaderboard artifact bundled with the wheel."""
+
+    resource = files("geometric_function_atlas").joinpath(
+        "data/crypto_lab_leaderboard.json"
+    )
+    payload = json.loads(resource.read_text(encoding="utf-8"))
+    source = payload.get("source")
+    rows = payload.get("leaderboard")
+    if (
+        payload.get("schema_version") != 1
+        or not isinstance(source, dict)
+        or not isinstance(rows, list)
+        or source.get("row_count") != len(rows)
+        or not isinstance(source.get("artifact"), str)
+        or not isinstance(source.get("source_commit"), str)
+    ):
+        raise ValueError("bundled crypto leaderboard artifact is malformed")
+    required = {"key", "label", "family", "asha", "NL", "SAC", "BIC", "DP", "LP"}
+    metric_keys = ("NL", "SAC", "BIC", "DP", "LP")
+    for row in rows:
+        if not isinstance(row, dict) or not required.issubset(row):
+            raise ValueError("bundled crypto leaderboard row is malformed")
+        if not all(isinstance(row[key], str) and row[key] for key in ("key", "label", "family")):
+            raise ValueError("bundled crypto leaderboard labels are malformed")
+        if not isinstance(row["asha"], bool):
+            raise TypeError("bundled crypto leaderboard asha flag is malformed")
+        if any(
+            isinstance(row[key], bool)
+            or not isinstance(row[key], (int, float))
+            or not math.isfinite(float(row[key]))
+            for key in metric_keys
+        ):
+            raise ValueError("bundled crypto leaderboard metrics are malformed")
+    paper = payload.get("paper_reported")
+    if not isinstance(paper, dict) or not paper:
+        raise ValueError("bundled crypto paper references are malformed")
+    for values in paper.values():
+        if not isinstance(values, dict) or any(
+            key not in values
+            or isinstance(values[key], bool)
+            or not isinstance(values[key], (int, float))
+            or not math.isfinite(float(values[key]))
+            for key in metric_keys
+        ):
+            raise ValueError("bundled crypto paper references are malformed")
+    return payload
+
+
+def website_leaderboard() -> tuple[dict[str, Any], ...]:
+    """Return the website's versioned 435-row benchmark metric snapshot.
+
+    The rows contain reported metrics, not S-box values; they are a read-only
+    reproduction artifact and are not recomputed or ranked as security claims.
+    """
+
+    payload = _website_crypto_payload()
+    source = payload["source"]
+    return tuple(
+        {
+            "key": row["key"],
+            "label": row["label"],
+            "family": row["family"],
+            "asha": bool(row["asha"]),
+            "NL_avg": float(row["NL"]),
+            "SAC_avg": float(row["SAC"]),
+            "BIC_avg": float(row["BIC"]),
+            "DP": float(row["DP"]),
+            "LP": float(row["LP"]),
+            "source": "website_snapshot",
+            "source_artifact": source["artifact"],
+            "source_commit": source["source_commit"],
+            "scope": (
+                "reported website benchmark metrics; no S-box payload or "
+                "cryptographic security claim"
+            ),
+            "novelty_claim": False,
+        }
+        for row in payload["leaderboard"]
+    )
+
+
+def _paper_reference_metrics() -> dict[str, dict[str, Any]]:
+    payload = _website_crypto_payload()
+    return {
+        str(label): {
+            "NL_avg": float(values["NL"]),
+            "SAC_avg": float(values["SAC"]),
+            "BIC_avg": float(values["BIC"]),
+            "DP": float(values["DP"]),
+            "LP": float(values["LP"]),
+            "reference_kind": "paper_reported",
+            "source": "website_snapshot",
+            "source_artifact": payload["source"]["artifact"],
+            "source_commit": payload["source"]["source_commit"],
+            "scope": "paper-reported benchmark metrics, not a recomputed S-box",
+            "novelty_claim": False,
+        }
+        for label, values in payload["paper_reported"].items()
+    }
 
 
 def _extremal_value(name: str, z: complex, terms: int = 48) -> complex:

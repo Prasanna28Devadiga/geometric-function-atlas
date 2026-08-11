@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
 np = pytest.importorskip("numpy")
@@ -81,23 +83,60 @@ def test_smooth_of_constant_array_is_the_same_array() -> None:
 
 
 def test_function_transform_uses_website_reflect_boundary_semantics() -> None:
-    image = np.arange(16, dtype=float).reshape(4, 4) / 15.0
-    output = apply_image_transform(image, "smooth", taps=3, function="sine")
+    image = np.arange(4, dtype=float).reshape(2, 2) / 3.0
+    output = apply_image_transform(image, "smooth", taps=7, function="sine")
 
     from geometric_function_atlas.lab.image import _function_kernel
 
-    kernel = _function_kernel("sine", "smooth", 3, 1.0, None)
+    def website_reflect(index: int, length: int) -> int:
+        if index < 0:
+            index = -index - 1
+        if index >= length:
+            index = 2 * length - index - 1
+        return max(0, min(length - 1, index))
+
+    kernel = _function_kernel("sine", "smooth", 7, 1.0, None)
     side = kernel.shape[0]
-    pad = side // 2
-    padded = np.pad(image, pad, mode="symmetric")
+    center = side // 2
     expected = np.zeros_like(image)
     for row in range(side):
         for column in range(side):
-            expected += kernel[row, column] * padded[
-                row : row + image.shape[0], column : column + image.shape[1]
-            ]
+            for y in range(image.shape[0]):
+                for x in range(image.shape[1]):
+                    yy = website_reflect(y + row - center, image.shape[0])
+                    xx = website_reflect(x + column - center, image.shape[1])
+                    expected[y, x] += kernel[row, column] * image[yy, xx]
     expected = np.clip(expected, 0.0, 1.0)
     assert np.allclose(output, expected)
+
+
+def test_color_ssim_uses_website_luma_and_clipped_windows() -> None:
+    reference = np.arange(8 * 8 * 3, dtype=float).reshape(8, 8, 3) / 191.0
+    test = np.roll(reference, 1, axis=1)
+
+    def website_ssim(x: Any, y: Any) -> float:
+        luma_x = 0.299 * x[..., 0] + 0.587 * x[..., 1] + 0.114 * x[..., 2]
+        luma_y = 0.299 * y[..., 0] + 0.587 * y[..., 1] + 0.114 * y[..., 2]
+        c1, c2, radius = 0.01**2, 0.03**2, 3
+        values = []
+        for row in range(x.shape[0]):
+            for column in range(x.shape[1]):
+                y0, y1 = max(0, row - radius), min(x.shape[0] - 1, row + radius)
+                x0, x1 = max(0, column - radius), min(x.shape[1] - 1, column + radius)
+                xx = luma_x[y0 : y1 + 1, x0 : x1 + 1]
+                yy = luma_y[y0 : y1 + 1, x0 : x1 + 1]
+                mux, muy = float(xx.mean()), float(yy.mean())
+                varx = float((xx * xx).mean()) - mux * mux
+                vary = float((yy * yy).mean()) - muy * muy
+                cov = float((xx * yy).mean()) - mux * muy
+                values.append(
+                    ((2 * mux * muy + c1) * (2 * cov + c2))
+                    / ((mux * mux + muy * muy + c1) * (varx + vary + c2))
+                )
+        return float(np.mean(values))
+
+    expected = website_ssim(reference, test)
+    assert image_metrics(reference, test)["SSIM"] == pytest.approx(expected, abs=1e-12)
 
 
 def test_edge_of_constant_array_is_zero() -> None:
