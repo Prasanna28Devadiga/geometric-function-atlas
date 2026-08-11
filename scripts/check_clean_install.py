@@ -50,6 +50,10 @@ assert counterexample_payload["schema_version"] == 1
 assert counterexample_payload["result_type"] == "counterexample_verification"
 assert counterexample_payload["verification"]["success"] is True
 gfa.validate_result_payload(counterexample_payload)
+
+plot = gfa.write_domain_plot("sine.svg", generator="sine", order=3)
+assert plot.output.name == "sine.svg"
+assert "<svg" in open("sine.svg", encoding="utf-8").read()
 """
 
 
@@ -124,6 +128,25 @@ def main(argv: list[str] | None = None) -> int:
         )
         if not json.loads(counterexample.stdout)["certified"]:
             raise AssertionError("installed gfa command did not certify the witness")
+        plot_path = neutral / "sine.svg"
+        plot = subprocess.run(
+            [
+                str(script),
+                "plot",
+                "sine",
+                "--order",
+                "3",
+                "--output",
+                str(plot_path),
+            ],
+            cwd=neutral,
+            check=True,
+            capture_output=True,
+            text=True,
+            env={**os.environ, "PYTHONPATH": ""},
+        )
+        if not plot_path.is_file() or "not a proof of the full image domain" not in plot.stdout:
+            raise AssertionError("installed gfa command did not generate the plot")
         try:
             invalid = subprocess.run(
                 [

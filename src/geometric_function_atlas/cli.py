@@ -24,6 +24,7 @@ from .contracts import (
 )
 from .counterexamples import verify_counterexample
 from .fekete_szego import fekete_szego
+from .plotting import write_domain_plot
 from .version import __version__
 
 EXIT_SUCCESS = 0
@@ -156,6 +157,26 @@ def _verify_counterexample(args: argparse.Namespace) -> None:
     _write_utf8("\n".join(lines))
 
 
+def _plot(args: argparse.Namespace) -> None:
+    supplied = None
+    if args.coefficients is not None:
+        supplied = tuple(
+            _comma_separated_numbers(args.coefficients, label="coefficients")
+        )
+    result = write_domain_plot(
+        args.output,
+        generator=args.generator,
+        coefficients=supplied,
+        order=args.order,
+        rmax=args.radius,
+        rings=args.rings,
+        spokes=args.spokes,
+    )
+    print(f"Wrote {result.output}")
+    print(f"Model: {result.approximation}")
+    print("Scope: visualization of a finite Taylor polynomial; not a proof of the full image domain")
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="geometric-function-atlas",
@@ -206,6 +227,26 @@ def _parser() -> argparse.ArgumentParser:
     counterexample.add_argument("--property", default="starlike")
     counterexample.add_argument("--json", action="store_true", help="emit JSON")
     counterexample.set_defaults(handler=_verify_counterexample)
+
+    plot = subparsers.add_parser(
+        "plot",
+        help="draw the image of the disk as a standalone SVG",
+    )
+    plot.add_argument(
+        "generator",
+        nargs="?",
+        help="built-in generator; plots the truncation f(z)=z*phi(z)",
+    )
+    plot.add_argument(
+        "--coefficients",
+        help="advanced: comma-separated a2,a3,... for f(z)=z+a2*z^2+...",
+    )
+    plot.add_argument("--order", type=int, default=12)
+    plot.add_argument("--radius", type=float, default=0.98)
+    plot.add_argument("--rings", type=int, default=5)
+    plot.add_argument("--spokes", type=int, default=12)
+    plot.add_argument("--output", required=True, help="output SVG path")
+    plot.set_defaults(handler=_plot)
 
     return parser
 

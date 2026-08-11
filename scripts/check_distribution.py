@@ -70,8 +70,11 @@ def check_sdist(archive: Path) -> None:
     assert any(name.endswith("/scripts/install.ps1") for name in names)
     assert any(name.endswith("/scripts/check_distribution.py") for name in names)
     assert any(name.endswith("/scripts/check_clean_install.py") for name in names)
+    assert any(name.endswith("/scripts/check_uv_tool_install.py") for name in names)
     assert any(name.endswith("/.github/workflows/ci.yml") for name in names)
     assert any(name.endswith("/CHANGELOG.md") for name in names)
+    assert any(name.endswith("/docs/assets/sine-domain.svg") for name in names)
+    assert any(name.endswith("/docs/assets/polynomial.svg") for name in names)
     assert not any(name.endswith("/docs/RELEASE_SCOPE.md") for name in names)
 
 

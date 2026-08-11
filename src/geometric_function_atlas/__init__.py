@@ -28,19 +28,31 @@ from .implementation_registry import (  # noqa: F401
 )
 from .models import Generator
 from .models import Z as z
+from .plotting import (
+    ConformalGrid,
+    DomainPlotResult,
+    conformal_grid,
+    generator_function_coefficients,
+    write_domain_plot,
+)
 from .version import __version__
 
 __all__ = [
+    "ConformalGrid",
     "CounterexampleResult",
+    "DomainPlotResult",
     "FeketeSzegoResult",
     "Generator",
     "GeneratorSeriesResult",
     "__version__",
+    "conformal_grid",
     "fekete_szego",
+    "generator_function_coefficients",
     "generator_series",
     "get_generator",
     "list_generators",
     "taylor_coefficients",
     "verify_counterexample",
+    "write_domain_plot",
     "z",
 ]

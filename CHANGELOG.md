@@ -33,4 +33,5 @@ First software release.
 
 This release does not include registry search, radius-certificate replay, plots,
 image or cryptography labs, mutable registry data, literature novelty decisions,
-or PyPI publication. Those remain separate future phases.
+or PyPI publication. Those remain outside this software release and may be
+addressed in future package work.

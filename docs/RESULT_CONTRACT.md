@@ -1,14 +1,14 @@
 # Structured result and verification contract
 
 The `v0.1.x` result contract is schema version `1`. It is shared by the
-Phase 1 structured results and is the envelope intended for future certificate
-replay and snapshot operations. It is deliberately separate from the live
-registry website and from any mutable database.
+structured results emitted by the package's exact computation operations. It is
+deliberately separate from the live registry website and from any mutable
+database.
 
 ## Success records
 
 `GeneratorSeriesResult.to_dict()` and `FeketeSzegoResult.to_dict()` retain the
-legacy Phase 1 fields and add the following closed envelope:
+legacy result fields and add the following closed envelope:
 
 - `schema_version`: integer contract version (`1`);
 - `result_type`: trusted operation name;
@@ -28,29 +28,29 @@ legacy Phase 1 fields and add the following closed envelope:
 - `failure_state`: `null` for a success record; and
 - `verification`: a fail-closed `VerificationReport`.
 
-Phase 1 records also require non-empty operation-specific assumptions, source
+Current structured records also require non-empty operation-specific assumptions, source
 references, and artifact identity keys for the source commit and fixture/proof.
 `provenance` is derived as `built_in` or `caller_supplied`; it is not an
 affirmative literature or novelty state. `evidence_status` is derived from the
 verification report and the operation kind rather than accepted as a public
-constructor claim: a failed report becomes `unresolved`, while a passing Phase
-1 report becomes `proven_exact_under_declared_assumptions`. Evidence and
+constructor claim: a failed report becomes `unresolved`, while a passing
+report becomes `proven_exact_under_declared_assumptions`. Evidence and
 literature statuses are closed package-owned values in this release, and the
-result-level `__all__` surface intentionally remains the ten-operation/model
-names from the initial package rather than exporting every contract helper.
+result-level `__all__` surface intentionally remains the public operation and
+model names rather than exporting every contract helper.
 
 The JSON schema is shipped at
 `geometric_function_atlas/schema/result.schema.json`. Unknown top-level,
 canonical-input, exact-expression, verification-report, and check fields are
 rejected by the dependency-free validator `validate_result_payload`.
 The validator also requires operation-specific canonical/exact keys and checks
-that the retained Phase-1 fields agree with those canonical values. A passing
+that the retained operation fields agree with those canonical values. A passing
 report must have `failure_state: null`; a failed report must name one of the
 explicit failure states and use the same value for `computational_status`.
 
 Exact expressions are display data, while the bounded exact-expression DAG is
 the authoritative identity. The validator decodes only the closed opcode set,
-checks canonical node identity, and recomputes successful Phase 1 outputs from
+checks canonical node identity, and recomputes successful structured outputs from
 that DAG; it never parses or executes a caller formula string. Custom generators
 must still be supplied as preconstructed SymPy expressions using the trusted `z`
 symbol; formula strings and undeclared symbols remain invalid.

@@ -96,6 +96,38 @@ def test_verify_counterexample_command_has_plain_language_output() -> None:
     assert "Traceback" not in completed.stderr
 
 
+def test_plot_command_writes_a_real_svg(tmp_path) -> None:
+    output = tmp_path / "sine-domain.svg"
+    completed = run_cli(
+        "plot",
+        "sine",
+        "--order",
+        "10",
+        "--output",
+        str(output),
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert output.is_file()
+    assert "Wrote" in completed.stdout
+    assert "Taylor order 10" in completed.stdout
+    assert "<svg" in output.read_text(encoding="utf-8")
+
+
+def test_plot_command_supports_advanced_supplied_coefficients(tmp_path) -> None:
+    output = tmp_path / "polynomial.svg"
+    completed = run_cli(
+        "plot",
+        "--coefficients",
+        "1,-0.25",
+        "--output",
+        str(output),
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert output.is_file()
+
+
 def test_version_command_is_an_installation_smoke_check() -> None:
     completed = run_cli("--version")
 

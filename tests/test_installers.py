@@ -91,3 +91,13 @@ def test_ci_uses_only_free_public_standard_runners_without_persistent_storage() 
     assert "enable-cache: true" not in workflow
     assert "enable-cache: false" in workflow
     assert 'branches: [main, "release/**"]' not in workflow
+
+
+def test_clean_install_smoke_covers_the_plotting_operation() -> None:
+    smoke = (ROOT / "scripts" / "check_clean_install.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "write_domain_plot" in smoke
+    assert '"plot"' in smoke
+    assert "not a proof of the full image domain" in smoke
