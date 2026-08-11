@@ -271,3 +271,40 @@ class Generator:
 
         validate_exact_expression(self.expression)
         return sp.sstr(self.expression)
+
+    @property
+    def phi_formula(self) -> str:
+        """Compatibility name used by the website's class catalog."""
+
+        return self.formula
+
+    @property
+    def phi_coeffs(self) -> tuple[str, ...]:
+        """Exact displayed coefficients used by the class-catalog view."""
+
+        from .coefficients import taylor_coefficients
+
+        return tuple(str(value) for value in taylor_coefficients(self, order=5))
+
+    def __getitem__(self, key: str) -> Any:
+        """Expose catalog fields without turning the model into a loose dict.
+
+        The public package historically exposed baked class dictionaries while
+        the computational class API exposed :class:`Generator` objects.  A
+        small read-only mapping bridge keeps both call styles interoperable and
+        makes the provenance-bearing object the canonical public entry.
+        """
+
+        fields = {
+            "key": self.key,
+            "name": self.name,
+            "formula": self.formula,
+            "phi_formula": self.phi_formula,
+            "citation": self.citation,
+            "reference_url": self.reference_url,
+            "phi_coeffs": self.phi_coeffs,
+        }
+        try:
+            return fields[key]
+        except KeyError as exc:
+            raise KeyError(key) from exc

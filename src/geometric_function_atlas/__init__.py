@@ -6,7 +6,6 @@ from .artifacts import (
     coefficient_bound,
     expansion,
     get_proof,
-    list_classes,
     list_proofs,
     open_problems,
     reconciliation,
@@ -17,7 +16,11 @@ from .artifacts import (
     validate_snapshot_payload,
     verify_certificate,
 )
+from .artifacts import (
+    list_classes as list_artifact_classes,
+)
 from .catalog import get_generator, list_generators
+from .citation import CitationBundle, citation_export, citation_formats, format_citation
 from .classes import (
     ClassAdmissibilityResult,
     ClassContainmentResult,
@@ -26,9 +29,7 @@ from .classes import (
     class_containment_screen,
     class_extremal_coefficients,
     class_member_screen,
-)
-from .classes import (
-    list_classes as list_screen_classes,
+    list_classes,
 )
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
 from .contracts import (  # noqa: F401
@@ -81,9 +82,13 @@ from .radii import (
     RadiusRecord,
     RadiusReplayResult,
     RadiusStatus,
+    audit_radius,
+    identify_radius,
     list_radii,
     radius,
+    recompute_radius,
     replay_radius_certificate,
+    verify_radius_attainment,
     verify_radius_certificate,
 )
 from .records import RecordError, build_screen_record, validate_screen_record
@@ -95,6 +100,7 @@ from .snapshot import (
     FamilyDetail,
     FunctionFamily,
     FunctionInstance,
+    LegacyFunction,
     Paper,
     PaperClaim,
     PaperDetail,
@@ -109,6 +115,7 @@ from .snapshot import (
     SnapshotResourceLimitError,
     SnapshotStats,
     SnapshotVerification,
+    Tag,
     VerificationRun,
     install_snapshot,
 )
@@ -121,11 +128,13 @@ from .snapshot import (
 from .verify import FunctionVerificationResult, verify_function
 from .version import __version__
 
+list_screen_classes = list_classes
 verify_snapshot = verify_registry_snapshot
 
 __all__ = [
     "SNAPSHOT_SCHEMA_VERSION",
     "Application",
+    "CitationBundle",
     "ClassAdmissibilityResult",
     "ClassContainmentResult",
     "ClassMembershipResult",
@@ -143,6 +152,7 @@ __all__ = [
     "FunctionVerificationResult",
     "Generator",
     "GeneratorSeriesResult",
+    "LegacyFunction",
     "Paper",
     "PaperClaim",
     "PaperDetail",
@@ -164,10 +174,14 @@ __all__ = [
     "SnapshotResourceLimitError",
     "SnapshotStats",
     "SnapshotVerification",
+    "Tag",
     "VerificationRun",
     "WitnessSearchResult",
     "__version__",
+    "audit_radius",
     "build_screen_record",
+    "citation_export",
+    "citation_formats",
     "class_admissibility",
     "class_containment_screen",
     "class_extremal_coefficients",
@@ -178,11 +192,14 @@ __all__ = [
     "expansion",
     "fekete_szego",
     "find_counterexample",
+    "format_citation",
     "generator_function_coefficients",
     "generator_series",
     "get_generator",
     "get_proof",
+    "identify_radius",
     "install_snapshot",
+    "list_artifact_classes",
     "list_classes",
     "list_generators",
     "list_proofs",
@@ -191,6 +208,7 @@ __all__ = [
     "open_problems",
     "parse_exact_expression",
     "radius",
+    "recompute_radius",
     "reconciliation",
     "references",
     "registry_snapshot_info",
@@ -204,6 +222,7 @@ __all__ = [
     "verify_certificate",
     "verify_counterexample",
     "verify_function",
+    "verify_radius_attainment",
     "verify_radius_certificate",
     "verify_snapshot",
     "write_coefficient_plot",

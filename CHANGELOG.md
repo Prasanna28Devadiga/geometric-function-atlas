@@ -30,6 +30,9 @@ All notable changes to Geometric Function Atlas are recorded here.
   sharpness. Non-sharp source records remain `certified_enclosure`.
 - Citation-aware paper facets (`journal`, `doi`, `citation`) and optional
   acquisition URLs preserved in snapshot manifests.
+- Bounded directed-radius recompute, identification, audit, and attainment CLI
+  commands; Image Lab convolution now uses the website's reflected boundary
+  indexing rather than edge replication.
 - Valid 3x3, 5x5, and 7x7 image-lab tap handling and XML-valid SVG metadata.
 
 ## 0.1.1 — 2026-08-10

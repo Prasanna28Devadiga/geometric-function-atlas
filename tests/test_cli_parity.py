@@ -49,6 +49,69 @@ def test_crypto_construct_fails_closed_without_lab_extra() -> None:
     assert payload["failure_state"] == "unsupported"
 
 
+def test_crypto_structure_exposes_diagnostic_tables() -> None:
+    if importlib.util.find_spec("numpy") is None:
+        pytest.skip("crypto lab requires the optional numpy dependency")
+    completed = run_cli("crypto-lab", "structure", "--reference", "identity", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert len(payload["SAC"]) == 8
+    assert len(payload["DDT"]) == 256
+    assert len(payload["LAT"]) == 256
+    assert payload["novelty_claim"] is False
+
+
+def test_crypto_compare_reports_explicit_reference_deltas() -> None:
+    if importlib.util.find_spec("numpy") is None:
+        pytest.skip("crypto lab requires the optional numpy dependency")
+    completed = run_cli("crypto-lab", "compare", "--reference", "identity", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert set(payload["references"]) == {"AES", "identity"}
+    assert payload["delta"]["identity"]["LP"] == 0.0
+    assert "security" in payload["scope"]
+
+
+def test_radius_recompute_audit_and_identify_cli_paths_are_bounded() -> None:
+    recompute = run_cli("radius-recompute", "sine", "sigmoid", "--json")
+    assert recompute.returncode == 0, recompute.stdout
+    assert json.loads(recompute.stdout)["status"] == "proven"
+
+    audit = run_cli("radius-audit", "sine", "sigmoid", "--json")
+    assert audit.returncode == 0, audit.stdout
+    assert json.loads(audit.stdout)["attainment_verified"] is True
+
+    identify = run_cli("radius-identify", "--value", "asin((E-1)/(E+1))", "--json")
+    assert identify.returncode == 0, identify.stdout
+    assert json.loads(identify.stdout)[0]["canonical_inputs"] == {
+        "inner": "sine",
+        "target": "sigmoid",
+    }
+
+    identify_numeric = run_cli(
+        "radius-identify",
+        "--value",
+        "0.4803810791337",
+        "--tolerance",
+        "1e-12",
+        "--json",
+    )
+    assert identify_numeric.returncode == 0, identify_numeric.stdout
+    assert json.loads(identify_numeric.stdout)[0]["direction"] == "sine->sigmoid"
+
+
+def test_radius_attainment_cli_path_replays_reviewed_contact_chain() -> None:
+    completed = run_cli("radius-attainment", "sine", "sigmoid", "--json")
+
+    assert completed.returncode == 0, completed.stdout
+    payload = json.loads(completed.stdout)
+    assert payload["status"] == "proven"
+    assert payload["certified"] is True
+    assert payload["direction"] == "sine->sigmoid"
+
+
 def test_image_transform_exposes_named_function_kernel(tmp_path: Path) -> None:
     if importlib.util.find_spec("numpy") is None:
         pytest.skip("image lab requires the optional numpy dependency")

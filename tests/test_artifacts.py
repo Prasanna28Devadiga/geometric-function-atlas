@@ -77,7 +77,7 @@ def test_corrupt_artifact_fails_closed(monkeypatch, tmp_path) -> None:
 
 
 def test_list_classes_returns_the_thirty_nine_class_catalog() -> None:
-    records = gfa.list_classes()
+    records = gfa.list_artifact_classes()
 
     assert len(records) == 39
     keys = [record["key"] for record in records]

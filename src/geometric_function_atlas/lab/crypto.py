@@ -13,6 +13,7 @@ Requires the ``lab`` extra (numpy). Import this module lazily through
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 import numpy as np
@@ -154,12 +155,43 @@ def differential_uniformity(sbox: Any) -> dict[str, Any]:
     return {"DU": maximum, "DP": maximum / N}
 
 
+def differential_distribution_table(sbox: Any) -> tuple[tuple[int, ...], ...]:
+    """Return the website's 256-by-256 differential distribution table.
+
+    Row zero is left as zeros, matching the browser explorer which only draws
+    non-zero input differences.  This is a diagnostic table, not a security
+    proof or a cryptographic strength claim.
+    """
+
+    array = _as_array(sbox)
+    table = np.zeros((N, N), dtype=np.int64)
+    x = np.arange(N)
+    for delta in range(1, N):
+        outputs = array ^ array[x ^ delta]
+        table[delta] = np.bincount(outputs, minlength=N)
+    return tuple(tuple(int(value) for value in row) for row in table)
+
+
 def linear_probability(sbox: Any, spectra: np.ndarray | None = None) -> dict[str, Any]:
     array = _as_array(sbox)
     if spectra is None:
         spectra = _component_spectra(array)
     max_w = int(np.max(np.abs(spectra[:, 1:])))
     return {"LP": max_w / (2 * N), "max_WHT": max_w}
+
+
+def linear_approximation_table(sbox: Any) -> tuple[tuple[int, ...], ...]:
+    """Return the browser explorer's WHT/2 linear approximation table."""
+
+    array = _as_array(sbox)
+    table = np.empty((N, N), dtype=np.int64)
+    for output_mask in range(N):
+        values = np.array(
+            [1 - 2 * ((int((output_mask & int(value)).bit_count())) & 1) for value in array],
+            dtype=np.int64,
+        )
+        table[:, output_mask] = _fwht(values) // 2
+    return tuple(tuple(int(value) for value in row) for row in table)
 
 
 def sbox_metrics(sbox: Any) -> dict[str, Any]:
@@ -188,6 +220,92 @@ def sbox_metrics(sbox: Any) -> dict[str, Any]:
         "DP": du["DP"],
         "LP": lp["LP"],
     }
+
+
+def sbox_structure(sbox: Any) -> dict[str, Any]:
+    """Return metrics plus the SAC, DDT, and LAT explorer structures."""
+
+    array = _as_array(sbox)
+    return {
+        "metrics": sbox_metrics(array),
+        "SAC": tuple(tuple(float(value) for value in row) for row in sac(array)["matrix"]),
+        "DDT": differential_distribution_table(array),
+        "LAT": linear_approximation_table(array),
+        "scope": (
+            "SAC, DDT, and LAT are empirical benchmark diagnostics; they do not "
+            "establish cryptographic security."
+        ),
+        "novelty_claim": False,
+    }
+
+
+def compare_sbox(
+    sbox: Any,
+    references: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Compare one S-box with explicit benchmark references.
+
+    The default references are AES and the identity permutation.  Callers may
+    provide additional named boxes, but the result remains a metric comparison
+    rather than a security ranking.
+    """
+
+    reference_boxes: Mapping[str, Any] = references or {
+        "AES": AES_SBOX,
+        "identity": IDENTITY_SBOX,
+    }
+    metrics = sbox_metrics(sbox)
+    reference_metrics = {
+        str(name): sbox_metrics(reference)
+        for name, reference in reference_boxes.items()
+    }
+    numeric = ("NL_avg", "NL_min", "SAC_avg", "BIC_avg", "DP", "LP")
+    delta = {
+        name: {key: metrics[key] - values[key] for key in numeric}
+        for name, values in reference_metrics.items()
+    }
+    return {
+        "metrics": metrics,
+        "references": reference_metrics,
+        "delta": delta,
+        "scope": (
+            "Reference comparisons are empirical benchmark metrics only; they "
+            "do not establish cryptographic security or novelty."
+        ),
+        "novelty_claim": False,
+    }
+
+
+def leaderboard(
+    boxes: Mapping[str, Any] | None = None,
+    *,
+    include_references: bool = True,
+) -> tuple[dict[str, Any], ...]:
+    """Rank a caller-selected or named finite set by average nonlinearity.
+
+    Without ``boxes`` this evaluates the five named package constructions and
+    optionally AES/identity.  It intentionally does not claim parity with the
+    website's larger baked research sweep.
+    """
+
+    if boxes is None:
+        boxes = {
+            name: construct_sbox(name)
+            for name in _CONSTRUCTION_FUNCTIONS
+        }
+    rows = [
+        {"label": str(name), **sbox_metrics(box)}
+        for name, box in boxes.items()
+    ]
+    if include_references:
+        rows.extend(
+            {"label": name, "reference": True, **sbox_metrics(box)}
+            for name, box in (("AES", AES_SBOX), ("identity", IDENTITY_SBOX))
+        )
+    rows.sort(key=lambda row: (-float(row["NL_avg"]), str(row["label"])))
+    for rank, row in enumerate(rows, start=1):
+        row["rank"] = rank
+    return tuple(rows)
 
 
 _PHI_COEFFICIENTS: dict[str, list[float]] = {

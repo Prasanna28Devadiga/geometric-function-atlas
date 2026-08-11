@@ -148,13 +148,19 @@ def _downsample2(a: np.ndarray) -> np.ndarray:
 
 
 def _convolve(a: np.ndarray, kernel: np.ndarray) -> np.ndarray:
-    """Odd-sized correlation with nearest-edge padding."""
+    """Odd-sized correlation with the website's reflect boundary mode.
+
+    The static Image Lab and its SciPy reference use ``mode="reflect"``:
+    boundary pixels are mirrored at the edge (the edge value is repeated in
+    the reflected sequence).  NumPy calls this convention ``symmetric``;
+    ``mode="edge"`` would silently change the transform at every boundary.
+    """
 
     if kernel.ndim != 2 or kernel.shape[0] != kernel.shape[1] or kernel.shape[0] % 2 != 1:
         raise ValueError("kernel must be a square array with odd side length")
     side = kernel.shape[0]
     pad = side // 2
-    padded = np.pad(a, pad, mode="edge")
+    padded = np.pad(a, pad, mode="symmetric")
     result = np.zeros_like(a, dtype=float)
     for row in range(side):
         for column in range(side):

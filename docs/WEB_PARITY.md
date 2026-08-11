@@ -16,7 +16,7 @@ separate GUI are out of scope.
 | Reproduce Fekete–Szegő values and bounds | `gfa fekete-szego` | **available** |
 | Query other coefficient bounds and expansions | `gfa coefficient-bound`, `gfa expansion` | available |
 | Reproduce function-domain and coefficient plots | `gfa plot` | **available** |
-| Query or recompute directed inclusion radii | `gfa radius` | available |
+| Query, identify, audit, or bounded-recompute directed inclusion radii | `gfa radius`, `gfa radius-identify`, `gfa radius-audit`, `gfa radius-recompute`, `gfa radius-attainment` | available |
 | Re-run a stored proof or certificate | `gfa verify-certificate` | available |
 | Compare classes and hierarchy | `gfa compare` | **available** |
 | Inspect class application tags | `gfa applications` | available |

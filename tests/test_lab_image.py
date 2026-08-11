@@ -80,6 +80,26 @@ def test_smooth_of_constant_array_is_the_same_array() -> None:
     assert np.allclose(output, constant)
 
 
+def test_function_transform_uses_website_reflect_boundary_semantics() -> None:
+    image = np.arange(16, dtype=float).reshape(4, 4) / 15.0
+    output = apply_image_transform(image, "smooth", taps=3, function="sine")
+
+    from geometric_function_atlas.lab.image import _function_kernel
+
+    kernel = _function_kernel("sine", "smooth", 3, 1.0, None)
+    side = kernel.shape[0]
+    pad = side // 2
+    padded = np.pad(image, pad, mode="symmetric")
+    expected = np.zeros_like(image)
+    for row in range(side):
+        for column in range(side):
+            expected += kernel[row, column] * padded[
+                row : row + image.shape[0], column : column + image.shape[1]
+            ]
+    expected = np.clip(expected, 0.0, 1.0)
+    assert np.allclose(output, expected)
+
+
 def test_edge_of_constant_array_is_zero() -> None:
     constant = np.full((8, 8), 0.5)
     output = apply_image_transform(constant, "edge")

@@ -11,9 +11,13 @@ from geometric_function_atlas import (
     FailureState,
     RadiusReplayResult,
     RadiusStatus,
+    audit_radius,
+    identify_radius,
     list_radii,
     radius,
+    recompute_radius,
     replay_radius_certificate,
+    verify_radius_attainment,
     verify_radius_certificate,
 )
 from geometric_function_atlas.contracts import (
@@ -210,3 +214,16 @@ def test_radius_cli_commands_emit_typed_records() -> None:
     # Kept here as an API-level anchor; CLI coverage lives beside existing CLI tests.
     assert radius("exponential", "order_0.5").value_exact == "log(2)"
     assert replay_radius_certificate(radius("sine", "tanh")).status == "proven"
+
+
+def test_radius_recompute_identify_audit_and_attainment_are_bounded() -> None:
+    record = radius("sine", "sigmoid")
+
+    recomputed = recompute_radius("sine", "sigmoid")
+    assert recomputed.certified is True
+    assert recomputed.status == "proven"
+    assert identify_radius(record.value_exact) == (record,)
+    audit = audit_radius("sine", "sigmoid")
+    assert audit["status"] == "proven"
+    assert audit["attainment_verified"] is True
+    assert verify_radius_attainment("sine", "sigmoid").certified is True

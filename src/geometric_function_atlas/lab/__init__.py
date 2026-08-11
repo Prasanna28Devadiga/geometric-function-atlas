@@ -28,7 +28,12 @@ _CRYPTO_EXPORTS = frozenset(
     {
         "AES_SBOX",
         "IDENTITY_SBOX",
+        "compare_sbox",
         "construct_sbox",
+        "differential_distribution_table",
+        "leaderboard",
+        "linear_approximation_table",
+        "sbox_structure",
         "sbox_metrics",
         "sbox_metrics_record",
     }

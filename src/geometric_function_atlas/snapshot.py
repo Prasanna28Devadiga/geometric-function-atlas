@@ -504,6 +504,27 @@ class Paper:
     abstract: str | None
     structured: Any
     doi: str | None
+    msc_codes: tuple[str, ...] = ()
+
+    @property
+    def theorem_count(self) -> int:
+        """Number of structured theorem records attached to the paper."""
+
+        if not isinstance(self.structured, Mapping):
+            return 0
+        theorems = self.structured.get("theorems", ())
+        return len(theorems) if isinstance(theorems, list) else 0
+
+    @property
+    def function_classes(self) -> tuple[str, ...]:
+        """Canonical class labels preserved in the structured paper record."""
+
+        if not isinstance(self.structured, Mapping):
+            return ()
+        values = self.structured.get("function_classes", ())
+        if not isinstance(values, list):
+            return ()
+        return tuple(str(value) for value in values if isinstance(value, str))
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -517,6 +538,59 @@ class Paper:
             "abstract": self.abstract,
             "structured": self.structured,
             "doi": self.doi,
+            "msc_codes": list(self.msc_codes),
+            "theorem_count": self.theorem_count,
+            "function_classes": list(self.function_classes),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class LegacyFunction:
+    """A row from the website's legacy ``functions`` table."""
+
+    id: int
+    name: str
+    display_name: str | None
+    category: str | None
+    dlmf_ref: str | None
+    power_series: Any
+    description: str | None
+    source_type: str | None
+    source_ref: str | None
+    tags: tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "display_name": self.display_name,
+            "category": self.category,
+            "dlmf_ref": self.dlmf_ref,
+            "power_series": self.power_series,
+            "description": self.description,
+            "source_type": self.source_type,
+            "source_ref": self.source_ref,
+            "tags": list(self.tags),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class Tag:
+    """A website tag with explicit function and paper populations."""
+
+    id: int
+    name: str
+    category: str | None
+    function_count: int = 0
+    paper_count: int = 0
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "category": self.category,
+            "function_count": self.function_count,
+            "paper_count": self.paper_count,
         }
 
 
@@ -844,7 +918,7 @@ def _run_from_row(row: sqlite3.Row) -> VerificationRun:
     )
 
 
-def _paper_from_row(row: sqlite3.Row) -> Paper:
+def _paper_from_row(row: sqlite3.Row, *, msc_codes: tuple[str, ...] = ()) -> Paper:
     return Paper(
         id=int(row["id"]),
         title=row["title"],
@@ -856,6 +930,25 @@ def _paper_from_row(row: sqlite3.Row) -> Paper:
         abstract=row["abstract"],
         structured=_json_value(row["structured_json"]),
         doi=row["doi"],
+        msc_codes=msc_codes,
+    )
+
+
+def _legacy_function_from_row(row: sqlite3.Row, tags: tuple[str, ...] = ()) -> LegacyFunction:
+    keys = set(row.keys())
+    value = lambda name, default=None: row[name] if name in keys else default
+    raw_series = value("power_series", value("coefficients_json"))
+    return LegacyFunction(
+        id=int(value("id")),
+        name=str(value("name", value("canonical_key", ""))),
+        display_name=value("display_name"),
+        category=value("category", value("family_group")),
+        dlmf_ref=value("dlmf_ref", value("reference")),
+        power_series=_json_value(raw_series),
+        description=value("description", value("notes")),
+        source_type=value("source_type"),
+        source_ref=value("source_ref", value("source")),
+        tags=tags,
     )
 
 
@@ -1127,18 +1220,192 @@ class RegistrySnapshot:
         ).fetchall()
         return tuple(_run_from_row(row) for row in rows)
 
+    def _paper_msc_codes(self, paper_id: int) -> tuple[str, ...]:
+        """Read optional MSC/ZbMATH classifications without requiring them."""
+
+        table = next(
+            (
+                name
+                for name in ("paper_msc", "paper_zbmath", "paper_msc_codes")
+                if _table_exists(self.connection, name)
+            ),
+            None,
+        )
+        if table is None:
+            return ()
+        columns = {
+            str(row[1])
+            for row in self.connection.execute(f'PRAGMA table_info("{table}")')
+        }
+        code_column = next(
+            (name for name in ("msc_code", "code", "msc", "codes", "msc_codes") if name in columns),
+            None,
+        )
+        if code_column is None or "paper_id" not in columns:
+            return ()
+        values: list[str] = []
+        for row in self.connection.execute(
+            f'SELECT "{code_column}" FROM "{table}" WHERE paper_id=?', (paper_id,)
+        ):
+            raw = _json_value(row[0])
+            if isinstance(raw, list):
+                values.extend(str(item) for item in raw)
+            elif raw is not None:
+                values.append(str(raw))
+        return tuple(sorted({value for value in values if value}))
+
+    def legacy_functions(
+        self,
+        query: str | None = None,
+        *,
+        tag: str | None = None,
+        category: str | None = None,
+        limit: int = 10_000,
+    ) -> tuple[LegacyFunction, ...]:
+        """List the site's legacy function rows and their tags."""
+
+        _require_tables(self.connection, "functions")
+        limit = _limit(limit)
+        columns = {str(row[1]) for row in self.connection.execute("PRAGMA table_info(functions)")}
+        clauses: list[str] = []
+        params: list[Any] = []
+        if query:
+            searchable = [name for name in ("name", "display_name", "description", "dlmf_ref") if name in columns]
+            if searchable:
+                clauses.append(" OR ".join(f"lower(coalesce(f.{name},'')) LIKE ?" for name in searchable))
+                params.extend([f"%{query.lower()}%"] * len(searchable))
+        if category and "category" in columns:
+            clauses.append("lower(f.category)=lower(?)")
+            params.append(category)
+        if tag:
+            _require_tables(self.connection, "function_tags", "tags")
+            clauses.append(
+                "EXISTS (SELECT 1 FROM function_tags ft JOIN tags t ON t.id=ft.tag_id "
+                "WHERE ft.function_id=f.id AND lower(t.name)=lower(?))"
+            )
+            params.append(tag)
+        where = " WHERE " + " AND ".join(f"({clause})" for clause in clauses) if clauses else ""
+        rows = self.connection.execute(
+            f"SELECT f.* FROM functions f{where} ORDER BY f.id LIMIT ?", (*params, limit)
+        ).fetchall()
+        result: list[LegacyFunction] = []
+        for row in rows:
+            tags: tuple[str, ...] = ()
+            if _table_exists(self.connection, "function_tags") and _table_exists(self.connection, "tags"):
+                tags = tuple(
+                    str(item[0])
+                    for item in self.connection.execute(
+                        "SELECT t.name FROM tags t JOIN function_tags ft ON ft.tag_id=t.id "
+                        "WHERE ft.function_id=? ORDER BY t.name", (int(row["id"]),)
+                    )
+                )
+            result.append(_legacy_function_from_row(row, tags))
+        return tuple(result)
+
+    def function(self, identifier: int | str) -> LegacyFunction:
+        """Return one legacy function by id or exact name."""
+
+        _require_tables(self.connection, "functions")
+        if isinstance(identifier, int) and not isinstance(identifier, bool):
+            row = self.connection.execute("SELECT * FROM functions WHERE id=?", (identifier,)).fetchone()
+        else:
+            row = self.connection.execute("SELECT * FROM functions WHERE name=?", (str(identifier),)).fetchone()
+        if row is None:
+            raise KeyError(f"unknown legacy function {identifier!r}")
+        return self.legacy_functions(limit=1, query=str(row["name"]))[0]
+
+    def tags(
+        self,
+        query: str | None = None,
+        *,
+        category: str | None = None,
+        limit: int = 10_000,
+    ) -> tuple[Tag, ...]:
+        """List website tags with function and paper population counts."""
+
+        _require_tables(self.connection, "tags")
+        columns = {str(row[1]) for row in self.connection.execute("PRAGMA table_info(tags)")}
+        clauses: list[str] = []
+        params: list[Any] = []
+        if query and "name" in columns:
+            clauses.append("lower(t.name) LIKE ?")
+            params.append(f"%{query.lower()}%")
+        if category and "category" in columns:
+            clauses.append("lower(t.category)=lower(?)")
+            params.append(category)
+        where = " WHERE " + " AND ".join(clauses) if clauses else ""
+        rows = self.connection.execute(
+            f"""SELECT t.*, count(DISTINCT ft.function_id) AS function_count,
+                       count(DISTINCT pt.paper_id) AS paper_count
+                FROM tags t
+                LEFT JOIN function_tags ft ON ft.tag_id=t.id
+                LEFT JOIN paper_tags pt ON pt.tag_id=t.id
+                {where} GROUP BY t.id ORDER BY lower(t.name), t.id LIMIT ?""",
+            (*params, _limit(limit)),
+        ).fetchall()
+        return tuple(
+            Tag(
+                id=int(row["id"]),
+                name=str(row["name"]),
+                category=dict(row).get("category"),
+                function_count=int(row["function_count"]),
+                paper_count=int(row["paper_count"]),
+            )
+            for row in rows
+        )
+
+    def paper_facets(self) -> dict[str, dict[str, int]]:
+        """Return the explorer facets used for paper filtering."""
+
+        papers = self.papers(limit=10_000)
+        facets: dict[str, dict[str, int]] = {
+            "years": {}, "decades": {}, "journals": {}, "tags": {},
+            "msc_codes": {}, "function_classes": {}, "claim_types": {},
+            "theorems": {"with_theorems": 0, "without_theorems": 0},
+        }
+        for paper in papers:
+            if paper.year is not None:
+                facets["years"][str(paper.year)] = facets["years"].get(str(paper.year), 0) + 1
+                decade = f"{paper.year // 10 * 10}"
+                facets["decades"][decade] = facets["decades"].get(decade, 0) + 1
+            if paper.journal:
+                facets["journals"][paper.journal] = facets["journals"].get(paper.journal, 0) + 1
+            bucket = "with_theorems" if paper.theorem_count else "without_theorems"
+            facets["theorems"][bucket] += 1
+            for code in paper.msc_codes:
+                facets["msc_codes"][code] = facets["msc_codes"].get(code, 0) + 1
+            for class_key in paper.function_classes:
+                facets["function_classes"][class_key] = facets["function_classes"].get(class_key, 0) + 1
+        if _table_exists(self.connection, "tags") and _table_exists(self.connection, "paper_tags"):
+            for row in self.connection.execute(
+                "SELECT t.name, count(DISTINCT pt.paper_id) FROM tags t "
+                "JOIN paper_tags pt ON pt.tag_id=t.id GROUP BY t.id, t.name"
+            ):
+                facets["tags"][str(row[0])] = int(row[1])
+        if _table_exists(self.connection, "paper_claims"):
+            for row in self.connection.execute(
+                "SELECT claim_type, count(DISTINCT paper_id) FROM paper_claims "
+                "WHERE claim_type IS NOT NULL GROUP BY claim_type"
+            ):
+                facets["claim_types"][str(row[0])] = int(row[1])
+        return facets
+
     def papers(
         self,
         query: str | None = None,
         *,
         author: str | None = None,
         year: int | None = None,
+        decade: int | str | None = None,
         journal: str | None = None,
         doi: str | None = None,
         citation: str | None = None,
         class_key: str | None = None,
         tag: str | None = None,
         claim: str | None = None,
+        msc: str | None = None,
+        has_theorems: bool | None = None,
+        theorem: str | None = None,
         sort: str = "relevance",
         limit: int = 10_000,
     ) -> tuple[Paper, ...]:
@@ -1160,6 +1427,15 @@ class RegistrySnapshot:
         if year is not None:
             clauses.append("p.year=?")
             params.append(year)
+        if decade is not None:
+            try:
+                decade_value = int(decade)
+            except (TypeError, ValueError) as exc:
+                raise ValueError("decade must be an integer such as 2020") from exc
+            if decade_value % 10 != 0:
+                raise ValueError("decade must be divisible by 10")
+            clauses.append("p.year>=? AND p.year<?")
+            params.extend((decade_value, decade_value + 10))
         if journal:
             clauses.append("lower(coalesce(p.journal,'')) LIKE ?")
             params.append(f"%{journal.lower()}%")
@@ -1184,6 +1460,27 @@ class RegistrySnapshot:
             _require_tables(self.connection, "paper_claims")
             clauses.append("EXISTS (SELECT 1 FROM paper_claims pc WHERE pc.paper_id=p.id AND lower(coalesce(pc.claim_text,'') || ' ' || coalesce(pc.statement_human,'')) LIKE ?)")
             params.append(f"%{claim.lower()}%")
+        if msc:
+            table = next(
+                (name for name in ("paper_msc", "paper_zbmath", "paper_msc_codes") if _table_exists(self.connection, name)),
+                None,
+            )
+            if table is None:
+                return ()
+            columns = {str(row[1]) for row in self.connection.execute(f'PRAGMA table_info("{table}")')}
+            code_column = next(
+                (name for name in ("msc_code", "code", "msc", "codes", "msc_codes") if name in columns),
+                None,
+            )
+            if code_column is None or "paper_id" not in columns:
+                return ()
+            clauses.append(
+                f'EXISTS (SELECT 1 FROM "{table}" pm WHERE pm.paper_id=p.id AND lower(CAST(pm."{code_column}" AS TEXT)) LIKE ?)'
+            )
+            params.append(f"%{msc.lower()}%")
+        if theorem:
+            clauses.append("lower(coalesce(p.structured_json,'')) LIKE ?")
+            params.append(f"%{theorem.lower()}%")
         where = " WHERE " + " AND ".join(clauses) if clauses else ""
         order = {"relevance": "p.year DESC, p.id", "year": "p.year DESC, p.id", "title": "lower(p.title), p.id"}.get(sort)
         if order is None:
@@ -1191,7 +1488,13 @@ class RegistrySnapshot:
         rows = self.connection.execute(
             f"SELECT p.* FROM papers p{where} ORDER BY {order} LIMIT ?", (*params, limit)
         ).fetchall()
-        return tuple(_paper_from_row(row) for row in rows)
+        result = tuple(
+            _paper_from_row(row, msc_codes=self._paper_msc_codes(int(row["id"])))
+            for row in rows
+        )
+        if has_theorems is not None:
+            result = tuple(paper for paper in result if bool(paper.theorem_count) is has_theorems)
+        return result
 
     def paper(self, identifier: int | str, *, limit: int = 10_000) -> PaperDetail:
         _require_tables(self.connection, "papers")
@@ -1203,7 +1506,7 @@ class RegistrySnapshot:
             ).fetchone()
         if row is None:
             raise KeyError(f"unknown paper {identifier!r}")
-        paper = _paper_from_row(row)
+        paper = _paper_from_row(row, msc_codes=self._paper_msc_codes(int(row["id"])))
         claims: tuple[PaperClaim, ...] = ()
         if _table_exists(self.connection, "paper_claims"):
             claims = tuple(

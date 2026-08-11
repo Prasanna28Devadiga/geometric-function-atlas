@@ -9,9 +9,13 @@ pytest.importorskip("numpy")
 from geometric_function_atlas.lab import (
     AES_SBOX,
     IDENTITY_SBOX,
+    compare_sbox,
     construct_sbox,
+    differential_distribution_table,
+    linear_approximation_table,
     sbox_metrics,
     sbox_metrics_record,
+    sbox_structure,
 )
 from geometric_function_atlas.records import validate_screen_record
 
@@ -85,3 +89,27 @@ def test_metrics_record_is_closed_and_not_a_security_claim() -> None:
     assert record["details"]["NL_min"] == 112
     assert record["novelty_claim"] is False
     validate_screen_record(record)
+
+
+def test_crypto_structure_exposes_website_sac_ddt_and_lat_views() -> None:
+    structure = sbox_structure(IDENTITY_SBOX)
+
+    assert len(structure["SAC"]) == 8
+    assert len(structure["SAC"][0]) == 8
+    assert len(structure["DDT"]) == 256
+    assert len(structure["DDT"][0]) == 256
+    assert len(structure["LAT"]) == 256
+    assert len(structure["LAT"][0]) == 256
+    assert structure["DDT"] == differential_distribution_table(IDENTITY_SBOX)
+    assert structure["LAT"] == linear_approximation_table(IDENTITY_SBOX)
+    assert structure["metrics"]["DU"] == 256
+
+
+def test_crypto_reference_comparison_is_explicitly_benchmark_only() -> None:
+    comparison = compare_sbox(IDENTITY_SBOX)
+
+    assert set(comparison["references"]) == {"AES", "identity"}
+    assert comparison["metrics"]["LP"] == pytest.approx(0.5)
+    assert comparison["delta"]["identity"]["LP"] == pytest.approx(0.0)
+    assert comparison["novelty_claim"] is False
+    assert "security" in comparison["scope"]

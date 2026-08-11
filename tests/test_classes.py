@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 import sympy as sp
 
+import geometric_function_atlas as gfa
 from geometric_function_atlas.classes import (
     class_admissibility,
     class_containment_screen,
@@ -19,6 +20,21 @@ def test_list_classes_covers_the_catalog() -> None:
     keys = {item.key for item in list_classes()}
     assert len(keys) == 39
     assert {"starlike", "exponential", "sine", "petal_arcsinh"} <= keys
+
+
+def test_public_class_catalog_entries_expose_exact_catalog_fields() -> None:
+    starlike = next(item for item in list_classes() if item.key == "starlike")
+
+    assert starlike["formula"] == starlike.formula
+    assert starlike["phi_formula"] == starlike.formula
+    assert starlike["phi_coeffs"][:2] == ("2", "2")
+
+
+def test_top_level_class_catalog_uses_the_computational_generator_objects() -> None:
+    item = next(item for item in gfa.list_classes() if item.key == "sine")
+
+    assert item.expression.free_symbols == {item.variable}
+    assert gfa.list_artifact_classes()[0]["key"] == "bean_tanh"
 
 
 def test_exponential_class_is_admissible() -> None:

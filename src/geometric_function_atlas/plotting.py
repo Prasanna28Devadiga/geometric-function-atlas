@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import binascii
 import colorsys
 import math
+import struct
+import zlib
 from dataclasses import dataclass
+from itertools import pairwise
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -228,6 +232,176 @@ def write_domain_plot(
         coefficients=plot_coefficients,
         approximation=approximation,
     )
+
+
+def _domain_plot_inputs(
+    *,
+    generator: str | None,
+    coefficients: tuple[float, ...] | None,
+    order: int,
+    rmax: float,
+    rings: int,
+    spokes: int,
+    samples: int,
+) -> tuple[ConformalGrid, tuple[float, ...], str | None, str]:
+    """Resolve shared domain-export inputs and geometry once."""
+
+    if (generator is None) == (coefficients is None):
+        raise ValueError("provide exactly one of generator or coefficients")
+    if generator is not None:
+        definition = get_generator(generator)
+        values = generator_function_coefficients(generator, order=order)
+        generator_key = definition.key
+        approximation = f"f(z) = z*phi(z), Taylor order {order}"
+    else:
+        values = tuple(coefficients or ())
+        generator_key = None
+        approximation = "f(z) = z + a2*z^2 + ... (supplied finite polynomial)"
+    return (
+        conformal_grid(values, rmax=rmax, rings=rings, spokes=spokes, samples=samples),
+        values,
+        generator_key,
+        approximation,
+    )
+
+
+def _domain_bounds(grid: ConformalGrid) -> tuple[float, float, float, float]:
+    curves = (*grid.rings, *grid.spokes)
+    points = [point for curve in curves for point in curve]
+    xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
+    xmin, xmax = min(xs), max(xs)
+    ymin, ymax = min(ys), max(ys)
+    margin = 0.06 * max(xmax - xmin, ymax - ymin, 1.0)
+    return xmin - margin, xmax + margin, ymin - margin, ymax + margin
+
+
+def write_tikz_plot(
+    output: str | Path,
+    *,
+    generator: str | None = None,
+    coefficients: tuple[float, ...] | None = None,
+    order: int = 12,
+    rmax: float = _DISK_RMAX,
+    rings: int = 5,
+    spokes: int = 12,
+    samples: int = 480,
+) -> DomainPlotResult:
+    """Write the website-compatible standalone TikZ conformal-grid export."""
+
+    path = Path(output)
+    if path.suffix.lower() not in {".tikz", ".tex"}:
+        raise ValueError("output must have the .tikz or .tex extension")
+    grid, values, generator_key, approximation = _domain_plot_inputs(
+        generator=generator, coefficients=coefficients, order=order,
+        rmax=rmax, rings=rings, spokes=spokes, samples=samples,
+    )
+    xmin, xmax, ymin, ymax = _domain_bounds(grid)
+    scale = 5.8 / max(xmax - xmin, ymax - ymin)
+    cx, cy = (xmin + xmax) / 2, (ymin + ymax) / 2
+
+    def point(value: tuple[float, float]) -> str:
+        x, y = value
+        return f"({(x - cx) * scale:.3f},{(y - cy) * scale:.3f})"
+
+    lines = [
+        "\\begin{tikzpicture}",
+        "  % conformal grid: image of the disk under the displayed polynomial",
+    ]
+    for curve in grid.spokes:
+        lines.append("  \\draw[gray!40] plot coordinates {" + " ".join(map(point, curve)) + "};")
+    for index, curve in enumerate(grid.rings):
+        color = "blue!70!black" if index == len(grid.rings) - 1 else "gray!40"
+        lines.append(f"  \\draw[{color}] plot coordinates {{" + " ".join(map(point, curve)) + "};")
+    lines.extend(("  \\fill (0,0) circle (1.2pt);  % f(0)=0", "\\end{tikzpicture}", ""))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+    return DomainPlotResult(path, generator_key, values, approximation)
+
+
+def _png_chunk(kind: bytes, payload: bytes) -> bytes:
+    return (
+        struct.pack(">I", len(payload)) + kind + payload
+        + struct.pack(">I", binascii.crc32(kind + payload) & 0xFFFFFFFF)
+    )
+
+
+def _write_rgb_png(path: Path, width: int, height: int, pixels: bytearray) -> None:
+    rows = b"".join(
+        b"\x00" + bytes(pixels[row * width * 3:(row + 1) * width * 3])
+        for row in range(height)
+    )
+    payload = b"\x89PNG\r\n\x1a\n"
+    payload += _png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+    payload += _png_chunk(b"IDAT", zlib.compress(rows, level=6))
+    payload += _png_chunk(b"IEND", b"")
+    path.write_bytes(payload)
+
+
+def write_png_plot(
+    output: str | Path,
+    *,
+    generator: str | None = None,
+    coefficients: tuple[float, ...] | None = None,
+    order: int = 12,
+    rmax: float = _DISK_RMAX,
+    rings: int = 5,
+    spokes: int = 12,
+    samples: int = 480,
+    width: int = 900,
+    height: int = 700,
+) -> DomainPlotResult:
+    """Write a dependency-free PNG conformal-grid export."""
+
+    path = Path(output)
+    if path.suffix.lower() != ".png":
+        raise ValueError("output must have the .png extension")
+    if (
+        isinstance(width, bool) or isinstance(height, bool)
+        or not isinstance(width, int) or not isinstance(height, int)
+        or not 16 <= width <= 4096 or not 16 <= height <= 4096
+    ):
+        raise ValueError("width and height must be integers between 16 and 4096")
+    grid, values, generator_key, approximation = _domain_plot_inputs(
+        generator=generator, coefficients=coefficients, order=order,
+        rmax=rmax, rings=rings, spokes=spokes, samples=samples,
+    )
+    xmin, xmax, ymin, ymax = _domain_bounds(grid)
+    scale = min((width - 20) / (xmax - xmin), (height - 20) / (ymax - ymin))
+    cx, cy = (xmin + xmax) / 2, (ymin + ymax) / 2
+    pixels = bytearray([251, 250, 247] * (width * height))
+
+    def pixel(value: tuple[float, float]) -> tuple[int, int]:
+        x, y = value
+        return round(width / 2 + (x - cx) * scale), round(height / 2 - (y - cy) * scale)
+
+    def draw_line(start: tuple[int, int], end: tuple[int, int], color: tuple[int, int, int]) -> None:
+        x0, y0 = start
+        x1, y1 = end
+        steps = max(abs(x1 - x0), abs(y1 - y0), 1)
+        for step in range(steps + 1):
+            x = round(x0 + (x1 - x0) * step / steps)
+            y = round(y0 + (y1 - y0) * step / steps)
+            if 0 <= x < width and 0 <= y < height:
+                offset = (y * width + x) * 3
+                pixels[offset:offset + 3] = bytes(color)
+
+    for curve in grid.spokes:
+        for start, end in pairwise(curve):
+            draw_line(pixel(start), pixel(end), (216, 211, 202))
+    for index, curve in enumerate(grid.rings):
+        color = (38, 93, 143) if index == len(grid.rings) - 1 else (216, 211, 202)
+        for start, end in pairwise(curve):
+            draw_line(pixel(start), pixel(end), color)
+    origin = pixel((0.0, 0.0))
+    for dx in range(-2, 3):
+        for dy in range(-2, 3):
+            if 0 <= origin[0] + dx < width and 0 <= origin[1] + dy < height:
+                offset = ((origin[1] + dy) * width + origin[0] + dx) * 3
+                pixels[offset:offset + 3] = bytes((31, 41, 51))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _write_rgb_png(path, width, height, pixels)
+    return DomainPlotResult(path, generator_key, values, approximation)
 
 
 @dataclass(frozen=True)
@@ -536,6 +710,7 @@ def write_plot(
     rmax: float = _DISK_RMAX,
     rings: int = 5,
     spokes: int = 12,
+    samples: int = 480,
 ) -> PlotResult | DomainPlotResult:
     """Write an SVG plot of the requested kind.
 
@@ -547,6 +722,21 @@ def write_plot(
         raise ValueError(
             f"kind must be one of: {', '.join(PLOT_KINDS)}"
         )
+    suffix = Path(output).suffix.lower()
+    if suffix in {".png", ".tikz", ".tex"}:
+        if kind != "domain":
+            raise ValueError("PNG and TikZ exports are supported for the domain plot only")
+        export = write_png_plot if suffix == ".png" else write_tikz_plot
+        return export(
+            output,
+            generator=generator,
+            coefficients=coefficients,
+            order=order,
+            rmax=rmax,
+            rings=rings,
+            spokes=spokes,
+            samples=samples,
+        )
     if kind == "domain":
         return write_domain_plot(
             output,
@@ -556,6 +746,7 @@ def write_plot(
             rmax=rmax,
             rings=rings,
             spokes=spokes,
+            samples=samples,
         )
     if kind == "coefficients":
         return write_coefficient_plot(
@@ -578,3 +769,7 @@ def write_plot(
         grid=grid,
         rmax=rmax,
     )
+
+
+export_png = write_png_plot
+export_tikz = write_tikz_plot

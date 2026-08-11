@@ -28,7 +28,7 @@ only panels and research-workspace workflows are explicit non-goals.
 | Reproduce website plots | `gfa plot <kind> <gen> --output out.svg` | `write_plot()` and friends |
 | Inspect/verify baked scientific artifacts | `gfa artifact-snapshot`, `gfa proofs`, `gfa expansion`, `gfa coefficient-bound`, `gfa reconciliation` | `snapshot_info()`, `list_proofs()`, `expansion()`, `coefficient_bound()`, `reconciliation()` |
 | Replay a baked exact certificate | `gfa verify-certificate <name>` | `verify_certificate()` |
-| Browse/replay directed inclusion radii | `gfa radii`, `gfa radius`, `gfa verify-radius-certificate` | `list_radii()`, `radius()`, `verify_radius_certificate()` |
+| Browse/replay directed inclusion radii | `gfa radii`, `gfa radius`, `gfa radius-recompute`, `gfa radius-identify`, `gfa radius-audit`, `gfa radius-attainment`, `gfa verify-radius-certificate` | `list_radii()`, `radius()`, `recompute_radius()`, `identify_radius()`, `audit_radius()`, `verify_radius_attainment()`, `verify_radius_certificate()` |
 | Verify/install an immutable registry snapshot | `gfa snapshot info|verify|install` | `verify_snapshot()`, `install_snapshot()`, `RegistrySnapshot.open()` |
 | Query snapshot statistics, families, papers, evidence, and applications | `gfa stats|search|families|family|facts|evidence|runs|papers|paper|applications` | `RegistrySnapshot.stats()`, `.search()`, `.families()`, `.family()`, `.facts()`, `.evidence()`, `.runs()`, `.papers()`, `.paper()`, `.applications()` |
 | Query aliases, hierarchy, and stored witnesses | `gfa aliases|normalize-class|hierarchy|counterexamples` | `RegistrySnapshot.aliases()`, `.normalize_class()`, `.hierarchy()`, `.counterexamples()` |
@@ -294,9 +294,13 @@ remain snapshot records with their original status and provenance.
 
 ```python
 from geometric_function_atlas import (
+    audit_radius,
+    identify_radius,
     list_radii,
     radius,
+    recompute_radius,
     replay_radius_certificate,
+    verify_radius_attainment,
     verify_radius_certificate,
 )
 
@@ -305,11 +309,19 @@ record = radius("sine", "sigmoid")
 assert record.direction == "sine->sigmoid"
 assert replay_radius_certificate(record).certified is True
 assert verify_radius_certificate("sine", "sigmoid").certified is True
+assert recompute_radius("sine", "sigmoid").certified is True
+assert identify_radius("asin((E-1)/(E+1)") == ()  # malformed input is not a match
+assert audit_radius("sine", "sigmoid")["attainment_verified"] is True
+assert verify_radius_attainment("sine", "sigmoid").certified is True
 ```
 
 ```bash
 gfa radii --status audit_required --json
 gfa radius sine sigmoid --json
+gfa radius-recompute sine sigmoid --json
+gfa radius-identify --value 'asin((E-1)/(E+1))' --json
+gfa radius-audit sine sigmoid --json
+gfa radius-attainment sine sigmoid --json
 gfa verify-radius-certificate sine sigmoid --json
 ```
 

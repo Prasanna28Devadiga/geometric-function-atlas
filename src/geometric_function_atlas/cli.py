@@ -13,6 +13,7 @@ from typing import Any
 
 from . import artifacts as _artifact_data
 from .catalog import get_generator, list_generators
+from .citation import citation_export
 from .classes import (
     class_admissibility,
     class_containment_screen,
@@ -40,8 +41,12 @@ from .lab import SPECIAL_FUNCTIONS
 from .plotting import write_plot
 from .radii import (
     RadiusStatus,
+    audit_radius,
+    identify_radius,
     list_radii,
     radius,
+    recompute_radius,
+    verify_radius_attainment,
     verify_radius_certificate,
 )
 from .snapshot import (
@@ -120,6 +125,26 @@ def _generators(args: argparse.Namespace) -> None:
         for generator in list_generators()
     ]
     _write(payload, as_json=args.json)
+
+
+def _citation(args: argparse.Namespace) -> None:
+    metadata = {
+        "key": args.key,
+        "title": args.title,
+        "author": args.author,
+        "year": args.year,
+        "url": args.url,
+        "journal": args.journal,
+        "doi": args.doi,
+        "note": args.note,
+    }
+    bundle = citation_export(metadata, accessed=args.accessed)
+    if args.format is not None:
+        _write_utf8(bundle.formats[args.format])
+    elif args.json:
+        _write(bundle.to_dict(), as_json=True)
+    else:
+        _write(bundle.to_dict(), as_json=False)
 
 
 def _coefficients(args: argparse.Namespace) -> None:
@@ -206,6 +231,88 @@ def _radii(args: argparse.Namespace) -> None:
 def _radius(args: argparse.Namespace) -> None:
     result = radius(args.source, args.target)
     _write(result.to_dict(), as_json=args.json)
+
+
+def _radius_recompute(args: argparse.Namespace) -> None:
+    result = recompute_radius(
+        args.source,
+        args.target,
+        candidate=args.candidate,
+        dps=args.dps,
+        max_steps=args.max_steps,
+    )
+    payload = result.to_dict()
+    if result.certified:
+        if args.json:
+            _write(payload, as_json=True)
+        else:
+            print(f"PROVEN: {result.direction}")
+            for step in result.steps:
+                print(f"  PASS {step.name}")
+        return
+    state = (
+        result.failure_state.value
+        if result.failure_state is not None
+        else FailureState.UNRESOLVED.value
+    )
+    raise _CommandFailure(state, payload)
+
+
+def _radius_attainment(args: argparse.Namespace) -> None:
+    result = verify_radius_attainment(
+        args.source,
+        args.target,
+        dps=args.dps,
+        max_steps=args.max_steps,
+    )
+    payload = result.to_dict()
+    if result.certified:
+        if args.json:
+            _write(payload, as_json=True)
+        else:
+            print(f"PROVEN ATTAINMENT: {result.direction}")
+            for step in result.steps:
+                print(f"  PASS {step.name}")
+        return
+    state = (
+        result.failure_state.value
+        if result.failure_state is not None
+        else FailureState.UNRESOLVED.value
+    )
+    raise _CommandFailure(state, payload)
+
+
+def _radius_identify(args: argparse.Namespace) -> None:
+    value: str | float = args.value
+    try:
+        rows = identify_radius(value, tolerance=args.tolerance, limit=args.limit)
+    except InvalidInputError:
+        rows = ()
+    if not rows:
+        try:
+            numeric = float(args.value)
+        except ValueError as exc:
+            raise InvalidInputError(
+                "radius identification value must be an exact expression or finite number"
+            ) from exc
+        rows = identify_radius(numeric, tolerance=args.tolerance, limit=args.limit)
+    _write([row.to_dict() for row in rows], as_json=args.json)
+
+
+def _radius_audit(args: argparse.Namespace) -> None:
+    payload = audit_radius(
+        args.source,
+        args.target,
+        candidate=args.candidate,
+        dps=args.dps,
+        max_steps=args.max_steps,
+    )
+    if payload["status"] == "proven":
+        _write(payload, as_json=args.json)
+        return
+    replay = payload.get("certificate_replay", {})
+    state = replay.get("failure_state") or FailureState.UNRESOLVED.value
+    raise _CommandFailure(state, payload)
 
 
 class _CommandFailure(RuntimeError):
@@ -384,9 +491,55 @@ def _snapshot_papers(args: argparse.Namespace) -> None:
                     class_key=args.class_key,
                     tag=args.tag,
                     claim=args.claim,
+                    decade=args.decade,
+                    msc=args.msc,
+                    has_theorems=args.has_theorems,
+                    theorem=args.theorem,
                     sort=args.sort,
                     limit=args.limit,
                 )
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_paper_facets(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(snapshot.paper_facets(), as_json=args.json)
+
+
+def _snapshot_functions(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.legacy_functions(
+                    args.query, tag=args.tag, category=args.category, limit=args.limit
+                )
+            ],
+            as_json=args.json,
+        )
+
+
+def _snapshot_function(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(snapshot.function(args.identifier).to_dict(), as_json=args.json)
+
+
+def _snapshot_tags(args: argparse.Namespace) -> None:
+    with RegistrySnapshot.open(
+        args.snapshot, manifest=_snapshot_manifest(args)
+    ) as snapshot:
+        _write(
+            [
+                item.to_dict()
+                for item in snapshot.tags(args.query, category=args.category, limit=args.limit)
             ],
             as_json=args.json,
         )
@@ -716,6 +869,43 @@ def _crypto_lab(args: argparse.Namespace) -> None:
     from . import lab
 
     lab.require_lab()
+    if args.action in {"structure", "compare"}:
+        from .lab import AES_SBOX, IDENTITY_SBOX, sbox_structure
+
+        if args.reference == "aes":
+            selected = AES_SBOX
+        elif args.reference == "identity":
+            selected = IDENTITY_SBOX
+        else:
+            if args.sbox is None:
+                raise InvalidInputError("provide --reference or --sbox")
+            selected = _parse_sbox(args.sbox)
+        if args.action == "structure":
+            payload = sbox_structure(selected)
+        else:
+            from .lab import compare_sbox
+
+            payload = compare_sbox(selected)
+        if args.json:
+            _write(payload, as_json=True)
+        else:
+            _write_utf8(
+                "S-box diagnostic structure\n"
+                f"  NL avg: {payload['metrics']['NL_avg']}\n"
+                f"  SAC avg: {payload['metrics']['SAC_avg']:.4f}\n"
+                f"  DDT/LAT: {len(payload.get('DDT', ())) or 'comparison only'}\n"
+                "Benchmark diagnostics only; never a security claim."
+            )
+        return
+    if args.action == "leaderboard":
+        from .lab import leaderboard
+
+        rows = list(leaderboard())
+        if args.json:
+            _write(rows, as_json=True)
+        else:
+            _write(rows, as_json=False)
+        return
     if args.action == "metrics":
         if args.reference is not None:
             if args.reference == "aes":
@@ -1065,6 +1255,22 @@ def _parser() -> argparse.ArgumentParser:
     generators.add_argument("--json", action="store_true", help="emit JSON")
     generators.set_defaults(handler=_generators)
 
+    citation = subparsers.add_parser(
+        "citation", help="export BibTeX, RIS, plain-text, or LaTeX citation formats"
+    )
+    citation.add_argument("--key", required=True)
+    citation.add_argument("--title", required=True)
+    citation.add_argument("--year", required=True)
+    citation.add_argument("--author", default=None)
+    citation.add_argument("--url", default="")
+    citation.add_argument("--journal")
+    citation.add_argument("--doi")
+    citation.add_argument("--note")
+    citation.add_argument("--accessed")
+    citation.add_argument("--format", choices=["BibTeX", "RIS", "Plain", "LaTeX"])
+    citation.add_argument("--json", action="store_true", help="emit JSON")
+    citation.set_defaults(handler=_citation)
+
     coefficients = subparsers.add_parser(
         "coefficients", help="compute exact generator Taylor coefficients"
     )
@@ -1117,6 +1323,47 @@ def _parser() -> argparse.ArgumentParser:
     one_radius.add_argument("target")
     one_radius.add_argument("--json", action="store_true", help="emit JSON")
     one_radius.set_defaults(handler=_radius)
+
+    radius_recompute = subparsers.add_parser(
+        "radius-recompute", help="replay a bounded exact radius computation"
+    )
+    radius_recompute.add_argument("source")
+    radius_recompute.add_argument("target")
+    radius_recompute.add_argument("--candidate")
+    radius_recompute.add_argument("--dps", type=int, default=50)
+    radius_recompute.add_argument("--max-steps", type=int, default=128)
+    radius_recompute.add_argument("--json", action="store_true", help="emit JSON")
+    radius_recompute.set_defaults(handler=_radius_recompute)
+
+    radius_attainment = subparsers.add_parser(
+        "radius-attainment", help="verify a reviewed radius contact and attainment chain"
+    )
+    radius_attainment.add_argument("source")
+    radius_attainment.add_argument("target")
+    radius_attainment.add_argument("--dps", type=int, default=50)
+    radius_attainment.add_argument("--max-steps", type=int, default=128)
+    radius_attainment.add_argument("--json", action="store_true", help="emit JSON")
+    radius_attainment.set_defaults(handler=_radius_attainment)
+
+    radius_identify = subparsers.add_parser(
+        "radius-identify", help="identify stored radii by exact expression or value"
+    )
+    radius_identify.add_argument("--value", required=True)
+    radius_identify.add_argument("--tolerance", type=float, default=1e-12)
+    radius_identify.add_argument("--limit", type=int, default=100)
+    radius_identify.add_argument("--json", action="store_true", help="emit JSON")
+    radius_identify.set_defaults(handler=_radius_identify)
+
+    radius_audit = subparsers.add_parser(
+        "radius-audit", help="audit one directed radius without promoting its status"
+    )
+    radius_audit.add_argument("source")
+    radius_audit.add_argument("target")
+    radius_audit.add_argument("--candidate")
+    radius_audit.add_argument("--dps", type=int, default=50)
+    radius_audit.add_argument("--max-steps", type=int, default=128)
+    radius_audit.add_argument("--json", action="store_true", help="emit JSON")
+    radius_audit.set_defaults(handler=_radius_audit)
 
     replay = subparsers.add_parser(
         "verify-radius-certificate",
@@ -1234,6 +1481,24 @@ def _parser() -> argparse.ArgumentParser:
     crypto_construct.add_argument("--construction", default="keyed", choices=["keyed", "direct"])
     crypto_construct.add_argument("--json", action="store_true", help="emit JSON")
     crypto_construct.set_defaults(handler=_crypto_lab)
+    for action, help_text in (
+        ("structure", "show SAC, DDT, and LAT diagnostic tables"),
+        ("compare", "compare metrics with AES and identity references"),
+    ):
+        crypto_view = crypto_sub.add_parser(action, help=help_text)
+        crypto_view.add_argument(
+            "--reference", choices=["aes", "identity"], default="identity"
+        )
+        crypto_view.add_argument(
+            "--sbox", help="256 comma-separated integers (alternative to --reference)"
+        )
+        crypto_view.add_argument("--json", action="store_true", help="emit JSON")
+        crypto_view.set_defaults(handler=_crypto_lab)
+    crypto_leaderboard = crypto_sub.add_parser(
+        "leaderboard", help="rank the finite named package/reference set"
+    )
+    crypto_leaderboard.add_argument("--json", action="store_true", help="emit JSON")
+    crypto_leaderboard.set_defaults(handler=_crypto_lab)
 
     image_lab = subparsers.add_parser(
         "image-lab", help="image metrics and transforms (lab extra)"
@@ -1354,6 +1619,15 @@ def _parser() -> argparse.ArgumentParser:
     papers.add_argument("--class-key")
     papers.add_argument("--tag")
     papers.add_argument("--claim")
+    papers.add_argument("--decade", type=int)
+    papers.add_argument("--msc")
+    papers.add_argument("--theorem")
+    papers.add_argument(
+        "--has-theorems",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="filter papers by presence of structured theorem records",
+    )
     papers.add_argument(
         "--sort", choices=("relevance", "year", "title"), default="relevance"
     )
@@ -1361,6 +1635,38 @@ def _parser() -> argparse.ArgumentParser:
     _add_limit(papers)
     papers.add_argument("--json", action="store_true", help="emit JSON")
     papers.set_defaults(handler=_snapshot_papers)
+
+    paper_facets = subparsers.add_parser(
+        "paper-facets", help="list website paper-explorer facet populations"
+    )
+    _add_snapshot_options(paper_facets)
+    paper_facets.add_argument("--json", action="store_true", help="emit JSON")
+    paper_facets.set_defaults(handler=_snapshot_paper_facets)
+
+    functions = subparsers.add_parser(
+        "functions", help="list legacy registry function rows"
+    )
+    functions.add_argument("--query")
+    functions.add_argument("--tag")
+    functions.add_argument("--category")
+    _add_snapshot_options(functions)
+    _add_limit(functions)
+    functions.add_argument("--json", action="store_true", help="emit JSON")
+    functions.set_defaults(handler=_snapshot_functions)
+
+    function = subparsers.add_parser("function", help="show one legacy function row")
+    function.add_argument("identifier")
+    _add_snapshot_options(function)
+    function.add_argument("--json", action="store_true", help="emit JSON")
+    function.set_defaults(handler=_snapshot_function)
+
+    tags = subparsers.add_parser("tags", help="list registry tags and populations")
+    tags.add_argument("--query")
+    tags.add_argument("--category")
+    _add_snapshot_options(tags)
+    _add_limit(tags)
+    tags.add_argument("--json", action="store_true", help="emit JSON")
+    tags.set_defaults(handler=_snapshot_tags)
 
     paper = subparsers.add_parser("paper", help="inspect one paper and its claims")
     paper.add_argument("identifier")

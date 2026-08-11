@@ -37,6 +37,7 @@ RADIUS_SCHEMA_VERSION = "1.0.0"
 MAX_CANDIDATE_LENGTH = 4096
 MAX_REPLAY_STEPS = 128
 MAX_REPLAY_DPS = 200
+MAX_IDENTIFICATION_CHARS = 4096
 
 
 class RadiusStatus(str, Enum):
@@ -1040,6 +1041,102 @@ def verify_radius_certificate(
     return replay_radius_certificate(record, candidate=candidate, dps=dps, max_steps=max_steps)
 
 
+def recompute_radius(
+    source: str,
+    target: str,
+    *,
+    candidate: str | None = None,
+    dps: int = 50,
+    max_steps: int = MAX_REPLAY_STEPS,
+) -> RadiusReplayResult:
+    """Recompute a reviewed lane by replaying its bundled exact certificate.
+
+    This is deliberately bounded certificate recomputation, not an open-ended
+    radius search.  Unreviewed rows remain unresolved rather than being
+    promoted by a numerical coincidence.
+    """
+
+    return verify_radius_certificate(
+        source, target, candidate=candidate, dps=dps, max_steps=max_steps
+    )
+
+
+def verify_radius_attainment(
+    source: str,
+    target: str,
+    *,
+    dps: int = 50,
+    max_steps: int = MAX_REPLAY_STEPS,
+) -> RadiusReplayResult:
+    """Verify the stored contact/attainment chain for one reviewed radius."""
+
+    return verify_radius_certificate(source, target, dps=dps, max_steps=max_steps)
+
+
+def identify_radius(
+    value: str | float,
+    *,
+    tolerance: float = 1e-12,
+    limit: int = 100,
+) -> tuple[RadiusRecord, ...]:
+    """Identify snapshot rows matching an exact expression or decimal value.
+
+    Matching is restricted to the bundled radius snapshot.  It does not infer
+    a closed form from arbitrary decimal input and returns an empty tuple when
+    no stored row matches.
+    """
+
+    if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1 or limit > 1000:
+        raise InvalidInputError("radius identification limit must be an integer in [1, 1000]")
+    if isinstance(tolerance, bool) or not isinstance(tolerance, (int, float)) or not math.isfinite(float(tolerance)) or tolerance < 0:
+        raise InvalidInputError("radius identification tolerance must be a finite non-negative number")
+    rows: list[RadiusRecord] = []
+    if isinstance(value, str):
+        if len(value) > MAX_IDENTIFICATION_CHARS:
+            raise ResourceLimitError("radius identification expression is too long")
+        direct = tuple(row for row in list_radii() if row.value_exact == value)
+        if direct:
+            return direct[:limit]
+        for row in list_radii():
+            if row.value_exact is not None and _expression_equal(value, row.value_exact):
+                rows.append(row)
+    elif isinstance(value, (int, float)) and not isinstance(value, bool):
+        numeric = float(value)
+        if not math.isfinite(numeric):
+            raise InvalidInputError("radius identification value must be finite")
+        for row in list_radii():
+            if row.value_float is not None and abs(row.value_float - numeric) <= float(tolerance):
+                rows.append(row)
+    else:
+        raise InvalidInputError("radius identification requires an exact expression or finite number")
+    return tuple(rows[:limit])
+
+
+def audit_radius(
+    source: str,
+    target: str,
+    *,
+    candidate: str | None = None,
+    dps: int = 50,
+    max_steps: int = MAX_REPLAY_STEPS,
+) -> dict[str, Any]:
+    """Return a bounded audit record without upgrading literature status."""
+
+    record = radius(source, target)
+    replay = replay_radius_certificate(record, candidate=candidate, dps=dps, max_steps=max_steps)
+    return {
+        "result_type": "radius_audit",
+        "direction": record.direction,
+        "status": replay.status,
+        "evidence_status": record.status.value,
+        "attainment_verified": replay.certified and bool(record.contact_and_attainment),
+        "certificate_replay": replay.to_dict(),
+        "claim_label": record.claim_label,
+        "scope": "bounded bundled-certificate audit; not a new radius search",
+        "novelty_claim": False,
+    }
+
+
 # A short alias used by some callers migrating from the research verifier.
 replay_radius = verify_radius_certificate
 
@@ -1052,9 +1149,13 @@ __all__ = [
     "RadiusReplayResult",
     "RadiusStatus",
     "ReplayStep",
+    "audit_radius",
+    "identify_radius",
     "list_radii",
     "radius",
+    "recompute_radius",
     "replay_radius",
     "replay_radius_certificate",
+    "verify_radius_attainment",
     "verify_radius_certificate",
 ]
