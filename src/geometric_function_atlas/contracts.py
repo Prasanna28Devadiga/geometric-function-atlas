@@ -68,7 +68,20 @@ _OPERATION_CHECKS = {
     },
 }
 _DAG_OPS = {"integer", "rational", "symbol", "add", "mul", "pow", "function"}
-_DAG_FUNCTIONS = {"Abs", "Max", "cos", "cosh", "exp", "log", "sin", "sinh"}
+_DAG_FUNCTIONS = {
+    "Abs",
+    "Max",
+    "Pi",
+    "asinh",
+    "atan",
+    "cos",
+    "cosh",
+    "exp",
+    "log",
+    "sin",
+    "sinh",
+    "tanh",
+}
 _DAG_ID_PATTERN = re.compile(r"n[0-9]+", flags=re.ASCII)
 _INTEGER_PATTERN = re.compile(r"[+-]?[0-9]+", flags=re.ASCII)
 _DENOMINATOR_PATTERN = re.compile(r"\+?[0-9]+", flags=re.ASCII)

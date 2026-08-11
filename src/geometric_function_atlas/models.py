@@ -20,12 +20,16 @@ _DAG_FUNCTIONS = frozenset(
     {
         "Abs",
         "Max",
+        "Pi",
+        "asinh",
+        "atan",
         "cos",
         "cosh",
         "exp",
         "log",
         "sin",
         "sinh",
+        "tanh",
     }
 )
 

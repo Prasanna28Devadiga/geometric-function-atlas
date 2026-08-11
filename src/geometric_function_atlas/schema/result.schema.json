@@ -113,7 +113,7 @@
         {"type": "object", "additionalProperties": false, "required": ["id", "op", "numerator", "denominator"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "rational"}, "numerator": {"type": "string", "pattern": "^[+-]?[0-9]+$"}, "denominator": {"type": "string", "pattern": "^\\+?(?:[1-9][0-9]*)$"}}},
         {"type": "object", "additionalProperties": false, "required": ["id", "op", "value"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "symbol"}, "value": {"const": "z"}}},
         {"type": "object", "additionalProperties": false, "required": ["id", "op", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"enum": ["add", "mul", "pow"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}},
-        {"type": "object", "additionalProperties": false, "required": ["id", "op", "name", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "function"}, "name": {"enum": ["Abs", "Max", "cos", "cosh", "exp", "log", "sin", "sinh"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}}
+        {"type": "object", "additionalProperties": false, "required": ["id", "op", "name", "args"], "properties": {"id": {"$ref": "#/$defs/dag_ref"}, "op": {"const": "function"}, "name": {"enum": ["Abs", "Max", "Pi", "asinh", "atan", "cos", "cosh", "exp", "log", "sin", "sinh", "tanh"]}, "args": {"type": "array", "items": {"$ref": "#/$defs/dag_ref"}}}}
       ]
     },
     "verification_check": {
