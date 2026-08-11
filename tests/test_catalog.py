@@ -167,4 +167,3 @@ def test_catalog_version_identifies_the_expanded_catalog() -> None:
     from geometric_function_atlas.version import GENERATOR_CATALOG_VERSION
 
     assert len(GENERATOR_CATALOG_VERSION) == len("2026.08.04")
-
