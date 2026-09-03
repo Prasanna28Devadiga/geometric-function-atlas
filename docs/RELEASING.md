@@ -46,7 +46,13 @@ explicit approval from the repository owner.
    notes from `CHANGELOG.md`.
 9. Download the published assets and rerun the clean-install check against the
    downloaded wheel.
-10. Run both public installer commands and verify `gfa --version`.
+10. Publish the release to PyPI through the frozen-manifest procedure below.
+11. Only after both the GitHub assets and PyPI version are live, open a small
+   follow-up pull request that switches `install.sh`, `install.ps1`, their tests,
+   and public installation examples from the previous release to the new one.
+12. Merge that follow-up after CI, run both public installer commands, and verify
+   `gfa --version` plus the new first-use command. This order prevents a broken
+   installer URL or a PyPI command that names an unpublished version.
 
 ## PyPI publication
 
