@@ -9,9 +9,10 @@ from typing import Any
 
 import pytest
 
-from geometric_function_atlas.lab import apply_image_transform, image_metrics
-
 np = pytest.importorskip("numpy")
+
+# Guard the optional dependency before resolving lazy lab exports.
+from geometric_function_atlas.lab import apply_image_transform, image_metrics  # noqa: I001
 
 
 ROOT = Path(__file__).resolve().parents[1]
