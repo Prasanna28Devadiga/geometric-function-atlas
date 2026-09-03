@@ -23,18 +23,18 @@ explicit approval from the repository owner.
 3. Run the local gate:
 
    ```bash
-   uv sync --extra test --extra build --locked
-   uv run --frozen --extra test python -m ruff check src tests scripts
-   uv run --frozen --extra test python -m mypy src --ignore-missing-imports
-   uv run --frozen --extra test python -W error -m pytest -q
+   uv sync --extra test --extra build --extra lab --locked
+   uv run --frozen --extra test --extra lab python -m ruff check src tests scripts
+   uv run --frozen --extra test --extra lab python -m mypy src --ignore-missing-imports
+   uv run --frozen --extra test --extra lab python -W error -m pytest -q
    rm -rf dist build
    uv run --frozen --extra build python -m build
    uv run --frozen --extra build python -m twine check dist/*
    uv run --frozen python scripts/check_distribution.py dist
    uv run --frozen python scripts/check_clean_install.py \
-     dist/geometric_function_atlas-0.2.0-py3-none-any.whl
+     dist/geometric_function_atlas-0.2.1-py3-none-any.whl
    uv run --frozen python scripts/check_uv_tool_install.py \
-     dist/geometric_function_atlas-0.2.0-py3-none-any.whl --python 3.12
+     dist/geometric_function_atlas-0.2.1-py3-none-any.whl --python 3.12
    ```
 
 4. Obtain an independent review of the exact diff.
