@@ -58,14 +58,11 @@ Windows PowerShell:
 irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
 ```
 
-After restarting the terminal, run `gfa --version`, followed by `gfa walkthrough`
-for a concise tour of an exact expansion, a coefficient functional, and a
-radius-certificate replay. Existing `uv` users can install the GitHub release
-wheel directly:
-
-```bash
-uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.2.1/geometric_function_atlas-0.2.1-py3-none-any.whl
-```
+After restarting the terminal, run `gfa --version`. The public installers remain
+on the last published release until the v0.2.1 assets are live; the release
+follow-up switches them atomically. In a source checkout of this release, run
+`uv run gfa walkthrough` for a concise tour of an exact expansion, a coefficient
+functional, and a radius-certificate replay.
 
 See `docs/INSTALL.md` for removal and maintainer installation from a local wheel.
 
@@ -91,7 +88,7 @@ The optional Image Lab and Cryptography Lab operations need NumPy. Install with
 the `lab` extra:
 
 ```bash
-uv tool install geometric-function-atlas --extra lab   # once published on PyPI
+uv tool install geometric-function-atlas --extra lab
 # or locally:
 uv tool install --with "numpy>=1.24" dist/geometric_function_atlas-*.whl
 ```
