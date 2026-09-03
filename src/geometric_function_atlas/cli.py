@@ -138,8 +138,13 @@ def _walkthrough(_args: argparse.Namespace) -> None:
         raise UnresolvedError("the bundled sine-to-sigmoid certificate did not replay")
 
     coefficients = ", ".join(str(value) for value in series.coefficients)
+    fs_payload = fs.to_dict()
+    fs_assumptions = "; ".join(fs_payload["assumptions"])
     lines = [
         "Geometric Function Atlas: first-run walkthrough",
+        "",
+        "Notation: S*(phi) means normalized analytic functions f with",
+        "zf'(z)/f(z) subordinate to the Ma-Minda generator phi(z).",
         "",
         f"1. Catalog: {len(generators)} registered Ma-Minda generators.",
         "   Starter keys: exponential, sine, cardioid, lemniscate, sigmoid",
@@ -147,11 +152,15 @@ def _walkthrough(_args: argparse.Namespace) -> None:
         "2. Exact expansion for the sine generator phi(z) = 1 + sin(z):",
         f"   coefficients through z^4: {coefficients}",
         "",
-        "3. Fekete-Szego for S*(exp(z)) with mu = 0:",
+        "3. Fekete-Szego functional |a3 - mu*a2^2| for S*(exp(z)), mu = 0:",
         f"   exact value: {fs.value}",
+        f"   assumptions: {fs_assumptions}",
         f"   evidence: {fs.evidence_status}",
         "",
         "4. Directed radius certificate: sine -> sigmoid",
+        "   directed radius means the asserted r for which the source-class",
+        "   functions restricted to |z| < r belong to the target class.",
+        "   S*(1 + sin(z)) -> S*(2/(1 + exp(-z)))",
         f"   exact radius: {replay.expected_candidate}",
         f"   certificate: {replay.status.upper()} ({len(replay.steps)} checks passed)",
         "",

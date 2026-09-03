@@ -58,10 +58,11 @@ Windows PowerShell:
 irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
 ```
 
-After restarting the terminal, run `gfa --version`, followed by
-`gfa walkthrough` for a concise tour of an exact expansion, a coefficient
-functional, and a radius-certificate replay. Existing `uv` users can
-install the GitHub release wheel directly:
+After restarting the terminal, run `gfa --version`. The public installers and
+direct wheel currently install v0.2.0; use `gfa generators` and the examples below
+with that release. The concise `gfa walkthrough` tour is present on this development
+branch and will become an end-user command in the next tagged release. Existing `uv`
+users can install the current GitHub release wheel directly:
 
 ```bash
 uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.2.0/geometric_function_atlas-0.2.0-py3-none-any.whl

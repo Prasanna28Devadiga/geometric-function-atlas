@@ -145,8 +145,14 @@ def test_walkthrough_is_a_concise_verified_first_run() -> None:
     assert "1 + sin(z)" in completed.stdout
     assert "1, 0, -1/6, 0, 1/120" in completed.stdout
     assert "Fekete-Szego" in completed.stdout
+    assert "S*(phi) means normalized analytic functions" in completed.stdout
+    assert "|a3 - mu*a2^2|" in completed.stdout
+    assert "phi is an admissible Ma-Minda generator" in completed.stdout
+    assert "phi has real Taylor coefficients" in completed.stdout
+    assert "B1 is positive" in completed.stdout
     assert "exact value: 3/4" in completed.stdout
     assert "sine -> sigmoid" in completed.stdout
+    assert "directed radius means" in completed.stdout
     assert "certificate: PROVEN" in completed.stdout
     assert "does not establish novelty" in completed.stdout
     assert "schema_version:" not in completed.stdout
