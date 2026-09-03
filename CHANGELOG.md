@@ -2,6 +2,20 @@
 
 All notable changes to Geometric Function Atlas are recorded here.
 
+## 0.2.1 — 2026-09-03
+
+### Added
+
+- `gfa walkthrough`, a short first-run path through the generator catalog, an
+  exact expansion, a Fekete–Szegő calculation, and a reviewed directed-radius
+  certificate replay.
+
+### Changed
+
+- The walkthrough defines its notation and prints the mathematical scope,
+  assumptions, evidence level, and novelty boundary instead of exposing the
+  package's internal result envelope.
+
 ## 0.2.0 — 2026-08-11
 
 ### Added

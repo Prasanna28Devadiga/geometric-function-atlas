@@ -32,7 +32,7 @@ def test_coefficients_command_emits_exact_strings() -> None:
     assert payload["order"] == 4
     assert payload["coefficients"] == ["1", "0", "-1/6", "0"]
     assert payload["evidence_status"] == "proven_exact_under_declared_assumptions"
-    assert payload["package_version"] == "0.2.0"
+    assert payload["package_version"] == "0.2.1"
 
 
 def test_fekete_szego_command_emits_evidence_typed_result() -> None:
@@ -132,7 +132,7 @@ def test_version_command_is_an_installation_smoke_check() -> None:
     completed = run_cli("--version")
 
     assert completed.returncode == 0
-    assert completed.stdout.strip() == "geometric-function-atlas 0.2.0"
+    assert completed.stdout.strip() == "geometric-function-atlas 0.2.1"
     assert completed.stderr == ""
 
 

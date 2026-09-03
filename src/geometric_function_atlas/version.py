@@ -1,6 +1,6 @@
 """Single source of truth for software and built-in artifact versions."""
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 GENERATOR_CATALOG_VERSION = "2026.08.11"
 SOURCE_ARTIFACT_COMMIT = "acee553"
 GENERATOR_FIXTURE_ID = "generator_catalog:2026.08.11"
