@@ -127,6 +127,55 @@ def _generators(args: argparse.Namespace) -> None:
     _write(payload, as_json=args.json)
 
 
+def _walkthrough(_args: argparse.Namespace) -> None:
+    """Run a concise first-use tour without exposing result envelopes."""
+
+    generators = list_generators()
+    series = generator_series(get_generator("sine"), order=5)
+    fs = fekete_szego("exponential", mu="0")
+    replay = verify_radius_certificate("sine", "sigmoid")
+    if not replay.certified:
+        raise UnresolvedError("the bundled sine-to-sigmoid certificate did not replay")
+
+    coefficients = ", ".join(str(value) for value in series.coefficients)
+    fs_payload = fs.to_dict()
+    fs_assumptions = "; ".join(fs_payload["assumptions"])
+    lines = [
+        "Geometric Function Atlas: first-run walkthrough",
+        "",
+        "Notation: S*(phi) means normalized analytic functions f with",
+        "zf'(z)/f(z) subordinate to the Ma-Minda generator phi(z).",
+        "",
+        f"1. Catalog: {len(generators)} registered Ma-Minda generators.",
+        "   Starter keys: exponential, sine, cardioid, lemniscate, sigmoid",
+        "",
+        "2. Exact expansion for the sine generator phi(z) = 1 + sin(z):",
+        f"   coefficients through z^4: {coefficients}",
+        "",
+        "3. Fekete-Szego functional |a3 - mu*a2^2| for S*(exp(z)), mu = 0:",
+        f"   exact value: {fs.value}",
+        f"   assumptions: {fs_assumptions}",
+        f"   evidence: {fs.evidence_status}",
+        "",
+        "4. Directed radius certificate: sine -> sigmoid",
+        "   directed radius means the asserted r for which the source-class",
+        "   functions restricted to |z| < r belong to the target class.",
+        "   S*(1 + sin(z)) -> S*(2/(1 + exp(-z)))",
+        f"   exact radius: {replay.expected_candidate}",
+        f"   certificate: {replay.status.upper()} ({len(replay.steps)} checks passed)",
+        "",
+        "The replay checks the released certificate; it does not establish novelty",
+        "or whether the assumptions match a different problem.",
+        "",
+        "Next commands:",
+        "  gfa generators",
+        "  gfa coefficients sine --order 5",
+        "  gfa fekete-szego exponential --mu 0",
+        "  gfa verify-radius-certificate sine sigmoid",
+    ]
+    _write_utf8("\n".join(lines))
+
+
 def _citation(args: argparse.Namespace) -> None:
     metadata = {
         "key": args.key,
@@ -1250,6 +1299,11 @@ def _parser() -> argparse.ArgumentParser:
         version=f"%(prog)s {__version__}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    walkthrough = subparsers.add_parser(
+        "walkthrough", help="run a concise first-use tour with verified examples"
+    )
+    walkthrough.set_defaults(handler=_walkthrough)
 
     generators = subparsers.add_parser("generators", help="list built-in generators")
     generators.add_argument("--json", action="store_true", help="emit JSON")

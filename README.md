@@ -14,6 +14,7 @@ only panels and research-workspace workflows are explicit non-goals.
 
 | Website capability | CLI | Python function |
 |---|---|---|
+| Run a concise first-use tour | `gfa walkthrough` | — |
 | Browse the generator catalog (39 Ma–Minda generators) | `gfa generators` | `list_generators()` |
 | Exact Taylor coefficients of a generator | `gfa coefficients <gen> --order N` | `generator_series()` |
 | Exact Ma–Minda Fekete–Szegő constants | `gfa fekete-szego <gen> --mu M` | `fekete_szego()` |
@@ -57,8 +58,11 @@ Windows PowerShell:
 irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
 ```
 
-After restarting the terminal, run `gfa --version`. Existing `uv` users can
-install the GitHub release wheel directly:
+After restarting the terminal, run `gfa --version`. The public installers and
+direct wheel currently install v0.2.0; use `gfa generators` and the examples below
+with that release. The concise `gfa walkthrough` tour is present on this development
+branch and will become an end-user command in the next tagged release. Existing `uv`
+users can install the current GitHub release wheel directly:
 
 ```bash
 uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.2.0/geometric_function_atlas-0.2.0-py3-none-any.whl
