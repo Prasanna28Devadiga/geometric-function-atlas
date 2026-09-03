@@ -136,6 +136,24 @@ def test_version_command_is_an_installation_smoke_check() -> None:
     assert completed.stderr == ""
 
 
+def test_walkthrough_is_a_concise_verified_first_run() -> None:
+    completed = run_cli("walkthrough")
+
+    assert completed.returncode == 0, completed.stderr
+    assert "Geometric Function Atlas: first-run walkthrough" in completed.stdout
+    assert "39 registered Ma-Minda generators" in completed.stdout
+    assert "1 + sin(z)" in completed.stdout
+    assert "1, 0, -1/6, 0, 1/120" in completed.stdout
+    assert "Fekete-Szego" in completed.stdout
+    assert "exact value: 3/4" in completed.stdout
+    assert "sine -> sigmoid" in completed.stdout
+    assert "certificate: PROVEN" in completed.stdout
+    assert "does not establish novelty" in completed.stdout
+    assert "schema_version:" not in completed.stdout
+    assert "exact_expression_dag:" not in completed.stdout
+    assert completed.stderr == ""
+
+
 def test_cli_reports_unknown_generator_without_traceback() -> None:
     completed = run_cli("coefficients", "missing", "--order", "2")
 
