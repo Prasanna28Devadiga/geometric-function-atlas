@@ -45,6 +45,7 @@ def test_posix_installer_uses_uv_as_a_managed_python_tool(tmp_path: Path) -> Non
 
     assert completed.returncode == 0, completed.stderr
     invocations = log.read_text(encoding="utf-8")
+    assert "python install 3.12" in invocations
     assert "tool install --managed-python --python 3.12 --force local-wheel.whl" in invocations
     assert "tool update-shell" in invocations
     assert "tool dir --bin" in invocations
@@ -55,13 +56,49 @@ def test_windows_installer_has_the_same_managed_python_contract() -> None:
     script = (ROOT / "scripts" / "install.ps1").read_text(encoding="utf-8")
 
     assert "https://astral.sh/uv/install.ps1" in script
-    assert "[scriptblock]::Create" in script
-    assert "-ExecutionPolicy" not in script
+    assert "[scriptblock]::Create" not in script
+    assert "$([guid]::NewGuid())" in script
+    assert "try {" in script
+    assert "finally {" in script
+    assert "$LASTEXITCODE -ne 0" in script
     assert "tool install --managed-python --python" in script
+    assert "python install $PythonVersion" in script
     assert "GFA_PACKAGE_SPEC" in script
     assert "tool update-shell" in script
     assert "gfa.exe" in script
     assert "--version" in script
+
+
+def test_public_installation_is_front_loaded_and_never_piped_to_a_shell() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    install = (ROOT / "docs" / "INSTALL.md").read_text(encoding="utf-8")
+
+    assert readme.index("## Install") < readme.index("## What you can do")
+    assert "No Python required" in readme
+    assert "https://gft-registry.fly.dev/install.sh" in readme
+    assert "https://gft-registry.fly.dev/install.ps1" in readme
+    assert "gfa walkthrough" in readme
+    assert "| sh" not in readme
+    assert "| iex" not in readme
+    assert "| sh" not in install
+    assert "| iex" not in install
+
+
+def test_pypi_project_links_prioritize_the_product_and_installer() -> None:
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+
+    assert 'Homepage = "https://gft-registry.fly.dev/"' in pyproject
+    assert (
+        'Documentation = "https://gft-registry.fly.dev/getting-started"' in pyproject
+    )
+    assert (
+        'Installer = "https://gft-registry.fly.dev/getting-started#install"'
+        in pyproject
+    )
+    assert (
+        'Source = "https://github.com/Prasanna28Devadiga/geometric-function-atlas"'
+        in pyproject
+    )
 
 
 def test_installers_default_to_the_latest_github_release_wheel() -> None:

@@ -6,6 +6,34 @@ Source repository: <https://github.com/Prasanna28Devadiga/geometric-function-atl
 
 This repository is intentionally separate from the registry website and its research workspace. It provides local commands and Python functions for reproducing the website's mathematical computations. It does not contain the Flask application, deployment configuration, private review state, or mutable registry database.
 
+## Install
+
+**No Python required.** The installer sets up `uv`, an isolated Python 3.12,
+the `gfa` command, and verifies the result. For copy buttons and visible setup
+steps, use the [guided installer](https://gft-registry.fly.dev/getting-started).
+
+macOS and Linux:
+
+```bash
+(f="$(mktemp)" && trap 'rm -f "$f"' EXIT && curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh -o "$f" && sh "$f")
+```
+
+Windows PowerShell:
+
+```powershell
+$ErrorActionPreference='Stop'; $f=Join-Path $env:TEMP "gfa-$([guid]::NewGuid()).ps1"; try { irm https://gft-registry.fly.dev/install.ps1 -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f; if ($LASTEXITCODE -ne 0) { throw "GFA installer failed ($LASTEXITCODE)" } } finally { rm $f -Force -ErrorAction SilentlyContinue }
+```
+
+Then start here:
+
+```text
+gfa walkthrough
+```
+
+The install is user-local: no administrator access, system-Python replacement,
+`pip`, virtual environment, or activation step. See [the installation guide](docs/INSTALL.md)
+for upgrades, removal, optional labs, and maintainer installs.
+
 ## What you can do
 
 Every operation represented in the package's parity table has a local command
@@ -40,34 +68,6 @@ only panels and research-workspace workflows are explicit non-goals.
 Result-printing commands accept `--json` for machine-readable output;
 file-writing commands (`plot`, `image-lab transform`, `image-lab sample`)
 write their artifact instead.
-
-## Install — Python is not required
-
-The supported user installation uses `uv` as an isolated tool manager. It
-downloads Python 3.12 and every runtime dependency automatically.
-
-macOS and Linux:
-
-```bash
-curl -LsSf https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.sh | sh
-```
-
-Windows PowerShell:
-
-```powershell
-irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
-```
-
-After restarting the terminal, run `gfa --version`, followed by `gfa walkthrough`
-for a concise tour of an exact expansion, a coefficient functional, and a
-radius-certificate replay. Existing `uv` users can install the immutable GitHub
-release wheel directly:
-
-```bash
-uv tool install --managed-python --python 3.12 https://github.com/Prasanna28Devadiga/geometric-function-atlas/releases/download/v0.2.1/geometric_function_atlas-0.2.1-py3-none-any.whl
-```
-
-See `docs/INSTALL.md` for removal and maintainer installation from a local wheel.
 
 ## Registry snapshot boundary
 

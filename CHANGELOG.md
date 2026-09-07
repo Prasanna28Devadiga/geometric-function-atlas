@@ -2,6 +2,19 @@
 
 All notable changes to Geometric Function Atlas are recorded here.
 
+## Unreleased
+
+### Changed
+
+- Installation is now the first action on the repository and future PyPI page,
+  with one command per platform, a guided web installer, and no prerequisite
+  Python setup.
+- The supported installers now show four visible setup stages, bootstrap a
+  managed Python explicitly, avoid pipe-to-shell execution, use unique temporary
+  files, preserve failures through cleanup, and direct users to `gfa walkthrough`.
+- PyPI project links now lead first to the live Atlas and guided installer while
+  retaining direct source and issue links.
+
 ## 0.2.1 — 2026-09-03
 
 ### Added
