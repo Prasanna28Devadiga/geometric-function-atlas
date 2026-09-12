@@ -4,6 +4,8 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
+## 0.3.0 — 2026-09-12
+
 ### Added
 
 - Short command aliases: `gfa coeffs`, `gfa fs`, `gfa disprove`, and

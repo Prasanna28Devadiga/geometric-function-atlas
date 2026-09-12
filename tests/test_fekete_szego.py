@@ -6,6 +6,7 @@ import pytest
 import sympy as sp
 
 from geometric_function_atlas import FeketeSzegoResult, fekete_szego
+from geometric_function_atlas.version import __version__
 
 
 def test_classical_starlike_anchor_matches_known_constants() -> None:
@@ -37,7 +38,7 @@ def test_result_serializes_without_losing_exact_values() -> None:
     assert payload["value_decimal"] == "0.5000000000000000"
     assert payload["method"] == "ma_minda_fekete_szego_closed_form"
     assert payload["novelty_claim"] is False
-    assert payload["package_version"] == "0.2.1"
+    assert payload["package_version"] == __version__
     assert payload["artifact_versions"]["generator_catalog"]
     json.dumps(payload)
 
