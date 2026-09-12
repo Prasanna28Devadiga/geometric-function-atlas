@@ -10,7 +10,7 @@ All notable changes to Geometric Function Atlas are recorded here.
   `gfa certify` stand for `coefficients`, `fekete-szego`,
   `verify-counterexample`, and `verify-radius-certificate`.
 - Misspelled generator keys earn a `did you mean ...?` suggestion, and
-  witness points accept exact fractions via `--at`
+  witness points accept fraction syntax via `--at`
   (`gfa disprove --coefficients 1 --at=-3/4`).
 
 ### Changed

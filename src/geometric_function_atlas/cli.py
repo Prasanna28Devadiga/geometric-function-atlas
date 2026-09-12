@@ -237,7 +237,12 @@ def _fekete_szego(args: argparse.Namespace) -> None:
 
 
 def _parse_real(part: str, *, label: str) -> float:
-    """Parse one real number, accepting exact integer/integer fractions."""
+    """Parse one real number, accepting integer/integer fraction syntax.
+
+    The accepted grammar is ``[+-]?digits`` or ``[+-]?digits/[+-]?digits``
+    (no interior whitespace); the value is returned as a float, so a
+    fraction is exact syntax but not exact arithmetic downstream.
+    """
 
     try:
         return float(part)
@@ -247,7 +252,7 @@ def _parse_real(part: str, *, label: str) -> float:
         numerator, _, denominator = part.partition("/")
         try:
             return float(Fraction(int(numerator.strip()), int(denominator.strip())))
-        except (ValueError, ZeroDivisionError):
+        except (ValueError, ZeroDivisionError, OverflowError):
             pass
     raise InvalidInputError(f"{label} must be comma-separated real numbers")
 
@@ -1405,9 +1410,10 @@ def _parser() -> argparse.ArgumentParser:
         "--at",
         dest="point",
         required=True,
-        help="witness point as real,imaginary (each may be an exact "
-        "fraction, e.g. -3/4,0); a bare real means the real axis. "
-        "Use the --point=-0.75,0 form for negatives.",
+        help="witness point as real,imaginary (each may use fraction syntax, "
+        "e.g. -3/4,0); a bare real means the real axis. "
+        "Use the --point=-0.75,0 form for negatives. "
+        "If both --point and --at are given, the last one wins.",
     )
     counterexample.add_argument("--property", default="starlike")
     counterexample.add_argument("--json", action="store_true", help="emit JSON")

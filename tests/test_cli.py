@@ -385,3 +385,75 @@ def test_witness_point_rejects_non_real_input() -> None:
 
     assert completed.returncode == 2
     assert "point must be comma-separated real numbers" in completed.stderr
+
+
+def test_witness_point_rejects_zero_denominator_without_traceback() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--at=1/0,0",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 2
+    assert "point must be comma-separated real numbers" in completed.stderr
+    assert "Traceback" not in completed.stderr
+
+
+def test_witness_point_rejects_huge_fraction_without_traceback() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        f"--at={'9' * 4000}/1,0",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 2
+    assert "point must be comma-separated real numbers" in completed.stderr
+    assert "Traceback" not in completed.stderr
+
+
+def test_witness_point_rejects_three_components() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--point=1,2,3",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 2
+    assert "point must have the form real,imaginary" in completed.stderr
+
+
+def test_witness_point_over_the_length_limit_is_a_resource_error() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        f"--point={'1' * 4100},0",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 5
+    assert "too long" in completed.stderr
+
+
+def test_legacy_verify_radius_alias_still_works() -> None:
+    completed = run_cli("verify-radius", "sine", "sigmoid", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout)["status"] == "proven"
+
+
+def test_human_fekete_szego_honours_precision() -> None:
+    completed = run_cli("fs", "exponential", "--mu", "0", "--precision", "30")
+
+    assert completed.returncode == 0, completed.stderr
+    assert "value_decimal: 0.750000000000000000000000000000" in completed.stdout

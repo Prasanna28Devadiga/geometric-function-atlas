@@ -75,7 +75,7 @@ Short aliases save typing: `gfa coeffs`, `gfa fs`, `gfa disprove`, and
 `gfa certify` stand for `coefficients`, `fekete-szego`,
 `verify-counterexample`, and `verify-radius-certificate`. A misspelled
 generator key earns a `did you mean ...?` suggestion, and witness points may
-use exact fractions with `--at` (`gfa disprove --coefficients 1 --at=-3/4`).
+use fraction syntax with `--at` (`gfa disprove --coefficients 1 --at=-3/4`).
 
 ## Registry snapshot boundary
 
