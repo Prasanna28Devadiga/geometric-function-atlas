@@ -7,19 +7,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github" / "workflows"
 ACTION_REF = re.compile(r"uses:\s+[^\s@]+@([0-9a-f]{40})(?:\s+#\s+.+)?$")
-RELEASE_COMMIT = "79330322194075fee305763e40ac736d4c40be49"
+RELEASE_COMMIT = "c5f9b94183aed69811de48915d85c9b014fc9f0b"
 RELEASE_ASSETS = {
     "wheel": {
-        "name": "geometric_function_atlas-0.2.1-py3-none-any.whl",
-        "sha256": "da3c0de98dec34911c4f1011b14424cbe83f6611903be215205658c6245700b9",
+        "name": "geometric_function_atlas-0.3.0-py3-none-any.whl",
+        "sha256": "b83d07a331a55fa3ea393dbdcf3ef254f461a77430e8f73c1e96ac71c3bea997",
     },
     "sdist": {
-        "name": "geometric_function_atlas-0.2.1.tar.gz",
-        "sha256": "3051c836b6aaac3f8b5806e47da82e72a173d52fcb4e64a2878e9b8a60be97b7",
+        "name": "geometric_function_atlas-0.3.0.tar.gz",
+        "sha256": "0c35bb550f1109a4f0754c9886032591fda6d50bbe59792855fe2c51fa7d43bf",
     },
     "checksums": {
         "name": "SHA256SUMS",
-        "sha256": "216343bc94833e1b198d7019e9be0352ed3edda10905c47c24c325cd8b5443e2",
+        "sha256": "b34a9e9989b203c454b37da0b61d32b847d8f337f4e75ab7ebd4f9a9eb023c23",
     },
 }
 
@@ -54,7 +54,7 @@ def test_pypi_manifest_pins_the_verified_release() -> None:
     assert manifest == {
         "schema_version": 1,
         "project": "geometric-function-atlas",
-        "tag": "v0.2.1",
+        "tag": "v0.3.0",
         "commit": RELEASE_COMMIT,
         "assets": RELEASE_ASSETS,
     }
