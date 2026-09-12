@@ -10,6 +10,8 @@ an expansion can be cross-checked against the site.
 
 from __future__ import annotations
 
+import difflib
+
 import sympy as sp
 
 from .models import Generator, Z
@@ -302,8 +304,14 @@ def get_generator(key: str) -> Generator:
     try:
         return _BY_KEY[key]
     except KeyError as exc:
-        available = ", ".join(sorted(_BY_KEY))
-        raise KeyError(f"unknown generator {key!r}; available: {available}") from exc
+        available = sorted(_BY_KEY)
+        hint = ""
+        close = difflib.get_close_matches(key, available, n=1, cutoff=0.6)
+        if close:
+            hint = f"; did you mean {close[0]!r}?"
+        raise KeyError(
+            f"unknown generator {key!r}{hint}; available: {', '.join(available)}"
+        ) from exc
 
 
 def generator_artifact_version(generator: Generator) -> str:
