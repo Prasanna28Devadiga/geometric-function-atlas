@@ -67,7 +67,15 @@ only panels and research-workspace workflows are explicit non-goals.
 
 Result-printing commands accept `--json` for machine-readable output;
 file-writing commands (`plot`, `image-lab transform`, `image-lab sample`)
-write their artifact instead.
+write their artifact instead. Without `--json`, result commands print a short
+human summary (the value plus its evidence label) and point to `--json` for
+the complete versioned record.
+
+Short aliases save typing: `gfa coeffs`, `gfa fs`, `gfa disprove`, and
+`gfa certify` stand for `coefficients`, `fekete-szego`,
+`verify-counterexample`, and `verify-radius-certificate`. A misspelled
+generator key earns a `did you mean ...?` suggestion, and witness points may
+use exact fractions with `--at` (`gfa disprove --coefficients 1 --at=-3/4`).
 
 ## Registry snapshot boundary
 
