@@ -270,3 +270,190 @@ def test_verify_radius_certificate_command_uses_fail_closed_exit_codes() -> None
     payload = json.loads(completed.stdout)
     assert payload["status"] == "candidate_mismatch"
     assert payload["certified"] is False
+
+
+def test_command_aliases_match_their_canonical_commands() -> None:
+    pairs = [
+        (
+            ("coeffs", "sine", "--order", "4", "--json"),
+            ("coefficients", "sine", "--order", "4", "--json"),
+        ),
+        (
+            ("fs", "exponential", "--mu", "0", "--json"),
+            ("fekete-szego", "exponential", "--mu", "0", "--json"),
+        ),
+        (
+            (
+                "disprove",
+                "--coefficients",
+                "1",
+                "--at=-3/4,0",
+                "--property",
+                "starlike",
+                "--json",
+            ),
+            (
+                "verify-counterexample",
+                "--coefficients",
+                "1",
+                "--point=-0.75,0",
+                "--property",
+                "starlike",
+                "--json",
+            ),
+        ),
+        (
+            ("certify", "sine", "sigmoid", "--json"),
+            ("verify-radius-certificate", "sine", "sigmoid", "--json"),
+        ),
+    ]
+    for alias_args, canonical_args in pairs:
+        alias_run = run_cli(*alias_args)
+        canonical_run = run_cli(*canonical_args)
+        assert alias_run.returncode == canonical_run.returncode == 0, (
+            alias_run.stderr or canonical_run.stderr
+        )
+        assert alias_run.stdout == canonical_run.stdout
+
+
+def test_human_output_is_a_curated_subset_with_a_json_pointer() -> None:
+    completed = run_cli("coefficients", "sine", "--order", "5")
+
+    assert completed.returncode == 0, completed.stderr
+    assert completed.stderr == ""
+    assert "generator: sine" in completed.stdout
+    assert "generator_formula: sin(z) + 1" in completed.stdout
+    assert "coefficients: ['1', '0', '-1/6', '0', '1/120']" in completed.stdout
+    assert "evidence_status: proven_exact_under_declared_assumptions" in completed.stdout
+    assert "--json" in completed.stdout
+    assert "schema_version" not in completed.stdout
+    assert "exact_expression_dag" not in completed.stdout
+
+    functional = run_cli("fs", "exponential", "--mu", "0")
+
+    assert functional.returncode == 0, functional.stderr
+    assert functional.stderr == ""
+    assert "generator: exponential" in functional.stdout
+    assert "mu: 0" in functional.stdout
+    assert "value_exact: 3/4" in functional.stdout
+    assert "value_decimal: 0.75" in functional.stdout
+    assert "evidence_status: proven_exact_under_declared_assumptions" in functional.stdout
+    assert "schema_version" not in functional.stdout
+
+
+def test_unknown_generator_suggests_a_close_match() -> None:
+    completed = run_cli("coeffs", "sin", "--order", "2")
+
+    assert completed.returncode == 2
+    assert "unknown generator 'sin'" in completed.stderr
+    assert "did you mean 'sine'" in completed.stderr
+
+    typo = run_cli("fs", "exponental", "--mu", "0")
+
+    assert typo.returncode == 2
+    assert "did you mean 'exponential'" in typo.stderr
+
+
+def test_unknown_generator_without_a_close_match_has_no_suggestion() -> None:
+    completed = run_cli("coefficients", "missing", "--order", "2")
+
+    assert completed.returncode == 2
+    assert "unknown generator 'missing'" in completed.stderr
+    assert "did you mean" not in completed.stderr
+
+
+def test_witness_point_accepts_fractions_and_a_bare_real() -> None:
+    for point_args in (("--point=-3/4,0",), ("--at=-3/4,0",), ("--at=-3/4",)):
+        completed = run_cli(
+            "disprove", "--coefficients", "1", *point_args, "--property", "starlike"
+        )
+
+        assert completed.returncode == 0, completed.stderr
+        assert "CERTIFIED COUNTEREXAMPLE" in completed.stdout
+        assert "Witness: z = -0.75 + 0i" in completed.stdout
+
+
+def test_witness_point_rejects_non_real_input() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--point=bogus",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 2
+    assert "point must be comma-separated real numbers" in completed.stderr
+
+
+def test_witness_point_rejects_zero_denominator_without_traceback() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--at=1/0,0",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 2
+    assert "point must be comma-separated real numbers" in completed.stderr
+    assert "Traceback" not in completed.stderr
+
+
+def test_witness_point_rejects_huge_fraction_without_traceback() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        f"--at={'9' * 4000}/1,0",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 2
+    assert "point must be comma-separated real numbers" in completed.stderr
+    assert "Traceback" not in completed.stderr
+
+
+def test_witness_point_rejects_three_components() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        "--point=1,2,3",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 2
+    assert "point must have the form real,imaginary" in completed.stderr
+
+
+def test_witness_point_over_the_length_limit_is_a_resource_error() -> None:
+    completed = run_cli(
+        "verify-counterexample",
+        "--coefficients",
+        "1",
+        f"--point={'1' * 4100},0",
+        "--property",
+        "starlike",
+    )
+
+    assert completed.returncode == 5
+    assert "too long" in completed.stderr
+
+
+def test_legacy_verify_radius_alias_still_works() -> None:
+    completed = run_cli("verify-radius", "sine", "sigmoid", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout)["status"] == "proven"
+
+
+def test_human_fekete_szego_honours_precision() -> None:
+    completed = run_cli("fs", "exponential", "--mu", "0", "--precision", "30")
+
+    assert completed.returncode == 0, completed.stderr
+    assert "value_decimal: 0.750000000000000000000000000000" in completed.stdout

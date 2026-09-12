@@ -9,6 +9,7 @@ import json
 import os
 import sys
 from collections.abc import Sequence
+from fractions import Fraction
 from typing import Any
 
 from . import artifacts as _artifact_data
@@ -196,14 +197,64 @@ def _citation(args: argparse.Namespace) -> None:
         _write(bundle.to_dict(), as_json=False)
 
 
+def _write_human(lines: list[str]) -> None:
+    """Print a short human-readable summary; machines should use --json."""
+
+    _write_utf8("\n".join(lines))
+
+
 def _coefficients(args: argparse.Namespace) -> None:
     result = generator_series(get_generator(args.generator), order=args.order)
-    _write(result.to_dict(), as_json=args.json)
+    payload = result.to_dict()
+    if args.json:
+        _write(payload, as_json=True)
+        return
+    _write_human(
+        [
+            f"generator: {args.generator}",
+            f"generator_formula: {payload['generator_formula']}",
+            f"coefficients: {payload['coefficients']}",
+            f"evidence_status: {payload['evidence_status']} (full record: --json)",
+        ]
+    )
 
 
 def _fekete_szego(args: argparse.Namespace) -> None:
     result = fekete_szego(args.generator, mu=args.mu)
-    _write(result.to_dict(precision=args.precision), as_json=args.json)
+    payload = result.to_dict(precision=args.precision)
+    if args.json:
+        _write(payload, as_json=True)
+        return
+    _write_human(
+        [
+            f"generator: {args.generator}",
+            f"mu: {payload['mu']}",
+            f"value_exact: {payload['value_exact']}",
+            f"value_decimal: {payload['value_decimal']}",
+            f"evidence_status: {payload['evidence_status']} (full record: --json)",
+        ]
+    )
+
+
+def _parse_real(part: str, *, label: str) -> float:
+    """Parse one real number, accepting integer/integer fraction syntax.
+
+    The accepted grammar is ``[+-]?digits`` or ``[+-]?digits/[+-]?digits``
+    (no interior whitespace); the value is returned as a float, so a
+    fraction is exact syntax but not exact arithmetic downstream.
+    """
+
+    try:
+        return float(part)
+    except ValueError:
+        pass
+    if "/" in part:
+        numerator, _, denominator = part.partition("/")
+        try:
+            return float(Fraction(int(numerator.strip()), int(denominator.strip())))
+        except (ValueError, ZeroDivisionError, OverflowError):
+            pass
+    raise InvalidInputError(f"{label} must be comma-separated real numbers")
 
 
 def _comma_separated_numbers(value: str, *, label: str) -> list[float]:
@@ -212,12 +263,7 @@ def _comma_separated_numbers(value: str, *, label: str) -> list[float]:
     parts = [part.strip() for part in value.split(",")]
     if not parts or any(not part for part in parts):
         raise InvalidInputError(f"{label} must be comma-separated real numbers")
-    try:
-        return [float(part) for part in parts]
-    except ValueError as exc:
-        raise InvalidInputError(
-            f"{label} must be comma-separated real numbers"
-        ) from exc
+    return [_parse_real(part, label=label) for part in parts]
 
 
 def _verify_counterexample(args: argparse.Namespace) -> None:
@@ -225,6 +271,9 @@ def _verify_counterexample(args: argparse.Namespace) -> None:
         args.coefficients, label="coefficients"
     )
     point = _comma_separated_numbers(args.point, label="point")
+    if len(point) == 1:
+        # A bare real (--at=-3/4) means a witness on the real axis.
+        point = [point[0], 0.0]
     if len(point) != 2:
         raise InvalidInputError("point must have the form real,imaginary")
     result = verify_counterexample(
@@ -1326,7 +1375,9 @@ def _parser() -> argparse.ArgumentParser:
     citation.set_defaults(handler=_citation)
 
     coefficients = subparsers.add_parser(
-        "coefficients", help="compute exact generator Taylor coefficients"
+        "coefficients",
+        aliases=["coeffs"],
+        help="compute exact generator Taylor coefficients",
     )
     coefficients.add_argument("generator")
     coefficients.add_argument("--order", type=int, required=True)
@@ -1334,7 +1385,9 @@ def _parser() -> argparse.ArgumentParser:
     coefficients.set_defaults(handler=_coefficients)
 
     fs = subparsers.add_parser(
-        "fekete-szego", help="compute an exact Ma-Minda Fekete-Szego constant"
+        "fekete-szego",
+        aliases=["fs"],
+        help="compute an exact Ma-Minda Fekete-Szego constant",
     )
     fs.add_argument("generator")
     fs.add_argument("--mu", required=True, help="real rational value, e.g. 1/2")
@@ -1344,6 +1397,7 @@ def _parser() -> argparse.ArgumentParser:
 
     counterexample = subparsers.add_parser(
         "verify-counterexample",
+        aliases=["disprove"],
         help="rigorously check a supplied counterexample witness",
     )
     counterexample.add_argument(
@@ -1353,8 +1407,13 @@ def _parser() -> argparse.ArgumentParser:
     )
     counterexample.add_argument(
         "--point",
+        "--at",
+        dest="point",
         required=True,
-        help="witness point as real,imaginary; use --point=-0.75,0 for negatives",
+        help="witness point as real,imaginary (each may use fraction syntax, "
+        "e.g. -3/4,0); a bare real means the real axis. "
+        "Use the --point=-0.75,0 form for negatives. "
+        "If both --point and --at are given, the last one wins.",
     )
     counterexample.add_argument("--property", default="starlike")
     counterexample.add_argument("--json", action="store_true", help="emit JSON")
@@ -1421,7 +1480,7 @@ def _parser() -> argparse.ArgumentParser:
 
     replay = subparsers.add_parser(
         "verify-radius-certificate",
-        aliases=["verify-radius"],
+        aliases=["verify-radius", "certify"],
         help="replay a reviewed exact directed-radius certificate",
     )
     replay.add_argument("source")

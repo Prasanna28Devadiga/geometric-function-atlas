@@ -1,18 +1,20 @@
 # Install Geometric Function Atlas
 
 You do **not** need Python. The installer obtains `uv`, Python 3.12, and all
-package dependencies, then installs the `gfa` command in an isolated environment.
+package dependencies, installs the `gfa` command in an isolated environment,
+and verifies it. The [guided installer](https://gft-registry.fly.dev/getting-started)
+provides copy buttons and shows each setup stage.
 
 ## macOS and Linux
 
 ```bash
-curl -LsSf https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.sh | sh
+(f="$(mktemp)" && trap 'rm -f "$f"' EXIT && curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh -o "$f" && sh "$f")
 ```
 
 ## Windows PowerShell
 
 ```powershell
-irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
+$ErrorActionPreference='Stop'; $f=Join-Path $env:TEMP "gfa-$([guid]::NewGuid()).ps1"; try { irm https://gft-registry.fly.dev/install.ps1 -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f; if ($LASTEXITCODE -ne 0) { throw "GFA installer failed ($LASTEXITCODE)" } } finally { rm $f -Force -ErrorAction SilentlyContinue }
 ```
 
 Restart the terminal once, then check the installation:

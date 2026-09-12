@@ -2,6 +2,32 @@
 
 All notable changes to Geometric Function Atlas are recorded here.
 
+## Unreleased
+
+### Added
+
+- Short command aliases: `gfa coeffs`, `gfa fs`, `gfa disprove`, and
+  `gfa certify` stand for `coefficients`, `fekete-szego`,
+  `verify-counterexample`, and `verify-radius-certificate`.
+- Misspelled generator keys earn a `did you mean ...?` suggestion, and
+  witness points accept fraction syntax via `--at`
+  (`gfa disprove --coefficients 1 --at=-3/4`).
+
+### Changed
+
+- Without `--json`, the `coefficients` and `fekete-szego` commands print a
+  short human summary (the value plus its evidence label) instead of the full
+  result envelope, and point to `--json` for the complete versioned record.
+  `--json` output is unchanged.
+- Installation is now the first action on the repository and future PyPI page,
+  with one command per platform, a guided web installer, and no prerequisite
+  Python setup.
+- The supported installers now show four visible setup stages, bootstrap a
+  managed Python explicitly, avoid pipe-to-shell execution, use unique temporary
+  files, preserve failures through cleanup, and direct users to `gfa walkthrough`.
+- PyPI project links now lead first to the live Atlas and guided installer while
+  retaining direct source and issue links.
+
 ## 0.2.1 — 2026-09-03
 
 ### Added
