@@ -4,6 +4,21 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
+### Added
+
+- Source-linked research workflows with exact coefficients, explanatory SVGs,
+  and changed-input examples, including a recent fifth-coefficient bound audit.
+
+### Fixed
+
+- Schur reconstruction now includes the accepted fifth parameter and expands
+  the rational Schwarz function to the requested member order. Previously a
+  four-coefficient hand expansion silently omitted the fifth parameter and
+  zero-padded nonzero higher-order tails for shorter parameter lists. Exact
+  monomial anchors and direct rational-recursion regressions guard both cases.
+- Include executable research examples in source distributions, with an archive
+  contents gate to prevent shipping documentation without its replay scripts.
+
 ## 0.3.0 — 2026-09-12
 
 ### Added

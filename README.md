@@ -38,7 +38,7 @@ for upgrades, removal, optional labs, and maintainer installs.
 
 Every operation represented in the package's parity table has a local command
 and a Python function. The table below is the complete shipped surface; browser-
-only panels and research-workspace workflows are explicit non-goals.
+only panels and private research-workspace operations are explicit non-goals.
 
 | Website capability | CLI | Python function |
 |---|---|---|
@@ -118,6 +118,13 @@ including its treatment of odd-sized inputs; the package does not claim analytic
 special-function or conformal-warp parity.
 
 ## Python API
+
+For problem-led examples rather than an API tour, see the
+[research workflows](docs/workflows/README.md): class geometry, sharp radii,
+coefficient comparisons, conjecture repair, and operator transfer. The
+[recent-literature case studies](docs/workflows/recent_literature.md) connect
+these tools to a source-bound sharp coefficient repair and an all-order
+convex-subordination argument, with explicit prior-art limitations.
 
 ### Exact generator series
 

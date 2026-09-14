@@ -124,3 +124,46 @@ def test_schur_depth_bounded() -> None:
 def test_decimal_gamma_rejected() -> None:
     with pytest.raises(InvalidInputError):
         member_coefficients(_bell_phi(), ["0.5", "0"], order=4)
+
+
+def test_fifth_schur_parameter_is_not_silently_dropped() -> None:
+    assert schur_omega_coefficients([0, 0, 0, 0, 1]) == [0, 0, 0, 0, 1]
+
+
+def test_member_reconstructs_rational_schur_tail_beyond_parameter_depth() -> None:
+    z = sp.Symbol("z")
+    # Literal reverse Schur recursion: omega=z*(1/2+z)/(1+z/2).
+    omega = z * (sp.Rational(1, 2) + z) / (1 + z/2)
+    q = (1 + omega)/(1 - omega)
+    logarithm = sp.integrate(sp.series((q-1)/z, z, 0, 4).removeO(), z)
+    exact_member = sp.series(z*sp.exp(logarithm), z, 0, 6).removeO().expand()
+    expected = [exact_member.coeff(z, n) for n in range(2, 6)]
+    assert member_coefficients(_starlike_phi(), ["1/2", "1"], order=4) == expected
+
+
+@pytest.mark.parametrize("parameters", [
+    ["1/2", "-1/3", "1"],
+    ["1/2", "1/3", "-1/4", "1/5", "-1/6"],
+    ["1", "-1/2", "1/3"],
+])
+def test_schur_extended_order_matches_literal_rational_recursion(parameters: list[str]) -> None:
+    z = sp.Symbol("z")
+    h = sp.Integer(0)
+    for value in reversed(parameters):
+        g = sp.Rational(value)
+        h = sp.cancel((g + z*h)/(1 + g*z*h))
+    polynomial = sp.series(z*h, z, 0, 9).removeO().expand()
+    assert schur_omega_coefficients(parameters, order=8) == [
+        polynomial.coeff(z, k) for k in range(1, 9)
+    ]
+
+
+@pytest.mark.parametrize("order", [0, -1, True, 1.5])
+def test_schur_invalid_expansion_order_rejected(order: object) -> None:
+    with pytest.raises(InvalidInputError):
+        schur_omega_coefficients([0,1], order=order)  # type: ignore[arg-type]
+
+
+def test_schur_expansion_order_resource_cap() -> None:
+    with pytest.raises(ResourceLimitError):
+        schur_omega_coefficients([0,1], order=9)

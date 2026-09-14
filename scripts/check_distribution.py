@@ -93,6 +93,14 @@ def check_sdist(archive: Path) -> None:
     assert any(name.endswith("/CHANGELOG.md") for name in names)
     assert any(name.endswith("/docs/assets/sine-domain.svg") for name in names)
     assert any(name.endswith("/docs/assets/polynomial.svg") for name in names)
+    for workflow_file in (
+        "class_geometry.py", "sharp_radius.py", "coefficient_comparison.py",
+        "conjecture_counterexample.py", "alexander_transform.py", "_curves.py",
+        "literature_coefficient_audit.py",
+    ):
+        assert any(name.endswith(f"/examples/research_workflows/{workflow_file}") for name in names), (
+            f"{archive.name} is missing executable research workflow {workflow_file}"
+        )
     assert not any(name.endswith("/docs/RELEASE_SCOPE.md") for name in names)
 
 
