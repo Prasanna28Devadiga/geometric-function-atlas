@@ -7,7 +7,7 @@ from typing import Any
 
 import sympy as sp
 
-from .catalog import generator_artifact_version, get_generator
+from .catalog import generator_artifact_version, generator_identity, get_generator
 from .contracts import (
     CheckStatus,
     FailureState,
@@ -113,7 +113,10 @@ class GeneratorSeriesResult:
     def to_dict(self) -> dict[str, Any]:
         return build_result_payload(
             result_type="generator_series",
-            canonical_inputs={"generator": self.generator.key, "order": self.order},
+            canonical_inputs={
+                "generator": generator_identity(self.generator),
+                "order": self.order,
+            },
             exact_expressions={
                 "generator": self.generator.formula,
                 "coefficients": [str(value) for value in self.coefficients],
@@ -142,7 +145,7 @@ class GeneratorSeriesResult:
                 else "built_in"
             ),
             legacy_fields={
-                "generator": self.generator.key,
+                "generator": generator_identity(self.generator),
                 "generator_formula": self.generator.formula,
                 "generator_citation": self.generator.citation,
                 "order": self.order,

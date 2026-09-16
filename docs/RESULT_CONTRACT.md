@@ -87,7 +87,17 @@ Failure records use the separate closed
 
 CLI commands preserve the existing human-readable argparse errors. With
 `--json`, failures are emitted as a versioned JSON error record on stdout with
-no traceback and the stable code above.
+no traceback and the stable code above. Without `--json`, a structured failure
+prints one concise explanation (status, direction, reason) plus a pointer to
+`--json` on stderr.
+
+Radius certificate replay keeps "unavailable" separate from "damaged": an
+unchanged snapshot row that has no bundled replay certificate reports the
+`not_replayable` status with the `unsupported` failure state (exit code 3),
+and the row keeps its own evidence status. `corrupt_artifact` (exit code 6) is
+reserved for malformed records and for any record that is not its unchanged
+trusted snapshot row, including a reviewed lane whose bundled certificate was
+removed.
 
 A standard-output broken pipe (for example `gfa ... | head` when the consumer
 closes the pipe early) exits with code 1 after silencing the pipe; no
@@ -97,6 +107,21 @@ The release gate `python scripts/check_clean_install.py <wheel>` creates a
 fresh virtual environment outside the checkout, installs the wheel, exercises
 the API and trusted registry, mutates a verification record, and checks the
 bounded-input rejection path through the installed console module.
+
+## Collaborator-bundle integrity
+
+`write_research_bundle_manifest()` records a closed set of relative regular
+files together with the package version, package source identity, declared
+entry point, canonical replay parameters, byte counts, and SHA-256 digests.
+The manifest is deterministic for identical inputs. Paths that are absolute,
+escape the bundle root, name the manifest itself, or traverse a symlink are
+rejected; file count and total bytes are bounded before hashing.
+
+`verify_research_bundle_manifest()` revalidates that structure and fails closed
+when an artifact is absent, replaced, resized, or changed. It intentionally
+does **not** execute the recorded entry point. Bundle verification proves only
+that the named bytes and replay metadata match the manifest; the mathematical
+status of each artifact remains whatever its own result or certificate says.
 
 ## Trusted implementation registry
 

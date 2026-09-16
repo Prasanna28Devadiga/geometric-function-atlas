@@ -11,6 +11,7 @@ an expansion can be cross-checked against the site.
 from __future__ import annotations
 
 import difflib
+import hashlib
 
 import sympy as sp
 
@@ -322,3 +323,18 @@ def generator_artifact_version(generator: Generator) -> str:
         if _BY_KEY.get(generator.key) is generator
         else "user-supplied"
     )
+
+
+def generator_identity(generator: Generator) -> str:
+    """Return a collision-safe identity for a catalog or caller generator.
+
+    Built-ins retain their stable public key. Caller definitions include the
+    full SHA-256 digest of the exact SymPy formula, so a reused catalog key
+    cannot disguise a different mathematical object. Names and citations are
+    provenance rather than part of the defining function.
+    """
+
+    if generator_artifact_version(generator) != "user-supplied":
+        return generator.key
+    digest = hashlib.sha256(generator.formula.encode("utf-8")).hexdigest()
+    return f"user:{generator.key}:{digest}"

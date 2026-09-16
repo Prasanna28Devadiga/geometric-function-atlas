@@ -9,6 +9,7 @@ from jsonschema import Draft202012Validator
 
 from geometric_function_atlas import (
     FailureState,
+    RadiusRecord,
     RadiusReplayResult,
     RadiusStatus,
     audit_radius,
@@ -192,6 +193,199 @@ def test_replay_rejects_source_hash_mismatch() -> None:
     assert result.status == "corrupt_artifact"
     assert result.certified is False
     assert "source" in result.error.lower() or "hash" in result.error.lower()
+
+
+def test_snapshot_row_without_bundled_certificate_is_not_replayable() -> None:
+    record = radius("exponential", "sine")
+
+    assert record.certificate is None
+    assert record.status is RadiusStatus.TOUCH_PROVEN_EXACT
+
+    result = replay_radius_certificate(record)
+
+    assert result.status == "not_replayable"
+    assert result.certified is False
+    assert result.failure_state is FailureState.UNSUPPORTED
+    assert result.error is not None
+    assert "certificate" in result.error
+    assert "touch_proven_exact" in result.error
+    # A missing bundled certificate is not damage: the snapshot row keeps its
+    # own evidence status and stays untouched.
+    assert radius("exponential", "sine").status is RadiusStatus.TOUCH_PROVEN_EXACT
+    assert record.to_dict()["evidence_status"] == "proven_exact_under_declared_assumptions"
+
+
+def test_recompute_verify_and_attainment_report_unavailable_replay() -> None:
+    results = {
+        "recompute": recompute_radius("exponential", "sine"),
+        "verify": verify_radius_certificate("exponential", "sine"),
+        "attainment": verify_radius_attainment("exponential", "sine"),
+    }
+
+    for label, result in results.items():
+        assert result.status == "not_replayable", label
+        assert result.certified is False, label
+        assert result.failure_state is FailureState.UNSUPPORTED, label
+
+
+def test_radius_audit_reports_unavailable_replay_without_damaging_the_row() -> None:
+    payload = audit_radius("exponential", "sine")
+
+    assert payload["status"] == "not_replayable"
+    assert payload["evidence_status"] == "touch_proven_exact"
+    assert payload["attainment_verified"] is False
+    assert payload["novelty_claim"] is False
+    replay = payload["certificate_replay"]
+    assert replay["failure_state"] == "unsupported"
+    assert replay["certified"] is False
+    assert replay["status"] == "not_replayable"
+
+
+def test_mutated_certificate_bearing_record_stays_corrupt_artifact() -> None:
+    record = radius("sine", "sigmoid")
+    mutated = replace(record, value_exact="asin((E-1)/(E+2))")
+
+    result = replay_radius_certificate(mutated)
+
+    assert result.status == "corrupt_artifact"
+    assert result.status != "not_replayable"
+    assert result.failure_state is FailureState.CORRUPT_ARTIFACT
+    assert result.certified is False
+
+
+def _mutate_certificate(record: RadiusRecord, **changes: object) -> RadiusRecord:
+    assert record.certificate is not None
+    return replace(record, certificate=replace(record.certificate, **changes))
+
+
+MUTATED_CERTIFICATE_RECORDS = {
+    "value_exact": lambda record: replace(record, value_exact="asin((E-1)/(E+2))"),
+    "assumptions": lambda record: replace(record, assumptions=("a different assumption",)),
+    "branch": lambda record: replace(record, inverse_branch_and_domain="a different branch"),
+    "containment": lambda record: replace(record, global_containment_route="a different route"),
+    "attainment": lambda record: replace(record, contact_and_attainment="a different contact"),
+    "provenance_hash": lambda record: replace(
+        record, provenance=replace(record.provenance, fixture_sha256="0" * 64)
+    ),
+    "certificate_candidate": lambda record: _mutate_certificate(
+        record, exact_candidate="asin((E-1)/(E+2))"
+    ),
+    "certificate_steps": lambda record: _mutate_certificate(
+        record, machine_steps=("forged step",)
+    ),
+    "certificate_machine_status": lambda record: _mutate_certificate(
+        record, machine_status="unverified"
+    ),
+    "certificate_baked_status": lambda record: _mutate_certificate(
+        record, baked_status="unidentified"
+    ),
+}
+
+
+@pytest.mark.parametrize("mutation", sorted(MUTATED_CERTIFICATE_RECORDS))
+def test_every_mutated_certificate_bearing_record_fails_closed(mutation: str) -> None:
+    mutated = MUTATED_CERTIFICATE_RECORDS[mutation](radius("sine", "sigmoid"))
+
+    result = replay_radius_certificate(mutated)
+
+    assert result.status == "corrupt_artifact", (mutation, result.to_dict())
+    assert result.status != "not_replayable", mutation
+    assert result.certified is False, mutation
+    assert result.failure_state is FailureState.CORRUPT_ARTIFACT, mutation
+    assert result.error, mutation
+
+
+def test_not_replayable_payload_remains_deterministic_json() -> None:
+    payload = replay_radius_certificate(radius("exponential", "sine")).to_dict()
+
+    assert payload["status"] == "not_replayable"
+    assert payload["failure_state"] == "unsupported"
+    assert payload["certified"] is False
+    assert json.loads(json.dumps(payload)) == payload
+
+
+def test_removing_a_bundled_certificate_is_corrupt_artifact_not_unavailable() -> None:
+    record = radius("sine", "sigmoid")
+    assert record.certificate is not None
+
+    result = replay_radius_certificate(replace(record, certificate=None))
+
+    assert result.status == "corrupt_artifact"
+    assert result.status != "not_replayable"
+    assert result.failure_state is FailureState.CORRUPT_ARTIFACT
+    assert result.certified is False
+    assert result.error
+    # The untouched reviewed lane still replays: only the mutation is condemned.
+    assert replay_radius_certificate(record).status == "proven"
+
+
+MUTATED_SNAPSHOT_ROW_WITHOUT_CERTIFICATE = {
+    "value_exact": lambda record: replace(record, value_exact="1/7"),
+    "value_decimal": lambda record: replace(record, value_decimal="0.123456789"),
+    "value_float": lambda record: replace(record, value_float=0.123456789),
+    "status": lambda record: replace(record, status=RadiusStatus.CLOSED_FORM_CONFIRMED),
+    "provenance_commit": lambda record: replace(
+        record, provenance=replace(record.provenance, source_snapshot_commit="forged")
+    ),
+    "provenance_hash": lambda record: replace(
+        record, provenance=replace(record.provenance, fixture_sha256="0" * 64)
+    ),
+}
+
+
+@pytest.mark.parametrize("mutation", sorted(MUTATED_SNAPSHOT_ROW_WITHOUT_CERTIFICATE))
+def test_mutating_an_uncertificated_snapshot_row_is_corrupt_artifact(mutation: str) -> None:
+    record = radius("exponential", "sine")
+    assert record.certificate is None
+
+    result = replay_radius_certificate(MUTATED_SNAPSHOT_ROW_WITHOUT_CERTIFICATE[mutation](record))
+
+    assert result.status == "corrupt_artifact", (mutation, result.to_dict())
+    assert result.status != "not_replayable", mutation
+    assert result.failure_state is FailureState.CORRUPT_ARTIFACT, mutation
+    assert result.certified is False, mutation
+    assert result.error, mutation
+    # ``unsupported`` describes only the pristine snapshot row, never its mutations.
+    assert replay_radius_certificate(record).status == "not_replayable", mutation
+
+
+def test_mapping_without_a_certificate_cannot_downgrade_a_reviewed_lane() -> None:
+    payload = radius("sine", "sigmoid").to_dict()
+    assert isinstance(payload["certificate"], dict)
+    deleted = {key: value for key, value in payload.items() if key != "certificate"}
+    explicit_none = dict(payload, certificate=None)
+
+    for label, stripped in (("deleted", deleted), ("explicit_none", explicit_none)):
+        result = replay_radius_certificate(stripped)
+
+        assert result.status == "corrupt_artifact", (label, result.to_dict())
+        assert result.status != "not_replayable", label
+        assert result.failure_state is FailureState.CORRUPT_ARTIFACT, label
+        assert result.certified is False, label
+
+    # The intact mapping still replays, so the verdict flips only on the deletion.
+    assert replay_radius_certificate(payload).status == "proven"
+
+
+def test_mapping_form_of_a_pristine_uncertificated_row_stays_unavailable() -> None:
+    result = replay_radius_certificate(radius("exponential", "sine").to_dict())
+
+    assert result.status == "not_replayable"
+    assert result.failure_state is FailureState.UNSUPPORTED
+    assert result.certified is False
+
+
+def test_uncertificated_row_absent_from_the_snapshot_is_corrupt_artifact() -> None:
+    payload = radius("exponential", "sine").to_dict()
+    payload["canonical_inputs"] = {"inner": "no_such_inner", "target": "no_such_target"}
+
+    result = replay_radius_certificate(payload)
+
+    # A direction that is not a trusted snapshot row is a consistency failure,
+    # never benign unavailability.
+    assert result.status == "corrupt_artifact"
+    assert result.failure_state is FailureState.CORRUPT_ARTIFACT
+    assert result.certified is False
 
 
 def test_replay_has_a_bounded_resource_failure() -> None:

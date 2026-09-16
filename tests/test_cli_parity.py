@@ -241,6 +241,44 @@ def test_extremal_coefficients_command_emits_exact_strings() -> None:
     assert all(isinstance(value, str) for value in payload["coefficients"])
 
 
+EXTREMAL_CLI_ORDER_4 = (
+    ("limacon_0.707", ["sqrt(2)", "5/4", "7*sqrt(2)/12", "43/96"]),
+    (
+        "parabolic",
+        [
+            "8/pi**2",
+            "8*(pi**2 + 12)/(3*pi**4)",
+            "8*(1440 + 23*pi**4 + 360*pi**2)/(135*pi**6)",
+            "8*(20160 + 99*pi**6 + 10080*pi**2 + 1708*pi**4)/(945*pi**8)",
+        ],
+    ),
+    ("rational_kr", ["-1 + sqrt(2)", "9/2 - 3*sqrt(2)", "-77/6 + 55*sqrt(2)/6", "901/24 - 53*sqrt(2)/2"]),
+    ("exponential", ["1", "3/4", "17/36", "19/72"]),
+    ("sine", ["1", "1/2", "1/9", "-1/72"]),
+    ("starlike", ["2", "3", "4", "5"]),
+)
+
+
+@pytest.mark.parametrize(("key", "expected"), EXTREMAL_CLI_ORDER_4)
+def test_extremal_coefficients_command_emits_exact_symbolic_coefficients(
+    key: str, expected: list[str]
+) -> None:
+    completed = run_cli("extremal-coefficients", key, "--order", "4", "--json")
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["class_key"] == key
+    assert payload["order"] == 4
+    assert payload["coefficients"] == expected
+
+    human = run_cli("extremal-coefficients", key, "--order", "4")
+
+    assert human.returncode == 0, human.stderr
+    assert human.stderr == ""
+    for value in expected:
+        assert value in human.stdout
+
+
 def test_verify_command_screen_tier_emits_screen_evidence() -> None:
     completed = run_cli(
         "verify",

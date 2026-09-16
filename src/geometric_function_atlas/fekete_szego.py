@@ -8,7 +8,7 @@ from typing import Any
 
 import sympy as sp
 
-from .catalog import generator_artifact_version
+from .catalog import generator_artifact_version, generator_identity
 from .coefficients import _resolve_generator, taylor_coefficients
 from .contracts import (
     CheckStatus,
@@ -199,7 +199,10 @@ class FeketeSzegoResult:
 
         return build_result_payload(
             result_type="fekete_szego",
-            canonical_inputs={"generator": self.generator.key, "mu": str(self.mu)},
+            canonical_inputs={
+                "generator": generator_identity(self.generator),
+                "mu": str(self.mu),
+            },
             exact_expressions={
                 "generator": self.generator.formula,
                 "B1": str(self.b1),
@@ -236,7 +239,7 @@ class FeketeSzegoResult:
                 else "built_in"
             ),
             legacy_fields={
-                "generator": self.generator.key,
+                "generator": generator_identity(self.generator),
                 "generator_formula": self.generator.formula,
                 "generator_citation": self.generator.citation,
                 "mu": str(self.mu),

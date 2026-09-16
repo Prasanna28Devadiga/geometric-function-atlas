@@ -27,7 +27,12 @@ from typing import Any
 
 import sympy as sp
 
-from .catalog import get_generator, list_generators
+from .catalog import (
+    generator_artifact_version,
+    generator_identity,
+    get_generator,
+    list_generators,
+)
 from .coefficients import taylor_coefficients
 from .contracts import (
     CheckStatus,
@@ -36,7 +41,7 @@ from .contracts import (
     VerificationCheck,
     VerificationReport,
 )
-from .models import Generator, Z
+from .models import Generator, Z, validate_exact_expression
 from .records import build_screen_record
 from .verify import _exact_float
 from .version import SOURCE_ARTIFACT_COMMIT
@@ -92,12 +97,54 @@ def list_classes() -> tuple[Generator, ...]:
     return list_generators()
 
 
-def _get_class(key: str) -> Generator:
-    return get_generator(key)
+def _get_class(value: str | Generator) -> Generator:
+    if isinstance(value, Generator):
+        return value
+    if not isinstance(value, str):
+        raise TypeError("class must be a catalog key or Generator")
+    return get_generator(value)
+
+
+def _record_generator_metadata(
+    generator: Generator,
+) -> tuple[str, str | None, str | None]:
+    """Return canonical identity plus caller-only formula and citation."""
+
+    if generator_artifact_version(generator) == "user-supplied":
+        return generator_identity(generator), generator.formula, generator.citation
+    return generator.key, None, None
+
+
+def _generator_record_details(
+    *,
+    key: str,
+    identity: str | None,
+    formula: str | None,
+) -> dict[str, str]:
+    if formula is None:
+        return {}
+    return {
+        "generator_key": key,
+        "generator_identity": identity or key,
+        "generator_formula": formula,
+        "generator_provenance": "caller_supplied",
+    }
+
+
+def _generator_assumption(formula: str | None) -> str:
+    if formula is None:
+        return "phi is the named catalog generator"
+    return "phi is the exact caller-supplied Generator definition recorded in details"
+
+
+def _generator_sources(citation: str | None) -> tuple[str, ...]:
+    if citation is None or citation == _REFERENCE:
+        return (_REFERENCE,)
+    return (_REFERENCE, citation)
 
 
 def class_admissibility(
-    class_key: str,
+    class_key: str | Generator,
     *,
     n_theta: int = 120,
     radii: tuple[float, ...] = (0.3, 0.6, 0.9, 0.99),
@@ -110,6 +157,9 @@ def class_admissibility(
     """
 
     generator = _get_class(class_key)
+    class_identity, generator_formula, generator_citation = (
+        _record_generator_metadata(generator)
+    )
     expression = generator.expression
 
     phi0 = sp.simplify(expression.subs(Z, 0))
@@ -200,7 +250,7 @@ def class_admissibility(
     )
     report = VerificationReport(checks=checks)
     return ClassAdmissibilityResult(
-        class_key=class_key,
+        class_key=generator.key,
         admissible=report.success,
         verification_report=report,
         exact_values={"phi0": sp.sstr(phi0), "phi_prime0": sp.sstr(derivative0)},
@@ -209,6 +259,9 @@ def class_admissibility(
             "symmetry_max_error": symmetry_error,
             "starlike_wrt_1_min": starlike_min,
         },
+        class_identity=class_identity,
+        generator_formula=generator_formula,
+        generator_citation=generator_citation,
     )
 
 
@@ -258,25 +311,33 @@ class ClassAdmissibilityResult:
     verification_report: VerificationReport
     exact_values: dict[str, str]
     margins: dict[str, float]
+    class_identity: str | None = None
+    generator_formula: str | None = None
+    generator_citation: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return build_screen_record(
             record_type="class_admissibility",
-            canonical_inputs={"class_key": self.class_key},
+            canonical_inputs={"class_key": self.class_identity or self.class_key},
             method="ma_minda_admissibility_screens",
             evidence_kind="numerical_screen",
             tier="screen",
             assumptions=(
-                "phi is the named catalog generator",
+                _generator_assumption(self.generator_formula),
                 "region conditions are evaluated as float screens with reported margins",
             ),
-            source_references=(_REFERENCE,),
+            source_references=_generator_sources(self.generator_citation),
             verification=self.verification_report,
             details={
                 "admissible": self.admissible,
                 "phi0": self.exact_values["phi0"],
                 "phi_prime0": self.exact_values["phi_prime0"],
                 **self.margins,
+                **_generator_record_details(
+                    key=self.class_key,
+                    identity=self.class_identity,
+                    formula=self.generator_formula,
+                ),
             },
         )
 
@@ -299,7 +360,7 @@ def _zfp_over_f(coefficients: tuple[float, ...], z: complex) -> complex:
 
 
 def class_member_screen(
-    class_key: str,
+    class_key: str | Generator,
     coefficients: list[float] | tuple[float, ...],
     *,
     grid_r: int = 16,
@@ -311,6 +372,9 @@ def class_member_screen(
     every value lies inside the sampled boundary of ``phi(D)``."""
 
     generator = _get_class(class_key)
+    class_identity, generator_formula, generator_citation = (
+        _record_generator_metadata(generator)
+    )
     try:
         values = tuple(float(value) for value in coefficients)
     except (TypeError, ValueError) as exc:
@@ -373,13 +437,16 @@ def class_member_screen(
             None if witness is None else (witness.real, witness.imag)
         )
     return ClassMembershipResult(
-        class_key=class_key,
+        class_key=generator.key,
         coefficients=values,
         member=member,
         fraction_inside=inside_count / total,
         min_dist_to_boundary=float(min_distance) if total else float("nan"),
         witness_w=witness_pair,
         verification_report=VerificationReport(checks=checks),
+        class_identity=class_identity,
+        generator_formula=generator_formula,
+        generator_citation=generator_citation,
     )
 
 
@@ -394,13 +461,16 @@ class ClassMembershipResult:
     min_dist_to_boundary: float
     witness_w: tuple[float, float] | None
     verification_report: VerificationReport
+    class_identity: str | None = None
+    generator_formula: str | None = None
+    generator_citation: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         exact_coefficients = tuple(sp.sstr(_exact_float(v)) for v in self.coefficients)
         return build_screen_record(
             record_type="class_membership",
             canonical_inputs={
-                "class_key": self.class_key,
+                "class_key": self.class_identity or self.class_key,
                 "coefficients": list(exact_coefficients),
             },
             method="ma_minda_membership_winding_screen",
@@ -411,20 +481,25 @@ class ClassMembershipResult:
                 "the boundary of phi(D) is sampled at a finite resolution",
                 "a violation confined to a thin annulus near |z|=1 can slip through",
             ),
-            source_references=(_REFERENCE,),
+            source_references=_generator_sources(self.generator_citation),
             verification=self.verification_report,
             details={
                 "member": self.member,
                 "fraction_inside": self.fraction_inside,
                 "min_dist_to_boundary": self.min_dist_to_boundary,
                 "witness_w": None if self.witness_w is None else list(self.witness_w),
+                **_generator_record_details(
+                    key=self.class_key,
+                    identity=self.class_identity,
+                    formula=self.generator_formula,
+                ),
             },
         )
 
 
 def class_containment_screen(
-    inner: str,
-    outer: str,
+    inner: str | Generator,
+    outer: str | Generator,
     *,
     n_inner: int = 180,
     r_inner: float = 0.99,
@@ -439,6 +514,12 @@ def class_containment_screen(
 
     inner_generator = _get_class(inner)
     outer_generator = _get_class(outer)
+    inner_identity, inner_formula, inner_citation = _record_generator_metadata(
+        inner_generator
+    )
+    outer_identity, outer_formula, outer_citation = _record_generator_metadata(
+        outer_generator
+    )
     inner_points = _boundary_curve(inner_generator, n=n_inner, radius=r_inner)
     outer_curve = _boundary_curve(outer_generator, n=n_outer)
     inside = [_winding_number(point, outer_curve) == 1 for point in inner_points]
@@ -470,13 +551,19 @@ def class_containment_screen(
         ),
     )
     return ClassContainmentResult(
-        inner=inner,
-        outer=outer,
+        inner=inner_generator.key,
+        outer=outer_generator.key,
         contained=contained,
         fraction_inside=fraction,
         margin=margin,
         witness_w=None if witness is None else (witness.real, witness.imag),
         verification_report=VerificationReport(checks=checks),
+        inner_identity=inner_identity,
+        inner_formula=inner_formula,
+        inner_citation=inner_citation,
+        outer_identity=outer_identity,
+        outer_formula=outer_formula,
+        outer_citation=outer_citation,
     )
 
 
@@ -491,11 +578,20 @@ class ClassContainmentResult:
     margin: float | None
     witness_w: tuple[float, float] | None
     verification_report: VerificationReport
+    inner_identity: str | None = None
+    inner_formula: str | None = None
+    inner_citation: str | None = None
+    outer_identity: str | None = None
+    outer_formula: str | None = None
+    outer_citation: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return build_screen_record(
             record_type="class_containment",
-            canonical_inputs={"inner": self.inner, "outer": self.outer},
+            canonical_inputs={
+                "inner": self.inner_identity or self.inner,
+                "outer": self.outer_identity or self.outer,
+            },
             method="ma_minda_containment_winding_screen",
             evidence_kind="numerical_screen",
             tier="screen",
@@ -504,7 +600,12 @@ class ClassContainmentResult:
                 "containment is by sampled winding numbers, not a theorem",
                 "a failed screen is a boundary witness, not a proof of non-containment",
             ),
-            source_references=(_REFERENCE,),
+            source_references=tuple(
+                dict.fromkeys(
+                    _generator_sources(self.inner_citation)
+                    + _generator_sources(self.outer_citation)
+                )
+            ),
             verification=self.verification_report,
             details={
                 "contained": self.contained,
@@ -512,19 +613,47 @@ class ClassContainmentResult:
                 "margin": self.margin,
                 "witness_w": None if self.witness_w is None else list(self.witness_w),
                 "witness_function": "extremal of the inner class",
+                **(
+                    {
+                        "inner_generator": {
+                            "key": self.inner,
+                            "identity": self.inner_identity or self.inner,
+                            "formula": self.inner_formula,
+                            "provenance": "caller_supplied",
+                        }
+                    }
+                    if self.inner_formula is not None
+                    else {}
+                ),
+                **(
+                    {
+                        "outer_generator": {
+                            "key": self.outer,
+                            "identity": self.outer_identity or self.outer,
+                            "formula": self.outer_formula,
+                            "provenance": "caller_supplied",
+                        }
+                    }
+                    if self.outer_formula is not None
+                    else {}
+                ),
             },
         )
 
 
 def class_extremal_coefficients(
-    class_key: str,
+    class_key: str | Generator,
     order: int,
 ) -> tuple[sp.Expr, ...]:
     """Return exact ``[a2, ..., a_{order+1}]`` of the sharp member
     ``f_phi(z) = z exp(int (phi - 1)/t dt)``.
 
     With ``phi - 1 = sum B_k z^k``, ``f/z = exp(sum (B_k/k) z^k)`` and the
-    exponential-of-series recurrence gives the exact rational coefficients.
+    exponential-of-series recurrence gives exact coefficients. Those
+    coefficients are rational for rational generators but algebraic or
+    transcendental for generators such as ``limacon_0.707``, ``parabolic``,
+    and ``rational_kr``; the exact symbolic expression is returned unchanged
+    and is never coerced to a float.
     """
 
     if isinstance(order, bool) or not isinstance(order, int):
@@ -542,4 +671,7 @@ def class_extremal_coefficients(
         for k in range(1, degree + 1):
             total += sp.Integer(k) * b[k - 1] / k * e[degree - k]
         e.append(sp.simplify(total / degree))
-    return tuple(sp.Rational(e[degree]) for degree in range(1, order + 1))
+    coefficients = tuple(e[degree] for degree in range(1, order + 1))
+    for value in coefficients:
+        validate_exact_expression(value)
+    return coefficients

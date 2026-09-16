@@ -73,11 +73,16 @@ def _exact_gamma(value: Any, *, label: str) -> sp.Expr:
     return parsed
 
 
-def schur_omega_coefficients(gammas: Sequence[Any]) -> list[sp.Expr]:
-    """Exact Taylor coefficients ``[c1..cm]`` of the Schwarz function w(z).
+def schur_omega_coefficients(
+    gammas: Sequence[Any], *, order: int | None = None,
+) -> list[sp.Expr]:
+    """Exact Taylor coefficients ``[c1..c_order]`` of the Schwarz function.
 
     Uses the factored convention of the certificate engine. The parameters are
     real, each inside the closed unit interval, and the depth is bounded.
+    The Schur remainder after the supplied parameters is zero; the resulting
+    function generally has a nonzero rational tail. By default ``order`` is
+    the number of parameters, not a declaration that later coefficients vanish.
     """
 
     if len(gammas) > MAX_SCHUR_DEPTH:
@@ -86,26 +91,25 @@ def schur_omega_coefficients(gammas: Sequence[Any]) -> list[sp.Expr]:
         )
     if len(gammas) < 1:
         raise InvalidInputError("at least one Schur parameter is required")
+    if order is None:
+        order = len(gammas)
+    if isinstance(order, bool) or not isinstance(order, int) or order < 1:
+        raise InvalidInputError("order must be a positive integer")
+    if order > MAX_COEFFICIENT_ORDER:
+        raise ResourceLimitError(f"coefficient order exceeds {MAX_COEFFICIENT_ORDER}")
     gamma = [_exact_gamma(value, label=f"gamma[{index}]") for index, value in enumerate(gammas)]
-    weight = [1 - gamma[index] ** 2 for index in range(len(gamma))]
-    coefficients: list[sp.Expr] = [gamma[0]]
-    if len(gamma) >= 2:
-        coefficients.append(weight[0] * gamma[1])
-    if len(gamma) >= 3:
-        coefficients.append(
-            weight[0] * (weight[1] * gamma[2] - gamma[0] * gamma[1] ** 2)
-        )
-    if len(gamma) >= 4:
-        coefficients.append(
-            weight[0]
-            * (
-                weight[1] * weight[2] * gamma[3]
-                - weight[1] * gamma[1] * gamma[2] ** 2
-                - 2 * weight[1] * gamma[0] * gamma[1] * gamma[2]
-                + gamma[0] ** 2 * gamma[1] ** 3
+    # Reverse Schur recursion h=(g+z*tail)/(1+g*z*tail), omega=z*h.
+    # Formal division by a series with constant term one is exact and bounded.
+    tail: list[sp.Expr] = [sp.Integer(0)] * order
+    for g in reversed(gamma):
+        coefficients = [g]
+        for k in range(1, order):
+            value = tail[k - 1] - g * sum(
+                tail[j - 1] * coefficients[k - j] for j in range(1, k + 1)
             )
-        )
-    return [sp.simplify(value) for value in coefficients]
+            coefficients.append(sp.simplify(value))
+        tail = coefficients
+    return tail
 
 
 def _exact_phi_coefficient(value: Any, *, index: int) -> sp.Expr:
@@ -157,8 +161,7 @@ def member_coefficients(
         # the member is exact for the truncated polynomial generator.
         B = B + [sp.Integer(0)] * (order - len(B))
 
-    omega = [sp.Integer(0)] + schur_omega_coefficients(gammas)
-    omega += [sp.Integer(0)] * (order - len(omega) + 1)
+    omega = [sp.Integer(0)] + schur_omega_coefficients(gammas, order=order)
 
     # q = sum_j B_j w^j truncated at z^order (phi(w) - 1 as a series)
     q: list[sp.Expr] = [sp.Integer(0)] * (order + 1)

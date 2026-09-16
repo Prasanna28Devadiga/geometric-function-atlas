@@ -38,7 +38,7 @@ for upgrades, removal, optional labs, and maintainer installs.
 
 Every operation represented in the package's parity table has a local command
 and a Python function. The table below is the complete shipped surface; browser-
-only panels and research-workspace workflows are explicit non-goals.
+only panels and private research-workspace operations are explicit non-goals.
 
 | Website capability | CLI | Python function |
 |---|---|---|
@@ -55,7 +55,7 @@ only panels and research-workspace workflows are explicit non-goals.
 | Screen class containment | `gfa compare <inner> <outer>` | `class_containment_screen()` |
 | Exact extremal coefficients of a class | `gfa extremal-coefficients <key>` | `class_extremal_coefficients()` |
 | Export citations | `gfa citation ...` | `citation_export()` |
-| Reproduce website plots | `gfa plot <kind> <gen> --output out.svg` (domain also supports PNG/TikZ) | `write_plot()` and friends |
+| Reproduce website plots | `gfa plot <kind> <gen> [--object phi\|z*phi\|f_phi] --output out.svg` (domain also supports PNG/TikZ) | `write_plot()` and friends |
 | Inspect/verify baked scientific artifacts | `gfa artifact-snapshot`, `gfa proofs`, `gfa expansion`, `gfa coefficient-bound`, `gfa reconciliation` | `snapshot_info()`, `list_proofs()`, `expansion()`, `coefficient_bound()`, `reconciliation()` |
 | Replay a baked exact certificate | `gfa verify-certificate <name>` | `verify_certificate()` |
 | Browse/replay directed inclusion radii | `gfa radii`, `gfa radius`, `gfa radius-recompute`, `gfa radius-identify`, `gfa radius-audit`, `gfa radius-attainment`, `gfa verify-radius-certificate` | `list_radii()`, `radius()`, `recompute_radius()`, `identify_radius()`, `audit_radius()`, `verify_radius_attainment()`, `verify_radius_certificate()` |
@@ -119,6 +119,16 @@ special-function or conformal-warp parity.
 
 ## Python API
 
+For problem-led examples rather than an API tour, see the
+[research workflows](docs/workflows/README.md): custom classes, class geometry,
+sharp radii, coefficient comparisons, conjecture repair, operator transfer, and
+deterministic [collaborator bundles](docs/workflows/collaborator_bundle.md). The
+[thirty-recipe catalogue](docs/workflows/catalogue.md) gives one terminal route
+for every reviewer example without presenting missing research engines as shipped. The
+[recent-literature case studies](docs/workflows/recent_literature.md) connect
+these tools to a source-bound sharp coefficient repair and an all-order
+convex-subordination argument, with explicit prior-art limitations.
+
 ### Exact generator series
 
 ```python
@@ -146,7 +156,9 @@ custom = Generator(
 
 Computations are not restricted to the built-in catalog. Analytic admissibility
 of custom input remains an explicit caller assumption, and undeclared free
-symbols are rejected.
+symbols are rejected. Caller definitions receive a collision-safe canonical
+identity of the form `user:<key>:<SHA-256 of exact formula>` in exported
+records; reusing a catalog key cannot impersonate the built-in object.
 
 ### Exact Fekete–Szegő constants
 
@@ -230,7 +242,15 @@ contained = class_containment_screen("exponential", "cardioid")
 
 # Exact extremal coefficients from the class definition.
 coeffs = class_extremal_coefficients("exponential", order=8)
+
+# The same Python APIs accept the exact custom Generator constructed above.
+custom_admissibility = class_admissibility(custom)
+custom_coeffs = class_extremal_coefficients(custom, order=8)
 ```
+
+See [`docs/workflows/custom_class.md`](docs/workflows/custom_class.md) for an
+end-to-end caller-defined class with exact coefficient bounds, explicitly
+labeled screens, and separate `phi`, `z*phi`, and `f_phi` exports.
 
 ### Plots
 
@@ -238,15 +258,46 @@ Four plot kinds reproduce the website's plots as dependency-free SVG:
 `domain` (conformal grid image), `coefficients` (coefficient magnitudes),
 `real-part` (heatmap of Re f), and `phase` (phase portrait).
 
+A named generator can be plotted as three genuinely different objects, chosen
+with `object=` in Python or `--object` on the command line:
+
+- `phi` — the generator itself, `phi(z) = 1 + B_1 z + B_2 z^2 + ...`. Its
+  constant term is 1 and its linear coefficient is `B_1` (not necessarily 1),
+  so it is **not** a normalized `z + ...` polynomial.
+- `z*phi` — the normalized truncation `z*phi(z) = z + B_1 z^2 + ...`, the
+  legacy default when no object is selected.
+- `f_phi` — the canonical Ma–Minda extremal
+  `f_phi(z) = z exp(integral_0^z (phi(t) - 1)/t dt) = z + a_2 z^2 + ...`,
+  computed with `class_extremal_coefficients()` and kept exact until the
+  plotting conversion boundary.
+
 ```python
 from geometric_function_atlas import write_plot
 
 write_plot("domain", "/tmp/exponential-domain.svg", generator="exponential")
-write_plot("phase", "/tmp/exponential-phase.svg", generator="exponential")
+write_plot("domain", "/tmp/exponential-phi.svg", generator="exponential", object="phi")
+write_plot("domain", "/tmp/exponential-fphi.svg", generator="exponential", object="f_phi")
 ```
 
-Plots visualize a finite Taylor polynomial; they are not proofs of the full
-image domain. Custom coefficient input is supported via `coefficients=...`.
+The same selection on the command line (quote `z*phi` so the shell does not
+expand the `*`):
+
+```bash
+gfa plot domain exponential --object phi --output phi-domain.svg
+gfa plot domain exponential --object 'z*phi' --output zphi-domain.svg
+gfa plot domain exponential --object f_phi --output fphi-domain.svg
+```
+
+`--coefficients` continues to mean the normalized polynomial
+`f(z) = z + a2 z^2 + ...`; it is rejected together with `--object` rather than
+silently reinterpreted. Results label this input as `normalized_polynomial`;
+that metadata value is not a fourth `--object` choice. Unknown object names are
+rejected and list the three accepted spellings.
+
+Every plot is a **sampled finite-truncation visualization** of the selected
+object at a fixed Taylor order (further capped at order 24 for `f_phi`). It is
+not a proof, not the full image domain, and not a certificate of class
+membership; the `real-part` and `phase` outputs are numerical screens only.
 
 The checked-in examples below are generated by the package itself:
 
@@ -346,7 +397,11 @@ gfa verify-radius-certificate sine sigmoid --json
 The radius certificate replay checks the declared branch, containment,
 contact/attainment evidence, exact candidate, and bounded symbolic steps. A
 stored decimal or a candidate expression is not silently upgraded to a global
-sharpness proof.
+sharpness proof. An unchanged snapshot row without a bundled replay certificate
+is reported as `not_replayable` (`unsupported`, exit code 3) and keeps its own
+evidence status; a malformed record, a certificate removed from a reviewed
+lane, or any other record that is not its unchanged trusted snapshot row is
+`corrupt_artifact`.
 
 ### Immutable registry snapshot queries
 
@@ -431,6 +486,8 @@ gfa extremal-coefficients exponential --order 8
 # Plots (SVG for every kind; domain PNG and domain TikZ exports are also supported).
 gfa plot sine --order 12 --output sine-domain.svg
 gfa plot domain exponential --output /tmp/domain.svg
+gfa plot domain exponential --object phi --output /tmp/domain-phi.svg
+gfa plot domain exponential --object f_phi --output /tmp/domain-fphi.svg
 gfa plot phase exponential --output /tmp/phase.svg
 gfa plot domain exponential --output /tmp/domain.png
 gfa plot domain exponential --output /tmp/domain.tikz

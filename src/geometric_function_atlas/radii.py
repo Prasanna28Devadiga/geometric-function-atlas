@@ -282,7 +282,16 @@ class RadiusRecord:
 
 @dataclass(frozen=True, slots=True)
 class RadiusReplayResult:
-    """Fail-closed result of an exact radius certificate replay."""
+    """Fail-closed result of an exact radius certificate replay.
+
+    ``status`` is ``proven`` for a fully replayed chain, ``not_replayable``
+    when the unchanged trusted snapshot row has no bundled certificate
+    (``unsupported``), ``candidate_mismatch`` for a wrong candidate,
+    ``unresolved`` for a failed chain, ``invalid_input`` for malformed input,
+    and ``corrupt_artifact`` for a malformed record or any record that is not
+    identical to its trusted snapshot row, including a reviewed row whose
+    bundled certificate was removed.
+    """
 
     source_class: str
     target_class: str
@@ -832,41 +841,95 @@ def radius(source: str, target: str) -> RadiusRecord:
     raise KeyError(f"unknown directed radius {source!r}->{target!r}")
 
 
-def _validate_record_for_replay(record: RadiusRecord) -> str | None:
-    if record.certificate is None:
-        return "no local exact certificate is registered for this directed radius"
+@dataclass(frozen=True, slots=True)
+class _ReplayBlocker:
+    """Closed reason why a record cannot be replayed locally.
+
+    ``failure_state`` keeps "this operation is unavailable for this record"
+    separate from "this artifact is damaged": the unchanged trusted snapshot
+    row without a bundled replay certificate is ``unsupported``, while a
+    malformed record or any record that differs from its trusted snapshot row
+    — certificate-bearing or not — is ``corrupt_artifact``. ``issue`` is the
+    machine-readable explanation carried into the result.
+    """
+
+    failure_state: FailureState
+    issue: str
+
+
+# The status label reported for each replay blocker; user-facing only.
+_REPLAY_FAILURE_STATUSES = {
+    FailureState.UNSUPPORTED: "not_replayable",
+    FailureState.CORRUPT_ARTIFACT: "corrupt_artifact",
+}
+
+
+def _validate_record_for_replay(record: RadiusRecord) -> _ReplayBlocker | None:
+    def corrupt(issue: str) -> _ReplayBlocker:
+        return _ReplayBlocker(FailureState.CORRUPT_ARTIFACT, issue)
+
+    def trusted_snapshot_row() -> RadiusRecord | None:
+        try:
+            return radius(record.source_class, record.target_class)
+        except (KeyError, InvalidInputError):
+            return None
+
     certificate = record.certificate
+    if certificate is None:
+        # A missing bundled certificate is benign unavailability only for the
+        # unchanged trusted snapshot row.  Identity is established first, so a
+        # stripped certificate or any mutation stays fail-closed as a damaged
+        # artifact instead of being downgraded to ``unsupported``.
+        trusted = trusted_snapshot_row()
+        if trusted is None:
+            return corrupt("directed radius is not present in the trusted snapshot")
+        if record != trusted:
+            if trusted.certificate is not None:
+                return corrupt(
+                    "record does not match its trusted snapshot row: the bundled replay "
+                    "certificate carried by that row was removed"
+                )
+            return corrupt(
+                "record metadata does not match the trusted snapshot row; a row without "
+                "a bundled certificate is only unsupported when it is unchanged"
+            )
+        return _ReplayBlocker(
+            FailureState.UNSUPPORTED,
+            "no exact replay certificate is bundled for this directed radius; "
+            f"the snapshot row is not damaged (evidence status: {record.status.value}) "
+            "and only local certificate replay is unavailable",
+        )
+
     if (record.source_class, record.target_class) not in _REVIEWED_DIRECTIONS:
-        return "direction is not registered in the reviewed certificate fixture"
+        return corrupt("direction is not registered in the reviewed certificate fixture")
     if certificate.machine_status != "proven" or not certificate.machine_steps:
-        return "certificate is missing proven machine evidence"
+        return corrupt("certificate is missing proven machine evidence")
     if not all(certificate.machine_steps):
-        return "certificate contains an empty verification step"
+        return corrupt("certificate contains an empty verification step")
     if not record.assumptions or not record.inverse_branch_and_domain or not record.global_containment_route or not record.contact_and_attainment:
-        return "certificate is missing branch, domain, containment, contact, or attainment evidence"
+        return corrupt("certificate is missing branch, domain, containment, contact, or attainment evidence")
     if record.provenance.source_snapshot_commit != RADIUS_SOURCE_COMMIT:
-        return "source snapshot commit does not match the reviewed artifact"
+        return corrupt("source snapshot commit does not match the reviewed artifact")
     if record.provenance.crosswalk_commit != RADIUS_CROSSWALK_COMMIT:
-        return "certificate crosswalk commit does not match the reviewed artifact"
+        return corrupt("certificate crosswalk commit does not match the reviewed artifact")
     if record.provenance.fixture_id != RADIUS_FIXTURE_ID:
-        return "certificate fixture identity does not match the reviewed artifact"
+        return corrupt("certificate fixture identity does not match the reviewed artifact")
     if record.provenance.fixture_sha256 != RADIUS_FIXTURE_SHA256:
-        return "certificate source hash does not match the bundled artifact"
+        return corrupt("certificate source hash does not match the bundled artifact")
     if certificate.exact_candidate != record.value_exact:
-        return "record value and certificate candidate disagree"
+        return corrupt("record value and certificate candidate disagree")
     if (
         certificate.source_class != record.source_class
         or certificate.target_class != record.target_class
     ):
-        return "certificate direction does not match the directed radius"
+        return corrupt("certificate direction does not match the directed radius")
     if certificate.baked_status != record.status.value:
-        return "certificate status does not match the radius status"
-    try:
-        trusted = radius(record.source_class, record.target_class)
-    except KeyError:
-        return "directed radius is not present in the trusted snapshot"
+        return corrupt("certificate status does not match the radius status")
+    trusted = trusted_snapshot_row()
+    if trusted is None:
+        return corrupt("directed radius is not present in the trusted snapshot")
     if record != trusted:
-        return "record metadata does not match the trusted snapshot and certificate fixture"
+        return corrupt("record metadata does not match the trusted snapshot and certificate fixture")
     return None
 
 
@@ -983,8 +1046,13 @@ def replay_radius_certificate(
 
     A mathematically wrong but syntactically valid candidate is reported as
     ``candidate_mismatch``. Malformed input and resource exhaustion use the
-    package's explicit failure states. A non-reviewed snapshot row is never
-    promoted merely because its decimal or expression looks plausible.
+    package's explicit failure states. The unchanged trusted snapshot row is
+    reported as ``not_replayable`` with the ``unsupported`` failure state when
+    it has no bundled replay certificate; it is not a damaged artifact.
+    ``corrupt_artifact`` is reserved for malformed records and for any record
+    that differs from its trusted snapshot row — including a reviewed row
+    whose bundled certificate was removed. A non-reviewed snapshot row is
+    never promoted merely because its decimal or expression looks plausible.
     """
 
     _resource_check(dps=dps, max_steps=max_steps)
@@ -999,9 +1067,15 @@ def replay_radius_certificate(
         "candidate": candidate if candidate is not None else expected,
         "expected_candidate": expected,
     }
-    issue = _validate_record_for_replay(resolved)
-    if issue is not None:
-        return RadiusReplayResult(**base, status="corrupt_artifact", certified=False, failure_state=FailureState.CORRUPT_ARTIFACT, error=issue)
+    blocker = _validate_record_for_replay(resolved)
+    if blocker is not None:
+        return RadiusReplayResult(
+            **base,
+            status=_REPLAY_FAILURE_STATUSES[blocker.failure_state],
+            certified=False,
+            failure_state=blocker.failure_state,
+            error=blocker.issue,
+        )
     assert resolved.certificate is not None
     candidate_value = base["candidate"]
     if candidate_value is None:

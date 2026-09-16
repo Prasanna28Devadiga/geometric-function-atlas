@@ -58,6 +58,26 @@ def test_fekete_result_contract_keeps_exact_inputs_and_verification() -> None:
     validate_result_payload(payload)
 
 
+def test_custom_generator_records_share_collision_safe_identity() -> None:
+    custom = Generator(
+        key="sine",
+        name="Caller expression reusing a catalog key",
+        expression=1 + 2 * z,
+        citation="Caller supplied",
+    )
+
+    series = generator_series(custom, order=2).to_dict()
+    bound = fekete_szego(custom, mu=0).to_dict()
+    identity = series["canonical_inputs"]["generator"]
+
+    assert identity.startswith("user:sine:")
+    assert bound["canonical_inputs"]["generator"] == identity
+    assert series["generator"] == identity
+    assert bound["generator"] == identity
+    validate_result_payload(series)
+    validate_result_payload(bound)
+
+
 def test_counterexample_result_uses_the_closed_versioned_contract() -> None:
     payload = verify_counterexample(
         [1], point=(-0.75, 0.0), property="starlike"
