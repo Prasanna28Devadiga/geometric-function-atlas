@@ -80,7 +80,27 @@ Malformed expressions, wrong direction, missing evidence, source/hash
 mismatch, and resource exhaustion fail closed; only all required replay steps
 passing yields `certified: true`. A candidate that parses but differs from the
 reviewed exact expression is reported as `candidate_mismatch`, not as a new
-radius.
+radius. An unchanged snapshot row outside the eight reviewed lanes has no
+bundled certificate and is reported as `not_replayable` with the `unsupported`
+failure state while keeping its own evidence status; `corrupt_artifact` is
+reserved for malformed records and for any record that is not its unchanged
+trusted snapshot row, including a reviewed lane whose bundled certificate was
+removed.
+
+The directed-radius atlas is a view of that immutable snapshot, not a new
+radius computation. Its source rows and target columns are ordered explicitly;
+the diagonal, missing directed pairs, evidence status, and availability of a
+local replay certificate remain distinct. A colored cell therefore never
+turns a snapshot value into a proof or implies the reverse direction.
+
+## Collaborator bundles
+
+A collaborator-bundle manifest is integrity provenance, not theorem evidence.
+It identifies the package/source version, replay entry point and parameters,
+and exact artifact bytes by SHA-256. Verification never imports or executes the
+entry point, and a verified manifest does not promote screens, enclosures, or
+unresolved results. Each bundled artifact retains its own assumptions,
+evidence status, references, and novelty boundary.
 
 ## Migration from the research artifact
 

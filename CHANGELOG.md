@@ -4,13 +4,52 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
+## 0.4.0 — 2026-09-16
+
 ### Added
 
+- Caller-defined exact `Generator` objects now flow through class
+  admissibility, membership, containment, exact extremal coefficients, and all
+  plot writers. Exported records and plot metadata use a collision-safe
+  `user:<key>:<SHA-256 of exact formula>` identity while preserving the full
+  formula and caller citation; built-in identities are unchanged. The new
+  `custom_class.py` workflow demonstrates the complete path at exact
+  starlikeness order `1/4`.
+- Deterministic collaborator-bundle manifests record the package/source
+  identity, entry point, canonical parameters, artifact sizes, and SHA-256
+  digests. Verification is fail-closed for traversal, symlink, size, count,
+  missing-file, and mutation errors and never executes the recorded entry
+  point or upgrades a mathematical claim.
+- A directed-radius atlas workflow exports all 28 classes, the 702 stored
+  records, every absent directed pair, evidence labels, and local replayability
+  as deterministic JSON and SVG. The fixed thirty-recipe research catalogue
+  distinguishes replayable routes from explicitly bounded new-engine
+  ABSTAINs.
 - Source-linked research workflows with exact coefficients, explanatory SVGs,
   and changed-input examples, including a recent fifth-coefficient bound audit.
+- Named-generator plots select their object explicitly: `phi` (the generator,
+  constant term 1), `z*phi` (the normalized truncation, the legacy default), or
+  `f_phi` (the canonical Ma–Minda extremal `z exp(int_0^z (phi-1)/t dt)`,
+  computed exactly via `class_extremal_coefficients`). Python writers accept
+  `object=`, the CLI accepts `--object`, and result metadata plus SVG/TikZ
+  labels name the selected object and its truncation. `--coefficients` still
+  means a normalized polynomial, reports `normalized_polynomial` in result
+  metadata, and is rejected together with `--object`.
 
 ### Fixed
 
+- `class_extremal_coefficients` (and `gfa extremal-coefficients`) no longer
+  coerces exact algebraic or transcendental coefficients through `Rational`
+  and no longer fails for `limacon_0.707`, `parabolic`, and `rational_kr`; all
+  39 catalog generators return exact, float-free coefficients at order 4.
+- Radius certificate replay separates unavailability from damage: an unchanged
+  snapshot row without a bundled replay certificate is `not_replayable` with
+  the `unsupported` failure state (exit code 3) and keeps its own evidence
+  status, while `corrupt_artifact` (exit code 6) is reserved for malformed
+  records and for any record that is not its unchanged trusted snapshot row,
+  including a certificate removed from a reviewed lane. Ordinary CLI mode now
+  prints one concise explanation plus a `--json` pointer instead of exiting
+  silently.
 - Schur reconstruction now includes the accepted fifth parameter and expands
   the rational Schwarz function to the requested member order. Previously a
   four-coefficient hand expansion silently omitted the fifth parameter and

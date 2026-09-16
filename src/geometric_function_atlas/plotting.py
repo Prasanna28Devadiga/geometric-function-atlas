@@ -1,4 +1,11 @@
-"""Dependency-free conformal-grid plots for normalized analytic functions."""
+"""Dependency-free sampled plots of finite Taylor polynomials.
+
+Named generators can be displayed as the generator ``phi`` itself, as the
+normalized truncation ``z*phi``, or as the canonical Ma-Minda extremal
+``f_phi``; supplied coefficients are a normalized polynomial. Every output is
+a sampled finite-truncation visualization, never a proof of the full image
+domain.
+"""
 
 from __future__ import annotations
 
@@ -12,11 +19,41 @@ from itertools import pairwise
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from .catalog import get_generator
+import sympy as sp
+
+from .catalog import generator_identity, get_generator
+from .classes import class_extremal_coefficients
 from .coefficients import taylor_coefficients
+from .models import Generator
 
 PLOT_KINDS: tuple[str, ...] = ("domain", "coefficients", "real-part", "phase")
+PLOT_OBJECTS: tuple[str, ...] = ("phi", "z*phi", "f_phi")
 _DISK_RMAX = 0.98
+
+
+def resolve_plot_object(value: str | None) -> str:
+    """Return the canonical plot-object selector; ``None`` means ``z*phi``.
+
+    The selector names which function a *named generator* plot displays:
+
+    ``phi``
+        the generator itself, ``phi(z) = 1 + B_1*z + B_2*z^2 + ...``;
+    ``z*phi``
+        the normalized truncation ``z*phi(z)`` (the legacy default);
+    ``f_phi``
+        the canonical Ma-Minda extremal
+        ``f_phi(z) = z*exp(integral_0^z (phi(t) - 1)/t dt)``.
+
+    Unknown values are rejected instead of being silently reinterpreted.
+    """
+
+    if value is None:
+        return "z*phi"
+    if value not in PLOT_OBJECTS:
+        raise ValueError(
+            f"unknown plot object {value!r}; must be one of: {', '.join(PLOT_OBJECTS)}"
+        )
+    return value
 
 
 @dataclass(frozen=True)
@@ -29,15 +66,32 @@ class ConformalGrid:
 
 @dataclass(frozen=True)
 class DomainPlotResult:
-    """Metadata for a generated standalone SVG domain plot."""
+    """Metadata for a generated standalone SVG domain plot.
+
+    ``coefficients`` holds the finite Taylor coefficients of the plotted
+    object above its linear term (``z^2``, ``z^3``, ...); ``constant`` and
+    ``linear`` hold the degree-0 and degree-1 coefficients.  ``object`` is the
+    named-generator selector (``phi``, ``z*phi``, or ``f_phi``), or
+    ``normalized_polynomial`` for supplied coefficients (constant 0, linear
+    1), which cannot carry a generator selector.
+
+    ``generator`` is the catalog key for a built-in definition. For a
+    caller-supplied :class:`Generator`, it is the collision-safe identity
+    ``user:<key>:<sha256>`` rather than the caller's potentially colliding key.
+    """
 
     output: Path
     generator: str | None
     coefficients: tuple[float, ...]
     approximation: str
+    object: str = "z*phi"
+    constant: float = 0.0
+    linear: float = 1.0
 
 
-def generator_function_coefficients(generator: str, *, order: int) -> tuple[float, ...]:
+def generator_function_coefficients(
+    generator: str | Generator, *, order: int
+) -> tuple[float, ...]:
     """Return coefficients of the truncation ``f(z)=z*phi(z)``.
 
     The returned tuple is ``(a2, a3, ...)``.  This is a visual approximation,
@@ -47,10 +101,153 @@ def generator_function_coefficients(generator: str, *, order: int) -> tuple[floa
     return tuple(float(value) for value in taylor_coefficients(generator, order=order))
 
 
-def _evaluate_normalized_polynomial(
-    coefficients: tuple[float, ...], z: complex
+def plot_object_coefficients(
+    generator: str | Generator,
+    *,
+    object: str | None = None,
+    order: int = 12,
+) -> tuple[sp.Expr, ...]:
+    """Exact coefficients of the selected plot object's Taylor truncation.
+
+    The tuple starts at degree 0 so the finite polynomial is fully
+    represented: ``phi`` gives ``(1, B_1, ..., B_order)``; ``z*phi`` gives
+    ``(0, 1, B_1, ..., B_order)``; ``f_phi`` gives
+    ``(0, 1, a_2, ..., a_{order+1})`` for the canonical Ma-Minda extremal
+    ``f_phi(z) = z*exp(integral_0^z (phi(t) - 1)/t dt)``.
+
+    Coefficients stay exact (rational, algebraic, or transcendental) and are
+    only converted to floats at the plotting boundary.
+    """
+
+    key = resolve_plot_object(object)
+    if key == "phi":
+        return (sp.Integer(1),) + tuple(taylor_coefficients(generator, order=order))
+    if key == "z*phi":
+        return (sp.Integer(0), sp.Integer(1)) + tuple(
+            taylor_coefficients(generator, order=order)
+        )
+    return (sp.Integer(0), sp.Integer(1)) + tuple(
+        class_extremal_coefficients(generator, order=order)
+    )
+
+
+@dataclass(frozen=True)
+class _PlotObjectModel:
+    """Resolved finite-Taylor model of one selected plot object."""
+
+    object: str
+    constant: float
+    linear: float
+    higher: tuple[float, ...]
+    approximation: str
+    object_phrase: str
+    ratio_symbol: str
+    phase_symbol: str
+    bar_symbol: str
+    bar_start: int
+    bar_values: tuple[float, ...]
+
+
+def _plot_object_model(
+    generator: str | Generator, object: str | None, *, order: int
+) -> _PlotObjectModel:
+    """Build the float model of ``generator`` plotted as the selected object."""
+
+    key = resolve_plot_object(object)
+    if key == "phi":
+        exact = taylor_coefficients(generator, order=order)
+        linear = float(exact[0])
+        higher = tuple(float(value) for value in exact[1:])
+        return _PlotObjectModel(
+            object=key,
+            constant=1.0,
+            linear=linear,
+            higher=higher,
+            approximation=f"phi(z) = 1 + B_1*z + B_2*z^2 + ..., Taylor order {order}",
+            object_phrase="generator phi",
+            ratio_symbol="phi'(z) / phi(z)",
+            phase_symbol="phi(z)",
+            bar_symbol="B_n",
+            bar_start=1,
+            bar_values=(linear, *higher),
+        )
+    if key == "z*phi":
+        higher = generator_function_coefficients(generator, order=order)
+        return _PlotObjectModel(
+            object=key,
+            constant=0.0,
+            linear=1.0,
+            higher=higher,
+            approximation=f"f(z) = z*phi(z), Taylor order {order}",
+            object_phrase="",
+            ratio_symbol="f'(z) / f(z)",
+            phase_symbol="f(z)",
+            bar_symbol="a_n",
+            bar_start=2,
+            bar_values=higher,
+        )
+    higher = tuple(
+        float(value) for value in class_extremal_coefficients(generator, order=order)
+    )
+    return _PlotObjectModel(
+        object=key,
+        constant=0.0,
+        linear=1.0,
+        higher=higher,
+        approximation=(
+            "f_phi(z) = z*exp(integral_0^z (phi(t)-1)/t dt), "
+            f"Taylor order {order}"
+        ),
+        object_phrase="canonical extremal f_phi",
+        ratio_symbol="f'(z) / f(z)",
+        phase_symbol="f(z)",
+        bar_symbol="a_n",
+        bar_start=2,
+        bar_values=higher,
+    )
+
+
+def _supplied_coefficients_model(
+    coefficients: tuple[float, ...],
+) -> _PlotObjectModel:
+    """Model supplied coefficients as an arbitrary normalized polynomial."""
+
+    values = tuple(coefficients)
+    return _PlotObjectModel(
+        object="normalized_polynomial",
+        constant=0.0,
+        linear=1.0,
+        higher=values,
+        approximation="f(z) = z + a2*z^2 + ... (supplied finite polynomial)",
+        object_phrase="",
+        ratio_symbol="f'(z) / f(z)",
+        phase_symbol="f(z)",
+        bar_symbol="a_n",
+        bar_start=2,
+        bar_values=values,
+    )
+
+
+def _compose_title(
+    owner: str, model: _PlotObjectModel, label: str, *, separator: str = " "
+) -> str:
+    """Name the plotted object in a title; the legacy ``z*phi`` stays unprefixed."""
+
+    if not model.object_phrase:
+        return f"{owner}: {label}"
+    return f"{owner}: {model.object_phrase}{separator}{label}"
+
+
+def _evaluate_polynomial(
+    coefficients: tuple[float, ...],
+    z: complex,
+    *,
+    constant: float = 0.0,
+    linear: float = 1.0,
 ) -> complex:
-    value = z
+    """Evaluate ``constant + linear*z + c_2 z^2 + ...`` at ``z``."""
+
+    value = complex(constant) + complex(linear) * z
     power = z
     for coefficient in coefficients:
         power *= z
@@ -59,12 +256,17 @@ def _evaluate_normalized_polynomial(
 
 
 def _curve(
-    coefficients: tuple[float, ...], points: tuple[complex, ...]
+    coefficients: tuple[float, ...],
+    points: tuple[complex, ...],
+    *,
+    constant: float = 0.0,
+    linear: float = 1.0,
 ) -> tuple[tuple[float, float], ...]:
     return tuple(
         (float(value.real), float(value.imag))
         for value in (
-            _evaluate_normalized_polynomial(coefficients, point) for point in points
+            _evaluate_polynomial(coefficients, point, constant=constant, linear=linear)
+            for point in points
         )
     )
 
@@ -72,12 +274,21 @@ def _curve(
 def conformal_grid(
     coefficients: tuple[float, ...],
     *,
+    constant: float = 0.0,
+    linear: float = 1.0,
     rmax: float = 0.98,
     rings: int = 5,
     spokes: int = 12,
     samples: int = 480,
 ) -> ConformalGrid:
-    """Sample the conformal grid used by the Atlas website's domain figures."""
+    """Sample the conformal grid used by the Atlas website's domain figures.
+
+    ``coefficients`` holds the coefficients of ``z^2, z^3, ...``; ``constant``
+    and ``linear`` supply the degree-0 and degree-1 terms, so the sampled
+    polynomial is ``constant + linear*z + c_2*z^2 + ...``.  The default
+    ``constant=0, linear=1`` is the normalized polynomial used by the legacy
+    ``z*phi`` plots.
+    """
 
     if not 0 < rmax < 1:
         raise ValueError("rmax must lie inside the open unit disk: 0 < rmax < 1")
@@ -89,6 +300,8 @@ def conformal_grid(
         raise ValueError("samples must be between 24 and 4096")
     if len(coefficients) > 64:
         raise ValueError("at most 64 supplied coefficients are supported")
+    if not math.isfinite(constant) or not math.isfinite(linear):
+        raise ValueError("constant and linear coefficients must be finite real numbers")
     if not all(math.isfinite(value) for value in coefficients):
         raise ValueError("coefficients must be finite real numbers")
 
@@ -99,7 +312,9 @@ def conformal_grid(
             radius * complex(math.cos(theta), math.sin(theta))
             for theta in (2 * math.pi * step / samples for step in range(samples + 1))
         )
-        ring_curves.append(_curve(coefficients, points))
+        ring_curves.append(
+            _curve(coefficients, points, constant=constant, linear=linear)
+        )
 
     spoke_curves = []
     spoke_samples = max(24, samples // 4)
@@ -110,7 +325,9 @@ def conformal_grid(
             rmax * step / spoke_samples * direction
             for step in range(spoke_samples + 1)
         )
-        spoke_curves.append(_curve(coefficients, points))
+        spoke_curves.append(
+            _curve(coefficients, points, constant=constant, linear=linear)
+        )
 
     return ConformalGrid(rings=tuple(ring_curves), spokes=tuple(spoke_curves))
 
@@ -131,44 +348,81 @@ def _svg_path(
     )
 
 
+def _resolve_plot_inputs(
+    generator: str | Generator | None,
+    coefficients: tuple[float, ...] | None,
+    order: int,
+    *,
+    object: str | None = None,
+) -> tuple[_PlotObjectModel, str, str | None]:
+    """Resolve a generator/coefficients choice into (model, owner, key).
+
+    ``owner`` is the human title owner (the catalog class name, or
+    ``"Normalized polynomial"`` for supplied coefficients).  An explicit
+    ``object`` selects what a named generator plots and is rejected together
+    with supplied coefficients, which already are a normalized polynomial.
+    """
+
+    resolve_plot_object(object)
+    if generator is None and coefficients is None:
+        raise ValueError(
+            "the object selector requires a named generator"
+            if object is not None
+            else "provide exactly one of generator or coefficients"
+        )
+    if generator is not None and coefficients is not None:
+        raise ValueError("provide exactly one of generator or coefficients")
+    if generator is None:
+        if object is not None:
+            raise ValueError(
+                "the object selector applies to a named generator; supplied "
+                "coefficients already are a normalized polynomial"
+            )
+        return _supplied_coefficients_model(coefficients or ()), "Normalized polynomial", None
+    definition = generator if isinstance(generator, Generator) else get_generator(generator)
+    return (
+        _plot_object_model(definition, object, order=order),
+        definition.name,
+        generator_identity(definition),
+    )
+
+
 def write_domain_plot(
     output: str | Path,
     *,
-    generator: str | None = None,
+    generator: str | Generator | None = None,
     coefficients: tuple[float, ...] | None = None,
     order: int = 12,
     rmax: float = 0.98,
     rings: int = 5,
     spokes: int = 12,
     samples: int = 480,
+    object: str | None = None,
 ) -> DomainPlotResult:
-    """Write a standalone SVG plot of ``f(D_rmax)``.
+    """Write a standalone SVG plot of the selected object's sampled image.
 
     Exactly one of ``generator`` and ``coefficients`` is required.  Named
-    generators plot the Taylor truncation of ``f(z)=z*phi(z)``.  Supplied
-    coefficients represent ``f(z)=z+a2*z^2+a3*z^3+...`` directly.
+    generators plot the finite Taylor polynomial of the selected ``object``:
+    the generator ``phi`` (constant term 1), the normalized truncation
+    ``z*phi`` (the legacy default), or the canonical Ma-Minda extremal
+    ``f_phi``.  Supplied coefficients represent the normalized polynomial
+    ``f(z)=z+a2*z^2+a3*z^3+...`` directly and must not be combined with
+    ``object``.
     """
 
     path = Path(output)
     if path.suffix.lower() != ".svg":
         raise ValueError("output must have the .svg extension")
-    if (generator is None) == (coefficients is None):
-        raise ValueError("provide exactly one of generator or coefficients")
-
-    if generator is not None:
-        definition = get_generator(generator)
-        plot_coefficients = generator_function_coefficients(generator, order=order)
-        title = f"{definition.name}: image of the disk"
-        approximation = f"f(z) = z*phi(z), Taylor order {order}"
-        generator_key: str | None = definition.key
-    else:
-        plot_coefficients = tuple(coefficients or ())
-        title = "Normalized polynomial: image of the disk"
-        approximation = "f(z) = z + a2*z^2 + ... (supplied finite polynomial)"
-        generator_key = None
+    model, owner, generator_key = _resolve_plot_inputs(
+        generator, coefficients, order, object=object
+    )
+    title = _compose_title(owner, model, "image of the disk", separator=", ")
+    approximation = model.approximation
 
     grid = conformal_grid(
-        plot_coefficients,
+        model.higher,
+        constant=model.constant,
+        linear=model.linear,
         rmax=rmax,
         rings=rings,
         spokes=spokes,
@@ -219,7 +473,7 @@ def write_domain_plot(
             f'  <text class="subtitle" x="42" y="64">{escape(subtitle)}</text>',
             spoke_paths,
             *ring_paths,
-            f'  <circle class="origin" cx="{map_x(0):.3f}" cy="{map_y(0):.3f}" r="3.2"/>',
+            f'  <circle class="origin" cx="{map_x(model.constant):.3f}" cy="{map_y(0):.3f}" r="3.2"/>',
             "</svg>",
             "",
         ]
@@ -229,39 +483,42 @@ def write_domain_plot(
     return DomainPlotResult(
         output=path,
         generator=generator_key,
-        coefficients=plot_coefficients,
+        coefficients=model.higher,
         approximation=approximation,
+        object=model.object,
+        constant=model.constant,
+        linear=model.linear,
     )
 
 
 def _domain_plot_inputs(
     *,
-    generator: str | None,
+    generator: str | Generator | None,
     coefficients: tuple[float, ...] | None,
     order: int,
+    object: str | None,
     rmax: float,
     rings: int,
     spokes: int,
     samples: int,
-) -> tuple[ConformalGrid, tuple[float, ...], str | None, str]:
+) -> tuple[ConformalGrid, _PlotObjectModel, str | None]:
     """Resolve shared domain-export inputs and geometry once."""
 
-    if (generator is None) == (coefficients is None):
-        raise ValueError("provide exactly one of generator or coefficients")
-    if generator is not None:
-        definition = get_generator(generator)
-        values = generator_function_coefficients(generator, order=order)
-        generator_key = definition.key
-        approximation = f"f(z) = z*phi(z), Taylor order {order}"
-    else:
-        values = tuple(coefficients or ())
-        generator_key = None
-        approximation = "f(z) = z + a2*z^2 + ... (supplied finite polynomial)"
+    model, _owner, generator_key = _resolve_plot_inputs(
+        generator, coefficients, order, object=object
+    )
     return (
-        conformal_grid(values, rmax=rmax, rings=rings, spokes=spokes, samples=samples),
-        values,
+        conformal_grid(
+            model.higher,
+            constant=model.constant,
+            linear=model.linear,
+            rmax=rmax,
+            rings=rings,
+            spokes=spokes,
+            samples=samples,
+        ),
+        model,
         generator_key,
-        approximation,
     )
 
 
@@ -279,21 +536,27 @@ def _domain_bounds(grid: ConformalGrid) -> tuple[float, float, float, float]:
 def write_tikz_plot(
     output: str | Path,
     *,
-    generator: str | None = None,
+    generator: str | Generator | None = None,
     coefficients: tuple[float, ...] | None = None,
     order: int = 12,
     rmax: float = _DISK_RMAX,
     rings: int = 5,
     spokes: int = 12,
     samples: int = 480,
+    object: str | None = None,
 ) -> DomainPlotResult:
-    """Write the website-compatible standalone TikZ conformal-grid export."""
+    """Write the website-compatible standalone TikZ conformal-grid export.
+
+    A non-default object adds an explicit ``% object: ...`` comment naming the
+    selected object and its truncation, and marks the image of ``z=0`` with
+    the correct value; the legacy ``z*phi`` export keeps its original bytes.
+    """
 
     path = Path(output)
     if path.suffix.lower() not in {".tikz", ".tex"}:
         raise ValueError("output must have the .tikz or .tex extension")
-    grid, values, generator_key, approximation = _domain_plot_inputs(
-        generator=generator, coefficients=coefficients, order=order,
+    grid, model, generator_key = _domain_plot_inputs(
+        generator=generator, coefficients=coefficients, order=order, object=object,
         rmax=rmax, rings=rings, spokes=spokes, samples=samples,
     )
     xmin, xmax, ymin, ymax = _domain_bounds(grid)
@@ -308,15 +571,34 @@ def write_tikz_plot(
         "\\begin{tikzpicture}",
         "  % conformal grid: image of the disk under the displayed polynomial",
     ]
+    if model.object_phrase:
+        lines.append(f"  % object: {model.object}; {model.approximation}")
     for curve in grid.spokes:
         lines.append("  \\draw[gray!40] plot coordinates {" + " ".join(map(point, curve)) + "};")
     for index, curve in enumerate(grid.rings):
         color = "blue!70!black" if index == len(grid.rings) - 1 else "gray!40"
         lines.append(f"  \\draw[{color}] plot coordinates {{" + " ".join(map(point, curve)) + "};")
-    lines.extend(("  \\fill (0,0) circle (1.2pt);  % f(0)=0", "\\end{tikzpicture}", ""))
+    origin_point = (
+        "(0,0)" if model.constant == 0 else point((model.constant, 0.0))
+    )
+    if model.object == "phi":
+        origin_note = (
+            f"  \\fill {origin_point} circle (1.2pt);  % phi(0)={model.constant:g}"
+        )
+    else:
+        origin_note = f"  \\fill {origin_point} circle (1.2pt);  % f(0)=0"
+    lines.extend((origin_note, "\\end{tikzpicture}", ""))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines), encoding="utf-8")
-    return DomainPlotResult(path, generator_key, values, approximation)
+    return DomainPlotResult(
+        output=path,
+        generator=generator_key,
+        coefficients=model.higher,
+        approximation=model.approximation,
+        object=model.object,
+        constant=model.constant,
+        linear=model.linear,
+    )
 
 
 def _png_chunk(kind: bytes, payload: bytes) -> bytes:
@@ -341,7 +623,7 @@ def _write_rgb_png(path: Path, width: int, height: int, pixels: bytearray) -> No
 def write_png_plot(
     output: str | Path,
     *,
-    generator: str | None = None,
+    generator: str | Generator | None = None,
     coefficients: tuple[float, ...] | None = None,
     order: int = 12,
     rmax: float = _DISK_RMAX,
@@ -350,8 +632,9 @@ def write_png_plot(
     samples: int = 480,
     width: int = 900,
     height: int = 700,
+    object: str | None = None,
 ) -> DomainPlotResult:
-    """Write a dependency-free PNG conformal-grid export."""
+    """Write a dependency-free PNG conformal-grid export of the selected object."""
 
     path = Path(output)
     if path.suffix.lower() != ".png":
@@ -362,8 +645,8 @@ def write_png_plot(
         or not 16 <= width <= 4096 or not 16 <= height <= 4096
     ):
         raise ValueError("width and height must be integers between 16 and 4096")
-    grid, values, generator_key, approximation = _domain_plot_inputs(
-        generator=generator, coefficients=coefficients, order=order,
+    grid, model, generator_key = _domain_plot_inputs(
+        generator=generator, coefficients=coefficients, order=order, object=object,
         rmax=rmax, rings=rings, spokes=spokes, samples=samples,
     )
     xmin, xmax, ymin, ymax = _domain_bounds(grid)
@@ -393,7 +676,7 @@ def write_png_plot(
         color = (38, 93, 143) if index == len(grid.rings) - 1 else (216, 211, 202)
         for start, end in pairwise(curve):
             draw_line(pixel(start), pixel(end), color)
-    origin = pixel((0.0, 0.0))
+    origin = pixel((model.constant, 0.0))
     for dx in range(-2, 3):
         for dy in range(-2, 3):
             if 0 <= origin[0] + dx < width and 0 <= origin[1] + dy < height:
@@ -401,47 +684,44 @@ def write_png_plot(
                 pixels[offset:offset + 3] = bytes((31, 41, 51))
     path.parent.mkdir(parents=True, exist_ok=True)
     _write_rgb_png(path, width, height, pixels)
-    return DomainPlotResult(path, generator_key, values, approximation)
+    return DomainPlotResult(
+        output=path,
+        generator=generator_key,
+        coefficients=model.higher,
+        approximation=model.approximation,
+        object=model.object,
+        constant=model.constant,
+        linear=model.linear,
+    )
 
 
 @dataclass(frozen=True)
 class PlotResult:
-    """Metadata for a generated SVG plot of any supported kind."""
+    """Metadata for a generated SVG plot of any supported kind.
+
+    ``coefficients`` holds the finite Taylor coefficients of the plotted
+    object above its linear term (``z^2``, ``z^3``, ...); ``constant`` and
+    ``linear`` hold the degree-0 and degree-1 coefficients.  ``object`` is the
+    named-generator selector (``phi``, ``z*phi``, or ``f_phi``), or
+    ``normalized_polynomial`` for supplied coefficients.
+    """
 
     output: Path
     kind: str
     generator: str | None
     coefficients: tuple[float, ...]
     approximation: str
+    object: str = "z*phi"
+    constant: float = 0.0
+    linear: float = 1.0
 
 
-def _resolve_plot_inputs(
-    generator: str | None,
-    coefficients: tuple[float, ...] | None,
-    order: int,
-    *,
-    label: str,
-) -> tuple[tuple[float, ...], str, str | None, str]:
-    """Resolve generator/coefficients into (coefficients, title, generator key, approximation)."""
+def _polynomial_derivative_value(
+    coefficients: tuple[float, ...], z: complex, *, linear: float = 1.0
+) -> complex:
+    """``f'(z)`` for ``f(z) = constant + linear*z + sum a_n z^n``."""
 
-    if (generator is None) == (coefficients is None):
-        raise ValueError("provide exactly one of generator or coefficients")
-    if generator is not None:
-        definition = get_generator(generator)
-        plot_coefficients = generator_function_coefficients(generator, order=order)
-        title = f"{definition.name}: {label}"
-        approximation = f"f(z) = z*phi(z), Taylor order {order}"
-        return plot_coefficients, title, definition.key, approximation
-    values = tuple(coefficients or ())
-    return values, f"Normalized polynomial: {label}", None, (
-        "f(z) = z + a2*z^2 + ... (supplied finite polynomial)"
-    )
-
-
-def _polynomial_derivative_value(coefficients: tuple[float, ...], z: complex) -> complex:
-    """``f'(z)`` for ``f(z) = z + sum a_n z^n``."""
-
-    value = 1.0 + 0.0j
+    value = complex(linear)
     power = 1.0 + 0.0j
     for degree, coefficient in enumerate(coefficients, start=2):
         power *= z
@@ -452,19 +732,28 @@ def _polynomial_derivative_value(coefficients: tuple[float, ...], z: complex) ->
 def write_coefficient_plot(
     output: str | Path,
     *,
-    generator: str | None = None,
+    generator: str | Generator | None = None,
     coefficients: tuple[float, ...] | None = None,
     order: int = 12,
+    object: str | None = None,
 ) -> PlotResult:
-    """Write an SVG bar chart of the coefficient magnitudes ``|a_n|``."""
+    """Write an SVG bar chart of the selected object's coefficient magnitudes.
+
+    For ``phi`` the bars are ``|B_1|, ..., |B_order|`` (the constant term is
+    not a bar); for ``z*phi`` and ``f_phi`` they are the normalized
+    ``|a_2|, ..., |a_{order+1}|``.  Supplied coefficients are the normalized
+    polynomial directly and must not be combined with ``object``.
+    """
 
     path = Path(output)
     if path.suffix.lower() != ".svg":
         raise ValueError("output must have the .svg extension")
-    values, title, generator_key, approximation = _resolve_plot_inputs(
-        generator, coefficients, order, label="Taylor coefficients"
+    model, owner, generator_key = _resolve_plot_inputs(
+        generator, coefficients, order, object=object
     )
-    magnitudes = [abs(float(value)) for value in values]
+    title = _compose_title(owner, model, "Taylor coefficients")
+    approximation = model.approximation
+    magnitudes = [abs(float(value)) for value in model.bar_values]
     maximum = max(magnitudes) if magnitudes else 1.0
     width, height, pad_left, pad_bottom = 900, 460, 90, 70
     pad_top = 88
@@ -485,13 +774,17 @@ def write_coefficient_plot(
         label_x = pad_left + index * slot + slot / 2
         bars.append(
             f'  <text class="tick" x="{label_x:.2f}" y="{pad_top + plot_height + 24:.2f}" '
-            f'text-anchor="middle">{index + 2}</text>'
+            f'text-anchor="middle">{index + model.bar_start}</text>'
         )
         bars.append(
             f'  <text class="value" x="{label_x:.2f}" y="{max(y - 6, 14):.2f}" '
             f'text-anchor="middle">{magnitude:g}</text>'
         )
-    subtitle = f"{approximation}; bars show |a_n| for n = 2..{len(values) + 1}"
+    last_degree = model.bar_start + len(model.bar_values) - 1
+    subtitle = (
+        f"{approximation}; bars show |{model.bar_symbol}| for n = "
+        f"{model.bar_start}..{last_degree}"
+    )
     svg = "\n".join(
         [
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">',
@@ -513,8 +806,11 @@ def write_coefficient_plot(
         output=path,
         kind="coefficients",
         generator=generator_key,
-        coefficients=values,
+        coefficients=model.higher,
         approximation=approximation,
+        object=model.object,
+        constant=model.constant,
+        linear=model.linear,
     )
 
 
@@ -560,16 +856,19 @@ def _disk_cells(
 def write_real_part_plot(
     output: str | Path,
     *,
-    generator: str | None = None,
+    generator: str | Generator | None = None,
     coefficients: tuple[float, ...] | None = None,
     order: int = 12,
     grid: int = 64,
     rmax: float = _DISK_RMAX,
+    object: str | None = None,
 ) -> PlotResult:
-    """Write an SVG heatmap of ``Re(z f'(z)/f(z))`` on the sampled disk.
+    """Write an SVG heatmap of ``Re(z f'(z)/f(z))`` for the selected object.
 
     A numerical screen: sampled visualization, never a proof of the full
-    starlikeness domain.
+    starlikeness domain.  For the generator ``phi`` the plotted quotient is
+    ``z*phi'(z)/phi(z)``; it is not a starlikeness screen for normalized
+    functions.
     """
 
     path = Path(output)
@@ -577,9 +876,11 @@ def write_real_part_plot(
         raise ValueError("output must have the .svg extension")
     if isinstance(grid, bool) or not isinstance(grid, int) or not 16 <= grid <= 256:
         raise ValueError("grid must be an integer between 16 and 256")
-    values, title, generator_key, approximation = _resolve_plot_inputs(
-        generator, coefficients, order, label="Re(z f'(z) / f(z)) heatmap"
+    model, owner, generator_key = _resolve_plot_inputs(
+        generator, coefficients, order, object=object
     )
+    title = _compose_title(owner, model, f"Re(z {model.ratio_symbol}) heatmap")
+    approximation = model.approximation
     width, height, pad = 900, 860, 40
     pad_top = 88
     plot_size = height - pad_top - pad
@@ -588,8 +889,10 @@ def write_real_part_plot(
     cell = plot_size / grid
     cells: list[str] = []
     for column, row, z in _disk_cells(grid, rmax=rmax):
-        f_value = _evaluate_normalized_polynomial(values, z)
-        fp_value = _polynomial_derivative_value(values, z)
+        f_value = _evaluate_polynomial(
+            model.higher, z, constant=model.constant, linear=model.linear
+        )
+        fp_value = _polynomial_derivative_value(model.higher, z, linear=model.linear)
         if abs(f_value) < 1e-300 or not math.isfinite(fp_value.real):
             continue
         quantity = (z * fp_value / f_value).real
@@ -600,7 +903,7 @@ def write_real_part_plot(
             f'fill="{_diverging_color(float(quantity))}"/>'
         )
     subtitle = (
-        f"{approximation}; sampled Re(z f'(z) / f(z)) on |z| <= {rmax:g} "
+        f"{approximation}; sampled Re(z {model.ratio_symbol}) on |z| <= {rmax:g} "
         "(red = negative, blue = positive). Numerical screen, not a proof."
     )
     svg = "\n".join(
@@ -624,21 +927,25 @@ def write_real_part_plot(
         output=path,
         kind="real-part",
         generator=generator_key,
-        coefficients=values,
+        coefficients=model.higher,
         approximation=approximation,
+        object=model.object,
+        constant=model.constant,
+        linear=model.linear,
     )
 
 
 def write_phase_plot(
     output: str | Path,
     *,
-    generator: str | None = None,
+    generator: str | Generator | None = None,
     coefficients: tuple[float, ...] | None = None,
     order: int = 12,
     grid: int = 64,
     rmax: float = _DISK_RMAX,
+    object: str | None = None,
 ) -> PlotResult:
-    """Write an SVG phase portrait of the finite Taylor polynomial.
+    """Write an SVG phase portrait of the selected object's Taylor polynomial.
 
     Empirical visualization: hue encodes ``arg f(z)`` on the sampled disk.
     """
@@ -648,9 +955,11 @@ def write_phase_plot(
         raise ValueError("output must have the .svg extension")
     if isinstance(grid, bool) or not isinstance(grid, int) or not 16 <= grid <= 256:
         raise ValueError("grid must be an integer between 16 and 256")
-    values, title, generator_key, approximation = _resolve_plot_inputs(
-        generator, coefficients, order, label="phase portrait"
+    model, owner, generator_key = _resolve_plot_inputs(
+        generator, coefficients, order, object=object
     )
+    title = _compose_title(owner, model, "phase portrait")
+    approximation = model.approximation
     width, height, pad = 900, 860, 40
     pad_top = 88
     plot_size = height - pad_top - pad
@@ -659,7 +968,9 @@ def write_phase_plot(
     cell = plot_size / grid
     cells: list[str] = []
     for column, row, z in _disk_cells(grid, rmax=rmax):
-        f_value = _evaluate_normalized_polynomial(values, z)
+        f_value = _evaluate_polynomial(
+            model.higher, z, constant=model.constant, linear=model.linear
+        )
         if abs(f_value) < 1e-300:
             continue
         phase = math.atan2(f_value.imag, f_value.real)
@@ -670,7 +981,7 @@ def write_phase_plot(
             f'fill="{_phase_color(float(phase))}"/>'
         )
     subtitle = (
-        f"{approximation}; hue = arg f(z) on |z| <= {rmax:g}. "
+        f"{approximation}; hue = arg {model.phase_symbol} on |z| <= {rmax:g}. "
         "Empirical visualization, not a proof."
     )
     svg = "\n".join(
@@ -694,8 +1005,11 @@ def write_phase_plot(
         output=path,
         kind="phase",
         generator=generator_key,
-        coefficients=values,
+        coefficients=model.higher,
         approximation=approximation,
+        object=model.object,
+        constant=model.constant,
+        linear=model.linear,
     )
 
 
@@ -703,7 +1017,7 @@ def write_plot(
     kind: str,
     output: str | Path,
     *,
-    generator: str | None = None,
+    generator: str | Generator | None = None,
     coefficients: tuple[float, ...] | None = None,
     order: int = 12,
     grid: int = 64,
@@ -711,11 +1025,16 @@ def write_plot(
     rings: int = 5,
     spokes: int = 12,
     samples: int = 480,
+    object: str | None = None,
 ) -> PlotResult | DomainPlotResult:
     """Write an SVG plot of the requested kind.
 
     Kinds: ``domain`` (conformal grid), ``coefficients`` (|a_n| bars),
     ``real-part`` (Re(z f'/f) heatmap), ``phase`` (phase portrait).
+
+    Named generators plot the selected ``object`` (``phi``, ``z*phi``,
+    ``f_phi``; the legacy default is ``z*phi``); supplied coefficients are
+    the normalized polynomial and reject an explicit selector.
     """
 
     if kind not in PLOT_KINDS:
@@ -736,6 +1055,7 @@ def write_plot(
             rings=rings,
             spokes=spokes,
             samples=samples,
+            object=object,
         )
     if kind == "domain":
         return write_domain_plot(
@@ -747,10 +1067,15 @@ def write_plot(
             rings=rings,
             spokes=spokes,
             samples=samples,
+            object=object,
         )
     if kind == "coefficients":
         return write_coefficient_plot(
-            output, generator=generator, coefficients=coefficients, order=order
+            output,
+            generator=generator,
+            coefficients=coefficients,
+            order=order,
+            object=object,
         )
     if kind == "real-part":
         return write_real_part_plot(
@@ -760,6 +1085,7 @@ def write_plot(
             order=order,
             grid=grid,
             rmax=rmax,
+            object=object,
         )
     return write_phase_plot(
         output,
@@ -768,6 +1094,7 @@ def write_plot(
         order=order,
         grid=grid,
         rmax=rmax,
+        object=object,
     )
 
 

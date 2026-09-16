@@ -274,6 +274,67 @@ def test_verify_radius_certificate_command_uses_fail_closed_exit_codes() -> None
     assert payload["certified"] is False
 
 
+def test_radius_recompute_reports_unavailable_replay_in_human_and_json_modes() -> None:
+    human = run_cli("radius-recompute", "exponential", "sine")
+
+    assert human.returncode == 3
+    assert human.stdout == ""
+    assert "NOT REPLAYABLE" in human.stderr
+    assert "exponential->sine" in human.stderr
+    assert "certificate" in human.stderr
+    assert "--json" in human.stderr
+
+    machine = run_cli("radius-recompute", "exponential", "sine", "--json")
+
+    assert machine.returncode == 3
+    assert machine.stderr == ""
+    payload = json.loads(machine.stdout)
+    assert payload["status"] == "not_replayable"
+    assert payload["failure_state"] == "unsupported"
+    assert payload["certified"] is False
+    assert "certificate" in payload["error"]
+
+
+def test_sibling_radius_replay_commands_match_the_unavailable_semantics() -> None:
+    for command in (
+        ("radius-audit", "exponential", "sine"),
+        ("radius-attainment", "exponential", "sine"),
+        ("verify-radius-certificate", "exponential", "sine"),
+    ):
+        human = run_cli(*command)
+
+        assert human.returncode == 3, command
+        assert human.stdout == "", command
+        assert "NOT REPLAYABLE" in human.stderr, command
+        assert "--json" in human.stderr, command
+
+        machine = run_cli(*command, "--json")
+
+        assert machine.returncode == 3, command
+        payload = json.loads(machine.stdout)
+        assert payload["status"] == "not_replayable", command
+        if command[0] == "radius-audit":
+            assert payload["evidence_status"] == "touch_proven_exact", command
+            assert payload["certificate_replay"]["failure_state"] == "unsupported", command
+        else:
+            assert payload["failure_state"] == "unsupported", command
+
+
+def test_radius_replay_cli_keeps_unavailable_mismatch_and_success_distinct() -> None:
+    mismatch = run_cli(
+        "radius-recompute", "sine", "sigmoid", "--candidate", "asinh((E-1)/(E+1))"
+    )
+
+    assert mismatch.returncode == 4
+    assert "CANDIDATE MISMATCH" in mismatch.stderr
+    assert "--json" in mismatch.stderr
+
+    proven = run_cli("radius-recompute", "sine", "sigmoid")
+
+    assert proven.returncode == 0, proven.stderr
+    assert "PROVEN: sine->sigmoid" in proven.stdout
+
+
 def test_command_aliases_match_their_canonical_commands() -> None:
     pairs = [
         (

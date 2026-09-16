@@ -8,7 +8,7 @@ import io
 import json
 import os
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from fractions import Fraction
 from typing import Any
 
@@ -39,7 +39,7 @@ from .contracts import (
 from .counterexamples import find_counterexample, verify_counterexample
 from .fekete_szego import fekete_szego
 from .lab import SPECIAL_FUNCTIONS
-from .plotting import write_plot
+from .plotting import resolve_plot_object, write_plot
 from .radii import (
     RadiusStatus,
     audit_radius,
@@ -422,6 +422,25 @@ class _CommandFailure(RuntimeError):
         super().__init__(state)
 
 
+def _report_command_failure(payload: Mapping[str, Any]) -> None:
+    """Print a concise human explanation for a structured failure payload.
+
+    Ordinary mode never dumps the JSON record: it names the operation status,
+    the direction when one is known, and the reason, then points at ``--json``
+    for the complete record. The process exit code carries the failure class.
+    """
+
+    nested = payload.get("certificate_replay")
+    detail: Mapping[str, Any] = nested if isinstance(nested, Mapping) else payload
+    status = str(detail.get("status") or detail.get("failure_state") or "failed")
+    label = status.replace("_", " ").upper()
+    direction = detail.get("direction") or payload.get("direction")
+    reason = detail.get("error") or "the operation did not produce a certified result"
+    headline = f"{label}: {direction} — {reason}" if direction else f"{label}: {reason}"
+    print(headline, file=sys.stderr)
+    print("Re-run with --json for the structured record.", file=sys.stderr)
+
+
 def _verify_radius_certificate(args: argparse.Namespace) -> None:
     result = verify_radius_certificate(
         args.source,
@@ -431,22 +450,20 @@ def _verify_radius_certificate(args: argparse.Namespace) -> None:
         max_steps=args.max_steps,
     )
     payload = result.to_dict()
-    if not args.json:
-        print(
-            f"{result.status.upper()}: {result.direction}"
-            + (f" — {result.error}" if result.error else "")
-        )
-        for step in result.steps:
-            print(f"  {'PASS' if step.verified else 'FAIL'} {step.name}")
     if result.certified:
         if args.json:
             _write(payload, as_json=True)
+        else:
+            print(f"PROVEN: {result.direction}")
+            for step in result.steps:
+                print(f"  PASS {step.name}")
         return
     state = (
         result.failure_state.value
         if result.failure_state is not None
         else FailureState.UNRESOLVED.value
     )
+    # Ordinary mode is reported once, centrally, by _report_command_failure.
     raise _CommandFailure(state, payload)
 
 
@@ -928,6 +945,14 @@ def _plot(args: argparse.Namespace) -> None:
         coefficients = tuple(
             _comma_separated_numbers(args.coefficients, label="coefficients")
         )
+    plot_object = None
+    if args.object is not None:
+        plot_object = resolve_plot_object(args.object)
+        if coefficients is not None:
+            raise InvalidInputError(
+                "the object selector applies to a named generator; supplied "
+                "--coefficients already are a normalized polynomial"
+            )
     result = write_plot(
         kind,
         args.output,
@@ -938,9 +963,11 @@ def _plot(args: argparse.Namespace) -> None:
         rmax=args.radius,
         rings=args.rings,
         spokes=args.spokes,
+        object=plot_object,
     )
     print(f"Wrote {result.output}")
     print(f"Kind: {kind}")
+    print(f"Object: {result.object}")
     print(f"Model: {result.approximation}")
     if kind == "domain":
         print("Scope: visualization of a finite Taylor polynomial; not a proof of the full image domain")
@@ -1570,6 +1597,15 @@ def _parser() -> argparse.ArgumentParser:
     )
     plot.add_argument("generator", nargs="?", help="built-in generator")
     plot.add_argument("--coefficients", help="advanced: comma-separated a2,a3,...")
+    plot.add_argument(
+        "--object",
+        metavar="OBJECT",
+        help=(
+            "named-generator plot object: phi (the generator itself), "
+            "z*phi (normalized truncation, the default; quote the * in shells), "
+            "or f_phi (canonical Ma-Minda extremal; order capped at 24)"
+        ),
+    )
     plot.add_argument("--order", type=int, default=12)
     plot.add_argument("--grid", type=int, default=64)
     plot.add_argument("--radius", type=float, default=0.98)
@@ -1994,6 +2030,8 @@ def _main(argv: Sequence[str] | None) -> int:
         if isinstance(exc, _CommandFailure):
             if getattr(args, "json", False):
                 _write(exc.payload, as_json=True)
+            else:
+                _report_command_failure(exc.payload)
             return EXIT_CODES[exc.state]
         state = _failure_state(exc)
         if getattr(args, "json", False):

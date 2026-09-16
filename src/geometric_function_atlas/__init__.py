@@ -19,6 +19,12 @@ from .artifacts import (
 from .artifacts import (
     list_classes as list_artifact_classes,
 )
+from .bundle import (
+    BUNDLE_MANIFEST_NAME,
+    BUNDLE_SCHEMA_VERSION,
+    verify_research_bundle_manifest,
+    write_research_bundle_manifest,
+)
 from .catalog import get_generator, list_generators
 from .citation import CitationBundle, citation_export, citation_formats, format_citation
 from .classes import (
@@ -65,11 +71,14 @@ from .implementation_registry import (  # noqa: F401
 from .models import Generator
 from .models import Z as z
 from .plotting import (
+    PLOT_OBJECTS,
     ConformalGrid,
     DomainPlotResult,
     PlotResult,
     conformal_grid,
     generator_function_coefficients,
+    plot_object_coefficients,
+    resolve_plot_object,
     write_coefficient_plot,
     write_domain_plot,
     write_phase_plot,
@@ -132,6 +141,9 @@ list_screen_classes = list_classes
 verify_snapshot = verify_registry_snapshot
 
 __all__ = [
+    "BUNDLE_MANIFEST_NAME",
+    "BUNDLE_SCHEMA_VERSION",
+    "PLOT_OBJECTS",
     "SNAPSHOT_SCHEMA_VERSION",
     "Application",
     "CitationBundle",
@@ -207,12 +219,14 @@ __all__ = [
     "list_screen_classes",
     "open_problems",
     "parse_exact_expression",
+    "plot_object_coefficients",
     "radius",
     "recompute_radius",
     "reconciliation",
     "references",
     "registry_snapshot_info",
     "replay_radius_certificate",
+    "resolve_plot_object",
     "snapshot_info",
     "snapshot_payload",
     "snapshot_verify",
@@ -224,11 +238,13 @@ __all__ = [
     "verify_function",
     "verify_radius_attainment",
     "verify_radius_certificate",
+    "verify_research_bundle_manifest",
     "verify_snapshot",
     "write_coefficient_plot",
     "write_domain_plot",
     "write_phase_plot",
     "write_plot",
     "write_real_part_plot",
+    "write_research_bundle_manifest",
     "z",
 ]

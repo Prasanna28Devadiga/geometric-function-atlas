@@ -73,6 +73,30 @@ def test_same_as_catalog_value_is_still_caller_supplied() -> None:
     assert generator_artifact_version(clone) == "user-supplied"
 
 
+def test_generator_identity_distinguishes_catalog_and_caller_definitions() -> None:
+    from geometric_function_atlas.catalog import generator_identity
+
+    built_in = get_generator("sine")
+    custom = Generator(
+        key="sine",
+        name="Caller sine key with a different formula",
+        expression=1 + 2 * z,
+        citation="Caller supplied",
+    )
+    clone = Generator(
+        key=custom.key,
+        name="A renamed but mathematically identical caller definition",
+        expression=custom.expression,
+        citation="Independent caller note",
+    )
+
+    assert generator_identity(built_in) == "sine"
+    assert generator_identity(custom) == generator_identity(clone)
+    assert generator_identity(custom).startswith("user:sine:")
+    assert len(generator_identity(custom).removeprefix("user:sine:")) == 64
+    assert generator_identity(custom) != generator_identity(built_in)
+
+
 def test_generator_rejects_evaluate_false_huge_integer_exponent() -> None:
     expression = sp.Add(
         1,
