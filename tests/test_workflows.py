@@ -77,10 +77,9 @@ def test_pypi_workflow_is_fail_closed_to_the_frozen_manifest() -> None:
     assert "uv sync --extra build --locked" in verify_block
     assert verify_block.count("uv run --frozen") >= 2
     assert "git ls-remote --tags" in verify_block
-    assert (
-        'test "$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | cut -f1)" '
-        '= "$RELEASE_COMMIT"'
-    ) in verify_block
+    assert 'refs/tags/$RELEASE_TAG^{}' in verify_block
+    assert 'refs/tags/$RELEASE_TAG"' in verify_block
+    assert 'test "$tag_commit" = "$RELEASE_COMMIT"' in verify_block
     assert "RELEASE_COMMIT: ${{ steps.manifest.outputs.commit }}" in verify_block
     assert "isDraft or .isPrerelease" in verify_block
 
