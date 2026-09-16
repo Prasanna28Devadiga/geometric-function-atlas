@@ -67,7 +67,11 @@ jobs:
           RELEASE_TAG: ${{ steps.manifest.outputs.tag }}
           RELEASE_COMMIT: ${{ steps.manifest.outputs.commit }}
         run: |
-          test "$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | cut -f1)" = "$RELEASE_COMMIT"
+          tag_commit="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG^{}" | cut -f1)"
+          if [ -z "$tag_commit" ]; then
+            tag_commit="$(git ls-remote --tags origin "refs/tags/$RELEASE_TAG" | cut -f1)"
+          fi
+          test "$tag_commit" = "$RELEASE_COMMIT"
           test "$(gh release view "$RELEASE_TAG" --json isDraft,isPrerelease --jq '.isDraft or .isPrerelease')" = "false"
       - name: Download exact GitHub release assets
         env:
