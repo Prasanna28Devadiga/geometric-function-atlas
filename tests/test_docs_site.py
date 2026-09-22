@@ -59,14 +59,12 @@ def test_mkdocs_site_declares_every_research_workflow_once() -> None:
         assert config.count(relative_path) == 1, relative_path
 
 
-def test_getting_started_preserves_commands_and_evidence_boundaries() -> None:
+def test_getting_started_is_a_short_tutorial_with_one_install_path() -> None:
     assert GETTING_STARTED.is_file()
     tutorial = GETTING_STARTED.read_text(encoding="utf-8")
 
     expected_commands = (
         "curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh",
-        "curl -LsSf https://gft-registry.fly.dev/install.sh -o gfa-install.sh",
-        "uv tool install --managed-python --python 3.12 geometric-function-atlas",
         "gfa walkthrough",
         "gfa generators",
         "gfa coefficients sine --order 5 --json",
@@ -74,16 +72,48 @@ def test_getting_started_preserves_commands_and_evidence_boundaries() -> None:
         "gfa verify-counterexample --coefficients 1 --point=-0.75,0 --property starlike",
         "gfa verify-radius-certificate sine sigmoid",
         "gfa plot domain exponential --output exponential-domain.svg",
-        "uv tool install --managed-python --python 3.12 'geometric-function-atlas[lab]'",
-        "uv tool uninstall geometric-function-atlas",
     )
     for command in expected_commands:
         assert command in tutorial
 
-    assert "A numerical screen is not a proof" in tutorial
-    assert "certificate replay does not establish novelty" in tutorial.lower()
-    assert "visualization, not a proof" in tutorial
-    assert "integrity does not certify the mathematics" in tutorial.lower()
+    assert tutorial.count("https://gft-registry.fly.dev/install.sh") == 1
+    assert len(tutorial.splitlines()) < 220
+    for unwanted in (
+        '=== "macOS / Linux"',
+        '=== "Windows PowerShell"',
+        "Review before running",
+        "Already have uv?",
+        "Optional labs",
+        "Upgrade or remove",
+        "Invoke-WebRequest",
+        "uv tool install",
+        "uv tool uninstall",
+    ):
+        assert unwanted not in tutorial
+    assert "replay" not in tutorial.lower()
+
+
+def test_workflow_guides_lead_with_actions_not_review_vocabulary() -> None:
+    primary_pages = WORKFLOW_PAGES[1:-1]
+
+    for relative_path in primary_pages:
+        guide = (ROOT / "docs" / relative_path).read_text(encoding="utf-8")
+        assert "## Run it" in guide, relative_path
+        assert "## What you will see" in guide, relative_path
+
+    for relative_path in WORKFLOW_PAGES:
+        guide = (ROOT / "docs" / relative_path).read_text(encoding="utf-8")
+        for unwanted in (
+            "**Problem.**",
+            "**Disposition:**",
+            "**Replay:**",
+            "bounded ABSTAIN",
+            "reviewer denominator",
+            "Evidence boundary",
+            "Snapshot honesty",
+        ):
+            assert unwanted not in guide, f"{relative_path}: {unwanted}"
+        assert "replay" not in guide.lower(), f"{relative_path}: replay"
 
 
 def test_docs_dependencies_and_canonical_url_are_declared() -> None:

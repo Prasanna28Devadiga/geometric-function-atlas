@@ -1,129 +1,35 @@
 # Getting started
 
-Install the Geometric Function Atlas command-line package, run one exact calculation,
-certify a counterexample, and replay a directed-radius certificate. The installer
-provides its own managed Python, so no existing Python installation is required.
+Install the `gfa` command, run a short tour, and try the main calculations.
 
-## 0. Install
-
-=== "macOS / Linux"
-
-    ```bash
-    curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh
-    ```
-
-    This downloads and runs the version-pinned GFA installer. You can
-    [read the hosted installer](https://gft-registry.fly.dev/install.sh) before
-    running it.
-
-=== "Windows PowerShell"
-
-    ```powershell
-    powershell -ExecutionPolicy Bypass -c "irm https://gft-registry.fly.dev/install.ps1 | iex"
-    ```
-
-    You can [read the PowerShell installer](https://gft-registry.fly.dev/install.ps1)
-    before running it.
-
-The hosted installer installs or finds [uv](https://docs.astral.sh/uv/), installs a
-managed Python 3.12, installs the released `gfa` command in an isolated tool
-environment, updates the user path, and verifies the result with `gfa --version`.
-It does not require administrator privileges or replace the system Python.
-
-### Review before running
-
-If you prefer to inspect the complete Unix installer before executing it:
+## Install
 
 ```bash
-curl -LsSf https://gft-registry.fly.dev/install.sh -o gfa-install.sh
-less gfa-install.sh
-sh gfa-install.sh
-rm gfa-install.sh
+curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh
 ```
 
-The short pipeline is convenient, but it sends the HTTPS response directly to the
-shell. The download-first route lets you read the complete file before choosing to
-run it.
+The installer sets up `gfa` and its own Python. You do not need to prepare a
+Python environment first.
 
-On Windows, download `install.ps1`, inspect it in an editor, and then run it in a new
-PowerShell process:
-
-```powershell
-Invoke-WebRequest https://gft-registry.fly.dev/install.ps1 -OutFile gfa-install.ps1
-notepad gfa-install.ps1
-powershell -ExecutionPolicy Bypass -File .\gfa-install.ps1
-Remove-Item .\gfa-install.ps1
-```
-
-### Already have uv?
-
-Install the package directly as an isolated managed-Python tool:
-
-```bash
-uv tool install --managed-python --python 3.12 geometric-function-atlas
-```
-
-Restart the terminal once if `gfa` is not immediately found, then verify:
-
-```bash
-gfa --version
-```
-
-### Optional labs
-
-The Image Lab and Cryptography Lab operations require NumPy. Install the package
-with its `lab` extra:
-
-```bash
-uv tool install --managed-python --python 3.12 'geometric-function-atlas[lab]'
-```
-
-Image outputs are empirical transforms, and cryptography outputs are benchmark
-metrics rather than security claims.
-
-### Upgrade or remove
-
-Rerun the hosted installer to move to the version it currently pins, or upgrade an
-existing uv-managed tool directly:
-
-```bash
-uv tool upgrade geometric-function-atlas
-```
-
-Remove the isolated tool without touching the system Python:
-
-```bash
-uv tool uninstall geometric-function-atlas
-```
-
-Maintainers testing local wheels should follow the
-[release procedure](RELEASING.md), which exercises the checked-in installer with
-an explicit `GFA_PACKAGE_SPEC`.
-
-## 1. Run the first walkthrough
+## Take the tour
 
 ```bash
 gfa walkthrough
 ```
 
-The walkthrough introduces the notation, one exact generator expansion, one
-Fekete–Szegő calculation, and one radius-certificate replay. It is the quickest
-way to confirm the installation and see the package's evidence language.
+This introduces the notation and runs three examples: a generator expansion, a
+coefficient bound, and a radius check.
 
-!!! note "Reading rule"
-    Exact computation, numerical screening, certified disproof, and certificate
-    replay are different outcomes. The package labels them separately.
+## Browse the built-in classes
 
-## 2. Browse generators
-
-A Ma–Minda class $\mathcal{S}^*(\phi)$ is identified by its generator $\phi$.
-List the package keys and exact formulas:
+A Ma–Minda class is described by a generator $\phi$. List the generators that
+ship with the package:
 
 ```bash
 gfa generators
 ```
 
-Abridged output:
+The output includes short names that can be used in later commands:
 
 ```text
 exponential: exp(z)
@@ -133,72 +39,67 @@ lemniscate: sqrt(z + 1)
 sigmoid: 2/(1 + exp(-z))
 ```
 
-Use a short key such as `sine` or `exponential` in later commands.
+## Expand a generator
 
-## 3. Compute exact generator coefficients
-
-For
+For the sine class,
 
 $$
-\phi(z)=1+\sum_{k\geq1}B_kz^k=1+\sin z,
+\phi(z)=1+\sin z
+       =1+z-\frac{z^3}{6}+\frac{z^5}{120}+\cdots.
 $$
 
-return $B_1,\ldots,B_5$, the coefficients of $z,\ldots,z^5$ after the normalized
-constant term $\phi(0)=1$:
+Ask for the first five coefficients:
 
 ```bash
 gfa coefficients sine --order 5 --json
 ```
 
-Abridged output:
+The result contains
 
 ```json
 {
-  "coefficients": ["1", "0", "-1/6", "0", "1/120"],
-  "generator_formula": "sin(z) + 1",
-  "evidence_status": "proven_exact_under_declared_assumptions"
+  "coefficients": ["1", "0", "-1/6", "0", "1/120"]
 }
 ```
 
-These are exact symbolic coefficients, not fitted decimals. The complete JSON
-record also carries assumptions, source references, verification checks, and
-artifact versions.
+The strings are exact symbolic values, so `-1/6` has not been rounded to a
+decimal.
 
-## 4. Evaluate a coefficient functional
+## Compute a Fekete–Szegő bound
 
-For the exponential Ma–Minda class, calculate the sharp theorem-backed value of
+For the exponential class, compute the bound for
 $|a_3-\mu a_2^2|$ at $\mu=0$:
 
 ```bash
 gfa fekete-szego exponential --mu 0 --json
 ```
 
+The exact answer is $3/4$:
+
 ```json
 {
   "value_exact": "3/4",
-  "value_decimal": "0.7500000000000000",
-  "evidence_status": "proven_exact_under_declared_assumptions"
+  "value_decimal": "0.7500000000000000"
 }
 ```
 
-Try an exact rational parameter without introducing floating-point input:
+Parameters can be fractions. For example, replace `--mu 0` with `--mu 1/2`.
 
-```bash
-gfa fekete-szego exponential --mu 1/2 --json
-```
+## Disprove starlikeness at one point
 
-Inspect `assumptions` and `source_references` before applying a value to a new
-problem. Ordinary output is intentionally abbreviated; use `--json` for the full
-record.
+Take
 
-## 5. Certify a disproof
+$$
+f(z)=z+z^2.
+$$
 
-Write $f(z)=z+z^2$ by supplying $a_2=1$, then check the proposed interior witness
-$z=-3/4$ against starlikeness:
+The following command checks the point $z=-3/4$:
 
 ```bash
 gfa verify-counterexample --coefficients 1 --point=-0.75,0 --property starlike
 ```
+
+It returns:
 
 ```text
 CERTIFIED COUNTEREXAMPLE
@@ -208,85 +109,54 @@ Certified value: [-2, -2]
 Counterexample condition: value <= 0
 ```
 
-A certified interior witness is a rigorous disproof for this function. It does not
-prove a broader statement about an entire function class.
+Starlikeness requires $\operatorname{Re}(zf'(z)/f(z))>0$ throughout the disk.
+The value $-2$ at an interior point is therefore a proof that this particular
+function is not starlike.
 
-!!! warning
-    **A numerical screen is not a proof.** The command checks the supplied point
-    with interval arithmetic before reporting a certified violation.
+## Check a sharp radius
 
-## 6. Replay a directed-radius certificate
-
-Replay the released certificate for the inclusion from the sine class to the
-sigmoid class:
+The package contains a proved inclusion radius from the sine class to the
+sigmoid class. Check its calculation:
 
 ```bash
 gfa verify-radius-certificate sine sigmoid
 ```
 
-```text
-PROVEN: sine->sigmoid
-  PASS psi composition reduces to the logarithmic sine form
-  PASS d/dz atanh(sin z) = sec z
-  PASS |cos(x+iy)|^2 = cos^2 x + sinh^2 y
-  PASS angular-bound remainder is sinh(b)^2 >= 0
-  PASS 2*atanh(sin(r*)) = 1
-```
+The radius is
 
-The stored exact radius is `asin((E-1)/(E+1))`. Inspect the full record separately:
+$$
+\arcsin\!\left(\frac{e-1}{e+1}\right).
+$$
 
-```bash
-gfa radius sine sigmoid --json
-```
+The command checks the identities used in the proof and reports each step. The
+[full argument](https://gft-registry.fly.dev/proofs/radius-sine-sigmoid) is on
+the live Atlas.
 
-Read the [underlying mathematical argument](https://gft-registry.fly.dev/proofs/radius-sine-sigmoid)
-on the live Atlas. A certificate replay does not establish novelty: it checks the
-released computational artifact, while literature priority and applicability to a
-new problem still require review.
-
-## 7. Make a plot
+## Draw a domain
 
 ```bash
 gfa plot domain exponential --output exponential-domain.svg
 ```
 
-Open `exponential-domain.svg` in a browser or vector-graphics program. It is built
-from a finite Taylor representation and is a visualization, not a proof of the
-full image domain.
+Open `exponential-domain.svg` in a browser. The picture comes from a finite
+Taylor expansion, so use it to explore the geometry rather than as a proof of
+the full image domain.
 
-## 8. Use the same operations from Python
+## Use Python
+
+The same calculations are available as Python functions:
 
 ```python
 from geometric_function_atlas import fekete_szego, generator_series
 
 series = generator_series("sine", order=5)
-print(series.to_dict())
+print(series.to_dict()["coefficients"])
 
-result = fekete_szego("exponential", mu="1/2")
-payload = result.to_dict()
-print(payload["value_exact"])
-print(payload["assumptions"])
-print(payload["source_references"])
+bound = fekete_szego("exponential", mu="1/2")
+print(bound.to_dict()["value_exact"])
 ```
 
-The command line and Python API call the same package operations. Use structured
-records when assumptions, references, checks, or artifact identity matter.
+## Choose what to do next
 
-## Read the evidence labels
-
-- **Proven exact under declared assumptions** means an exact theorem-backed
-  calculation was carried out under assumptions recorded with the result.
-- **Certified counterexample** means a rigorous witness disproves the stated
-  property for the supplied function.
-- **Certificate replay** means the registered checks for a released artifact pass;
-  it does not establish literature novelty.
-- **Screen** means finite numerical or symbolic evidence only.
-- **Bundle verified** means declared bytes match a closed checksum manifest; bundle
-  integrity does not certify the mathematics recorded inside those files.
-
-## Choose a research workflow
-
-Continue with the [research workflow index](workflows/README.md) to investigate a
-custom class, understand class geometry, derive a sharp radius, inspect the radius
-atlas, compare coefficient bounds, repair a conjecture, transfer results through
-the Alexander transform, or prepare a deterministic collaborator bundle.
+Go to [Choose a workflow](workflows/README.md) for worked examples on class
+geometry, sharp radii, coefficient bounds, conjectures, and recent papers.

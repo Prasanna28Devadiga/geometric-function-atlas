@@ -1,46 +1,79 @@
-# Transfer a starlike problem to a convex one
+# Use the Alexander transform
 
-**Problem.** How can a transformation turn a solved starlike problem into a convex one? What changes in the coefficients and image geometry?
+Start with a starlike function and integrate $f(z)/z$ to obtain a convex one.
+This page shows the identity, the coefficient change, and the before-and-after
+images.
 
-```sh
-python examples/research_workflows/alexander_transform.py --generator starlike --output /tmp/gfa-alexander-classical
-python examples/research_workflows/alexander_transform.py --generator sine --output /tmp/gfa-alexander-sine
+## Run it
+
+```bash
+python examples/research_workflows/alexander_transform.py \
+  --generator starlike \
+  --output /tmp/gfa-alexander
 ```
 
-The two solutions use the same operator, not separately memorized formulas. Change `--radius` to investigate the images farther toward the boundary. The output preserves exact coefficient transformations, the identity residuals, numerical curve data, and a plot.
+## What you will see
 
-## The identity does the mathematical work
+Open `/tmp/gfa-alexander/alexander_transform.svg`. The first panel shows the
+starlike function; the second shows its Alexander transform. The JSON file
+contains the exact coefficients and the symbolic identity check.
 
-Let f be normalized analytic and define the Alexander transform
+## The identity
 
-`g(z)=integral_0^z f(t)/t dt`.
+For a normalized analytic function $f$, define
 
-The quotient f(t)/t extends analytically at zero, and the disk is simply connected, so the integral is path independent and `g(0)=0, g'(0)=1`. Differentiation gives
+$$
+g(z)=\int_0^z\frac{f(t)}{t}\,dt.
+$$
 
-`z*g'(z)=f(z)` and `1+z*g''(z)/g'(z)=z*f'(z)/f(z)`.
+Then
 
-The quotients are understood by continuation at zero. Elsewhere the identity requires nonvanishing of f/z, equivalently g'. For the canonical members in this workflow, f/z is an exponential and has no zeros.
+$$
+zg'(z)=f(z)
+$$
 
-Consequently the starlikeness condition for f becomes the convexity condition for g. More generally, the two expressions are identical in the defining subordinations for `S*(phi)` and `C(phi)`. This is a classical Alexander relation, not a new operator theorem.
+and therefore
 
-If `f(z)=z+sum_{n>=2} a_n*z^n`, termwise integration gives
+$$
+1+\frac{zg''(z)}{g'(z)}=\frac{zf'(z)}{f(z)}.
+$$
 
-`g(z)=z+sum_{n>=2} (a_n/n)*z^n`.
+The expression on the right tests starlikeness of $f$; the one on the left
+tests convexity of $g$. The equality is the whole reason the transform works.
 
-The script uses the package's exact canonical-member recurrence, divides the nth coefficient by n, and checks both analytic identities symbolically.
+If
 
-## Two explicit solutions
+$$
+f(z)=z+\sum_{n\ge2}a_nz^n,
+$$
 
-For the Koebe function `f=z/(1-z)^2`, integration gives `g=z/(1-z)`. On the full disk g maps onto the half-plane Re(w)>-1/2; its finite-radius circular images help explain the convexity geometrically.
+then integration gives
 
-For the sine-associated canonical member `f=z*exp(Si(z))`, the transform is
+$$
+g(z)=z+\sum_{n\ge2}\frac{a_n}{n}z^n.
+$$
 
-`g(z)=integral_0^z exp(Si(t)) dt`.
+## Two examples
 
-A simple elementary closed form is not required to use the operator. The exact derivative identity gives the class relation; numerical straight-path quadrature supplies the plot. The first transformed coefficients are `a2/2=1/2`, `a3/3=1/6`, and `a4/4=1/36`.
+For the Koebe function,
 
-## What the computation does not establish
+$$
+f(z)=\frac{z}{(1-z)^2},
+\qquad
+g(z)=\frac{z}{1-z}.
+$$
 
-The plot samples full analytic functions, with numerical quadrature for the sine transform. A one-point comparison at two working precisions is a consistency check, not a global error estimate. Exact coefficient transformations do not imply that an arbitrary finite Taylor polynomial remains convex.
+The transform maps the unit disk onto the half-plane
+$\operatorname{Re}w>-1/2$.
 
-The before/after panels use equal real and imaginary units within each plane; read the printed ranges before comparing apparent image sizes. Sources and assumptions are part of the problem, not hidden consequences of the plot. The mathematical transfer is justified by the displayed identity and the standard analytic characterizations, not by visual convexity.
+Try the sine class as well:
+
+```bash
+python examples/research_workflows/alexander_transform.py \
+  --generator sine \
+  --output /tmp/gfa-alexander-sine
+```
+
+Its canonical member is $z\exp(\operatorname{Si}(z))$. The transform does not
+need an elementary closed form: the identity is exact, and numerical quadrature
+is used only to draw the second panel.
