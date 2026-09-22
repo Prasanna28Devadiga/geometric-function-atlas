@@ -67,6 +67,6 @@ Install once   [macOS/Linux] [Windows]
 Reproduce      gfa <task-oriented command>
 ```
 
-The install buttons copy the commands in `docs/INSTALL.md`. The reproduce button
+The install buttons copy the commands in `docs/getting-started.md`. The reproduce button
 copies the exact command for that page item. Human-readable output is the default;
 `--json` is an optional advanced action.

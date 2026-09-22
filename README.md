@@ -9,19 +9,20 @@ This repository is intentionally separate from the registry website and its rese
 ## Install
 
 **No Python required.** The installer sets up `uv`, an isolated Python 3.12,
-the `gfa` command, and verifies the result. For copy buttons and visible setup
-steps, use the [guided installer](https://gft-registry.fly.dev/getting-started).
+the `gfa` command, and verifies the result. The
+[getting-started guide](https://prasanna28devadiga.github.io/geometric-function-atlas/getting-started/)
+also provides inspect-first and direct-uv alternatives.
 
 macOS and Linux:
 
 ```bash
-(f="$(mktemp)" && trap 'rm -f "$f"' EXIT && curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh -o "$f" && sh "$f")
+curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh
 ```
 
 Windows PowerShell:
 
 ```powershell
-$ErrorActionPreference='Stop'; $f=Join-Path $env:TEMP "gfa-$([guid]::NewGuid()).ps1"; try { irm https://gft-registry.fly.dev/install.ps1 -OutFile $f; powershell.exe -NoProfile -ExecutionPolicy Bypass -File $f; if ($LASTEXITCODE -ne 0) { throw "GFA installer failed ($LASTEXITCODE)" } } finally { rm $f -Force -ErrorAction SilentlyContinue }
+powershell -ExecutionPolicy Bypass -c "irm https://gft-registry.fly.dev/install.ps1 | iex"
 ```
 
 Then start here:
@@ -31,8 +32,9 @@ gfa walkthrough
 ```
 
 The install is user-local: no administrator access, system-Python replacement,
-`pip`, virtual environment, or activation step. See [the installation guide](docs/INSTALL.md)
-for upgrades, removal, optional labs, and maintainer installs.
+`pip`, virtual environment, or activation step. See the
+[installation guide](https://prasanna28devadiga.github.io/geometric-function-atlas/getting-started/)
+for script inspection, upgrades, removal, optional labs, and maintainer installs.
 
 ## What you can do
 

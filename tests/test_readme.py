@@ -56,7 +56,7 @@ def test_public_docs_do_not_expose_internal_phase_nomenclature() -> None:
     public_docs = (
         ROOT / "README.md",
         ROOT / "CHANGELOG.md",
-        ROOT / "docs" / "INSTALL.md",
+        ROOT / "docs" / "getting-started.md",
         ROOT / "docs" / "ROADMAP.md",
         ROOT / "docs" / "RESULT_CONTRACT.md",
         ROOT / "docs" / "WEB_PARITY.md",
@@ -144,4 +144,4 @@ def test_readme_plot_controls_execute(tmp_path: Path) -> None:
 def test_generated_plot_assets_are_included_in_source_distribution() -> None:
     manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
 
-    assert "recursive-include docs/assets *.svg" in manifest
+    assert "recursive-include docs/assets *.css *.js *.svg" in manifest

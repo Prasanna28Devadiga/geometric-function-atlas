@@ -69,19 +69,31 @@ def test_windows_installer_has_the_same_managed_python_contract() -> None:
     assert "--version" in script
 
 
-def test_public_installation_is_front_loaded_and_never_piped_to_a_shell() -> None:
+def test_public_installation_is_front_loaded_with_short_and_inspectable_paths() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    install = (ROOT / "docs" / "INSTALL.md").read_text(encoding="utf-8")
+    install = (ROOT / "docs" / "getting-started.md").read_text(encoding="utf-8")
+    unix_command = (
+        "curl --proto '=https' --tlsv1.2 -LsSf "
+        "https://gft-registry.fly.dev/install.sh | sh"
+    )
+    short_windows = (
+        'powershell -ExecutionPolicy Bypass -c "irm '
+        'https://gft-registry.fly.dev/install.ps1 | iex"'
+    )
 
     assert readme.index("## Install") < readme.index("## What you can do")
     assert "No Python required" in readme
-    assert "https://gft-registry.fly.dev/install.sh" in readme
-    assert "https://gft-registry.fly.dev/install.ps1" in readme
+    assert unix_command in readme
+    assert short_windows in readme
+    assert unix_command in install
+    assert short_windows in install
+    assert "install.sh -o gfa-install.sh" in install
+    assert "less gfa-install.sh" in install
+    assert "sh gfa-install.sh" in install
+    assert "uv tool install --managed-python --python 3.12" in install
+    assert "read the hosted installer" in install
     assert "gfa walkthrough" in readme
-    assert "| sh" not in readme
-    assert "| iex" not in readme
-    assert "| sh" not in install
-    assert "| iex" not in install
+    assert 'f="$(mktemp)"' not in readme
 
 
 def test_pypi_project_links_prioritize_the_product_and_installer() -> None:
@@ -89,10 +101,12 @@ def test_pypi_project_links_prioritize_the_product_and_installer() -> None:
 
     assert 'Homepage = "https://gft-registry.fly.dev/"' in pyproject
     assert (
-        'Documentation = "https://gft-registry.fly.dev/getting-started"' in pyproject
+        'Documentation = "https://prasanna28devadiga.github.io/'
+        'geometric-function-atlas/"' in pyproject
     )
     assert (
-        'Installer = "https://gft-registry.fly.dev/getting-started#install"'
+        'Installer = "https://prasanna28devadiga.github.io/'
+        'geometric-function-atlas/getting-started/#0-install"'
         in pyproject
     )
     assert (
