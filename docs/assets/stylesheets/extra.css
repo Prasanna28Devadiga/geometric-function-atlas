@@ -1,0 +1,127 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap");
+
+:root {
+  --gfa-paper: #faf9f7;
+  --gfa-paper-deep: #f3f1ed;
+  --gfa-ink: #1a1814;
+  --gfa-body: #4a4640;
+  --gfa-border: #d9d4cc;
+  --gfa-russet: #a82e1f;
+  --gfa-green: #30734a;
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #faf9f7;
+  --md-default-fg-color: #1a1814;
+  --md-default-fg-color--light: #4a4640;
+  --md-default-fg-color--lighter: #8a8479;
+  --md-primary-fg-color: #faf9f7;
+  --md-primary-fg-color--light: #faf9f7;
+  --md-primary-fg-color--dark: #f3f1ed;
+  --md-primary-bg-color: #1a1814;
+  --md-accent-fg-color: #a82e1f;
+  --md-code-bg-color: #f3f1ed;
+  --md-code-fg-color: #1a1814;
+  --md-typeset-a-color: #a82e1f;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #1a1814;
+  --md-default-fg-color: #f0ede8;
+  --md-default-fg-color--light: #c4c0b8;
+  --md-default-fg-color--lighter: #8a8479;
+  --md-primary-fg-color: #1a1814;
+  --md-primary-fg-color--light: #221f1b;
+  --md-primary-fg-color--dark: #11100e;
+  --md-primary-bg-color: #f0ede8;
+  --md-accent-fg-color: #c9402f;
+  --md-code-bg-color: #221f1b;
+  --md-code-fg-color: #f0ede8;
+  --md-typeset-a-color: #d75040;
+}
+
+body,
+input {
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.md-typeset {
+  font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  line-height: 1.65;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset .admonition-title,
+.md-typeset summary,
+.md-nav,
+.md-header,
+.md-search,
+.md-tabs {
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.md-typeset code,
+.md-typeset pre,
+.md-typeset kbd {
+  font-family: "IBM Plex Mono", Consolas, monospace;
+}
+
+.md-header {
+  box-shadow: none;
+  border-bottom: 1px solid var(--gfa-border);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  border-bottom-color: #3d3830;
+}
+
+.md-typeset h1 {
+  color: var(--md-default-fg-color);
+  font-weight: 500;
+}
+
+.md-typeset h2 {
+  border-bottom: 1px solid var(--gfa-border);
+  padding-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h2 {
+  border-bottom-color: #3d3830;
+}
+
+.gfa-home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.gfa-home-card {
+  border: 1px solid var(--gfa-border);
+  border-radius: 3px;
+  padding: 1rem 1.1rem;
+  background: var(--gfa-paper-deep);
+}
+
+[data-md-color-scheme="slate"] .gfa-home-card {
+  border-color: #3d3830;
+  background: #221f1b;
+}
+
+.gfa-home-card h2 {
+  border: 0;
+  margin-top: 0;
+  padding: 0;
+}
+
+.md-typeset .admonition {
+  border-radius: 3px;
+}
+
+@media screen and (max-width: 44.984375em) {
+  .gfa-home-grid {
+    grid-template-columns: 1fr;
+  }
+}

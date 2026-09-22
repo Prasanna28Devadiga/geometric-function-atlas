@@ -1,0 +1,106 @@
+site_name: Geometric Function Atlas
+site_description: Reproducible and auditable computations for geometric function theory.
+site_url: https://prasanna28devadiga.github.io/geometric-function-atlas/
+repo_url: https://github.com/Prasanna28Devadiga/geometric-function-atlas
+repo_name: Prasanna28Devadiga/geometric-function-atlas
+edit_uri: edit/main/docs/
+strict: true
+
+theme:
+  name: material
+  font: false
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - toc.integrate
+    - content.code.copy
+    - search.suggest
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    logo: material/math-integral-box
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            inherited_members: false
+            members_order: source
+            show_bases: false
+            show_if_no_docstring: true
+            show_root_heading: true
+            show_signature_annotations: true
+            show_source: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+      toc_depth: 4
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Overview: index.md
+  - Getting started: getting-started.md
+  - Research workflows:
+      - Choose a workflow: workflows/README.md
+      - Investigate a custom class: workflows/custom_class.md
+      - Understand class geometry: workflows/class_geometry.md
+      - Find a sharp radius: workflows/sharp_radius.md
+      - Browse the radius atlas: workflows/radius_atlas.md
+      - Compare coefficient bounds: workflows/coefficient_comparison.md
+      - Repair a conjecture: workflows/conjecture_counterexample.md
+      - Transfer by Alexander transform: workflows/alexander_transform.md
+      - Prepare a collaborator bundle: workflows/collaborator_bundle.md
+      - Recent-literature case studies: workflows/recent_literature.md
+      - Thirty-recipe catalogue: workflows/catalogue.md
+  - Python API:
+      - Generators and coefficients: reference/generators-and-coefficients.md
+      - Classes and extremals: reference/classes.md
+      - Function verification: reference/verification.md
+      - Counterexamples: reference/counterexamples.md
+      - Directed radii: reference/radii.md
+      - Plotting: reference/plotting.md
+      - Registry snapshots: reference/snapshots.md
+      - Bundles and records: reference/bundles-and-records.md
+      - Citations and artifacts: reference/citations-and-artifacts.md
+  - Evidence and reproducibility:
+      - Result contract: RESULT_CONTRACT.md
+      - Provenance policy: PROVENANCE.md
+      - Website/package parity: WEB_PARITY.md
+  - Project:
+      - Capability inventory: ROADMAP.md
+      - Release procedure: RELEASING.md
