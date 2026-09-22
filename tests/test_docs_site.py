@@ -125,6 +125,9 @@ def test_docs_theme_uses_standard_material_features_and_atlas_branding() -> None
     assert "assets/javascripts/mathjax.js" in config
     assert "custom_dir:" not in config
     assert "inherited_members: false" in config
+    assert "repo_url:" not in config
+    assert "social:" in config
+    assert "https://github.com/Prasanna28Devadiga/geometric-function-atlas" in config
 
     css = (ROOT / "docs" / "assets" / "stylesheets" / "extra.css").read_text(
         encoding="utf-8"

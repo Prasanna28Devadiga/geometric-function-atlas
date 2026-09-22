@@ -1,10 +1,13 @@
 site_name: Geometric Function Atlas
 site_description: Reproducible and auditable computations for geometric function theory.
 site_url: https://prasanna28devadiga.github.io/geometric-function-atlas/
-repo_url: https://github.com/Prasanna28Devadiga/geometric-function-atlas
-repo_name: Prasanna28Devadiga/geometric-function-atlas
-edit_uri: edit/main/docs/
 strict: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Prasanna28Devadiga/geometric-function-atlas
+      name: geometric-function-atlas source on GitHub
 
 theme:
   name: material
