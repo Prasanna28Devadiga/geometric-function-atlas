@@ -80,16 +80,16 @@ nav:
   - Getting started: getting-started.md
   - Research workflows:
       - Choose a workflow: workflows/README.md
-      - Investigate a custom class: workflows/custom_class.md
-      - Understand class geometry: workflows/class_geometry.md
+      - Explore your own class: workflows/custom_class.md
+      - See class geometry: workflows/class_geometry.md
       - Find a sharp radius: workflows/sharp_radius.md
-      - Browse the radius atlas: workflows/radius_atlas.md
+      - Read the radius map: workflows/radius_atlas.md
       - Compare coefficient bounds: workflows/coefficient_comparison.md
-      - Repair a conjecture: workflows/conjecture_counterexample.md
-      - Transfer by Alexander transform: workflows/alexander_transform.md
-      - Prepare a collaborator bundle: workflows/collaborator_bundle.md
-      - Recent-literature case studies: workflows/recent_literature.md
-      - Thirty-recipe catalogue: workflows/catalogue.md
+      - Test a conjecture: workflows/conjecture_counterexample.md
+      - Use the Alexander transform: workflows/alexander_transform.md
+      - Share a result: workflows/collaborator_bundle.md
+      - Work from a paper: workflows/recent_literature.md
+      - Thirty things to try: workflows/catalogue.md
   - Python API:
       - Generators and coefficients: reference/generators-and-coefficients.md
       - Classes and extremals: reference/classes.md

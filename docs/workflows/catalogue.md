@@ -1,243 +1,136 @@
-# Thirty bounded research recipes
+# Thirty things to try
 
-This catalogue is the fixed EX01–EX30 denominator from the reviewer packet. It is not a feature wish list disguised as completed science. Each entry gives a route that works now or an explicit bounded ABSTAIN naming the missing proof/search engine. Exact identities, numerical screens, snapshot lookups, and literature claims remain separate. **No novelty claim** is made by any entry.
+Choose an idea, follow the starting point, and open the linked workflow when you
+want the full derivation.
 
-## EX01 — Compare sine, exponential, and cardioid generators
+## Ready to try
 
-**Disposition:** implemented recipe using exact generator series.
+**Ready** means the current package can run the stated calculation. The entry
+also says whether the result is exact or based on sampled points.
 
-**Replay:** call `generator_series(key, order=6)` for `sine`, `exponential`, and `cardioid`, compare `exact_expressions`, then plot `object="phi"` if geometry is needed.
+## Not yet supported
 
-This compares $\phi$ itself, not $z\phi$ or a canonical member. Coefficients stay exact; a sampled plot is explanatory only.
+**Not yet supported** means the package has no complete search or proof method
+for that question. There is no hidden command for it yet.
 
-## EX02 — Recover the classical starlike Fekete–Szegő constant
+## All thirty ideas
 
-**Disposition:** implemented exact theorem anchor.
+**EX01 — Compare three generators**
 
-**Replay:** run `fekete_szego("starlike", mu="0")` and verify that the exact value is `3`; rerun at `mu="1"` to obtain `1` and inspect the declared Ma–Minda assumptions.
+`generator_series(key, order=6)` for `sine`, `exponential`, and `cardioid`. **Ready.** The coefficients are exact.
 
-The value is a known theorem specialization, not a new bound.
+**EX02 — Recover a classical constant**
 
-## EX03 — Vary $\mu$ in Fekete–Szegő
+Run `fekete_szego("starlike", mu="0")`. **Ready.** The answer is $3$.
 
-**Disposition:** implemented workflow with exact branch transitions and equality examples.
+**EX03 — Vary $\mu$ in the Fekete–Szegő problem**
 
-**Replay:** `python examples/research_workflows/coefficient_comparison.py --generator starlike --output /tmp/gfa-ex03`.
+Start with [Compare coefficient bounds](coefficient_comparison.md). **Ready.** The transition points and equality examples are exact.
 
-The JSON distinguishes the two extremal Schwarz functions and labels transition non-uniqueness.
+**EX04 — Vary the starlikeness order $\alpha$**
 
-## EX04 — Vary starlikeness order $\alpha$
+Run [Explore your own class](custom_class.md) with `--alpha 0`, `1/4`, and `1/2`. **Ready** for exact chosen values.
 
-**Disposition:** implemented bounded exact-specialization workflow.
+**EX05 — Vary Janowski parameters $A,B$**
 
-**Replay:** run `custom_class.py` repeatedly with exact rational `--alpha` values such as `0`, `1/4`, and `1/2`; compare the exact JSON records and generator identities.
+Adapt `build_generator()` to $(1+Az)/(1+Bz)$. **Ready** for chosen rational pairs, not a symbolic parameter region.
 
-A finite rational sweep does not prove a statement uniformly over $0\leq\alpha<1$.
+**EX06 — Locate Fekete–Szegő branch changes**
 
-## EX05 — Vary Janowski parameters $A,B$
+Read `transition_mu` from the coefficient workflow. **Ready.** The derivation explains the corners.
 
-**Disposition:** bounded exact recipe; symbolic parameter regions remain unsupported.
+**EX07 — Compute canonical-member coefficients**
 
-**Replay:** adapt `build_generator()` in `custom_class.py` to the exact specialization $(1+Az)/(1+Bz)$, require exact rational $-1\leq B<A\leq1$, and run a declared finite grid.
+Call `class_extremal_coefficients(generator, order=8)`. **Ready.** Coefficients remain symbolic.
 
-Each $(A,B)$ pair is a separate exact object. The recipe does not infer branch formulas over a continuum.
+**EX08 — Compare $\phi$, $z\phi$, and $f_\phi$**
 
-## EX06 — Locate Fekete–Szegő branch changes
+Run [Explore your own class](custom_class.md). **Ready.** The three plots represent different functions.
 
-**Disposition:** implemented exact derivation.
+**EX09 — Compare two Taylor orders**
 
-**Replay:** inspect `transition_mu` and the independent attaining values emitted by `coefficient_comparison.py`; its test checks the displayed extremal against the public theorem result.
+Run [See class geometry](class_geometry.md) with `--order 6` and `12`. **Ready.** The reported errors are sampled.
 
-The plotted curve samples an exact piecewise formula; the derivation, not the polyline, establishes the transitions.
+**EX10 — Prove a polynomial starlike**
 
-## EX07 — Compute canonical extremal coefficients
+Call `verify_function([0.1], property="starlike", max_cost="symbolic")`. **Ready** for the stated sufficient criterion.
 
-**Disposition:** implemented exact API for built-in and caller-defined generators.
+**EX11 — Explain why a candidate function fails**
 
-**Replay:** call `class_extremal_coefficients(generator, order=8)` and independently check $zf'_{\phi}/f_{\phi}=\phi$ when a closed form is known.
+Run [Test a conjecture](conjecture_counterexample.md). **Ready.** It returns an exact witness when one is found.
 
-Algebraic and transcendental catalogue coefficients are kept symbolic rather than forced through `Rational`.
+**EX12 — Recheck a fixed counterexample**
 
-## EX08 — Compare $\phi$, $z\phi$, and $f_\phi$
+Call `verify_counterexample([1.0], point=(-0.75, 0.0), property="starlike")`. **Ready.** Interval arithmetic checks the witness.
 
-**Disposition:** implemented workflow with distinct plot semantics.
+**EX13 — Compare one polynomial with several classes**
 
-**Replay:** run `custom_class.py` or call `write_domain_plot(..., object=name)` for each of `phi`, `z*phi`, and `f_phi`.
+Call `class_member_screen(...)`. **Ready** as a numerical screen.
 
-Metadata records the selected mathematical object and finite-Taylor approximation. The three images are not interchangeable.
+**EX14 — See why a sufficient test can be inconclusive**
 
-## EX09 — Compare pictures across Taylor order
+Test the Koebe dilation with `verify_function`. **Ready.** Failing this test does not disprove starlikeness.
 
-**Disposition:** implemented changed-input recipe.
+**EX15 — Compare exponential and cardioid domains**
 
-**Replay:** run `class_geometry.py` at `--order 6` and `--order 12` with the same generator and radius; compare `sampled_truncation_errors_by_degree` and the SVGs.
+Call `class_containment_screen("exponential", "cardioid")`. **Ready** as a screen; sampled points cannot prove containment.
 
-Those errors are maxima over the declared sampled outer ring, not uniform analytic tail bounds.
+**EX16 — Compare $A\to B$ and $B\to A$**
 
-## EX10 — Prove a polynomial starlike by a sufficient condition
+Call `radius(A, B)` and `radius(B, A)`. **Ready.** The source and target cannot be swapped.
 
-**Disposition:** implemented exact sufficient-condition route.
+**EX17 — Recheck the sine-to-sigmoid radius**
 
-**Replay:** call `verify_function([0.1], property="starlike", max_cost="symbolic")` for $f(z)=z+0.1z^2$ and require `outcome == "proven"`.
+Call `verify_radius_certificate("sine", "sigmoid")`. **Ready.** It checks all stored proof steps.
 
-For a finite polynomial, the exact C01 coefficient sum is a proof under the documented criterion.
+**EX18 — List radius records that need work**
 
-## EX11 — Explain a failed function screen
+Call `list_radii(status="audit_required")`. **Ready.** Keep `audit_required` and `unidentified` separate.
 
-**Disposition:** implemented counterexample workflow.
+**EX19 — Draw the complete radius map**
 
-**Replay:** run `conjecture_counterexample.py` and inspect the exact parameter interval, candidate witness, interval replay, and repaired claim.
+Run [Read the radius map](radius_atlas.md). **Ready.** It shows 702 rows; eight have a local certificate.
 
-A sampled failure is promoted only when the witness is independently enclosed.
+**EX20 — Solve an off-axis radius example**
 
-## EX12 — Independently replay a witness
+Run [Find a sharp radius](sharp_radius.md) with `--source off_axis`. **Ready** for this family.
 
-**Disposition:** implemented public verifier recipe.
+**EX21 — Compose radii through an intermediate class**
 
-**Replay:** call `verify_counterexample([1.0], point=(-0.75, 0.0), property="starlike")` for $f(z)=z+z^2$ and require `certified is True`.
+Compare the two input records by hand. **Not yet supported.** A product of two radii need not be sharp.
 
-The point and coefficient list form a portable witness; the verifier recomputes the interval rather than trusting a stored boolean.
+**EX22 — Construct members from Schwarz parameters**
 
-## EX13 — Compare membership across classes
+See `tests/test_schur.py`. **Ready** for fixed real rational parameters; there is no general complex interface.
 
-**Disposition:** implemented numerical-screen table recipe.
+**EX23 — Maximize $H_2(2)$ over a class**
 
-**Replay:** apply `class_member_screen` to the same finite coefficient list for each named class, record `member`, margin, grid, and witness, and keep `class_containment_screen` as a separate generator-image question.
+`functional_value("hankel2_2", coefficients)` evaluates one member. **Not yet supported.** The package cannot prove a global maximum.
 
-A pass is sampled evidence only.
+**EX24 — Compare inverse and logarithmic coefficients**
 
-## EX14 — Show a sufficient condition can be inconclusive
+Evaluate `inv_a3` and `log_gamma2` on the same coefficients. **Ready** for a chosen member, not a class-wide maximum.
 
-**Disposition:** implemented negative-control recipe.
+**EX25 — Investigate $H_3(1)$**
 
-**Replay:** call `verify_function(closed_form=z/(1-z)**2, property="starlike", max_cost="symbolic")` and require `outcome == "c01_fails_sufficient_condition"`.
+Record the functional and required coefficient order. **Not yet supported.** The higher-order search engine is missing.
 
-The Koebe function is starlike by the classical theorem, while this coefficient sufficient condition fails. That outcome is **not a counterexample** to starlikeness; it is an ABSTAIN by the selected proof route.
+**EX26 — Test an arbitrary coefficient inequality**
 
-## EX15 — Screen exponential contained in cardioid
+Use the maintained polynomial example as a model. **Not yet supported.** Caller-supplied functional formulas are not accepted.
 
-**Disposition:** implemented numerical containment-screen recipe.
+**EX27 — Find where a family loses starlikeness**
 
-**Replay:** call `class_containment_screen("exponential", "cardioid")`, retain its sampling parameters and minimum margin, and reverse the arguments as a separate run.
+Test explicitly chosen parameter values. **Not yet supported.** The package cannot certify the first loss parameter over a continuum.
 
-A numerical screen is not a containment theorem; a positive theorem still needs analytic boundary or subordination proof.
+**EX28 — Apply the Alexander transform**
 
-## EX16 — Compare $A\to B$ and $B\to A$ radii
+Run [Use the Alexander transform](alexander_transform.md). **Ready.** The coefficient transfer and differential identity are exact.
 
-**Disposition:** implemented directed snapshot recipe.
+**EX29 — Check a coefficient table from a paper**
 
-**Replay:** use `radius(A, B)` and `radius(B, A)` separately or inspect the two cells in `radius_atlas.json`; direction is never inferred from the reverse row.
+Run [Work from a paper](recent_literature.md). **Ready** for the cited source and version.
 
-The sine/sigmoid anchor visibly has different exact values and statuses in the two directions.
+**EX30 — Send an experiment to a collaborator**
 
-## EX17 — Annotate the sine-to-sigmoid certificate
-
-**Disposition:** implemented certificate-replay recipe.
-
-**Replay:** obtain `radius("sine", "sigmoid")`, run `verify_radius_certificate("sine", "sigmoid")`, and inspect branch, containment, contact, and sharpness checks rather than only the exact string.
-
-The result is locally replayable and source-bound; replay alone does not decide novelty.
-
-## EX18 — Filter radius records needing investigation
-
-**Disposition:** implemented evidence-filter recipe.
-
-**Replay:** call `list_radii(status="audit_required")` and separately `list_radii(status="unidentified")`; preserve source, target, status, and exact/decimal fields in any shortlist.
-
-Do not combine `audit_required` and `unidentified` into one proof status.
-
-## EX19 — Render the radius atlas matrix
-
-**Disposition:** implemented deterministic JSON+SVG workflow.
-
-**Replay:** `python examples/research_workflows/radius_atlas.py --output /tmp/gfa-ex19`.
-
-The export covers all 784 cells over 28 classes, marks 54 missing non-diagonal rows, and reports that only eight stored records have bundled replay certificates.
-
-## EX20 — Estimate a radius for a new pair
-
-**Disposition:** implemented for a declared bounded family, not arbitrary pairs.
-
-**Replay:** run `sharp_radius.py --source off_axis --s 1/4 --output /tmp/gfa-ex20` and inspect the imaginary-axis contact and the real-axis-shortcut counterexample.
-
-The workflow does not claim to solve arbitrary source/target formulas; new pairs require a frozen inverse branch and contact grammar.
-
-## EX21 — Compose radii through an intermediate class
-
-**Disposition:** bounded ABSTAIN pending a theorem-level composition contract.
-
-**Replay:** compare the two directed input records manually and record their assumptions; do not multiply them as a sharp radius.
-
-Dilation can suggest a product lower bound under compatible normalizations, but the package does not yet encode the direction, hypotheses, provenance propagation, or sharpness-loss semantics. It therefore does not return a composed radius.
-
-## EX22 — Construct members from Schwarz functions
-
-**Disposition:** bounded exact internal workflow, with public promotion deferred.
-
-**Replay:** use the maintained `member_coefficients` anchors in `tests/test_schur.py` and the source-bound literature workflow; fixed real rational Schur parameters reconstruct exact finite Taylor jets.
-
-The current helper does not accept general complex Schur parameters and is not advertised as a complete public member parametrization.
-
-## EX23 — Optimize $H_2(2)$
-
-**Disposition:** bounded ABSTAIN for global optimization; exact point evaluation exists.
-
-**Replay:** `functional_value("hankel2_2", coefficients)` evaluates $|a_2a_4-a_3^2|$ exactly at a supplied jet, but do not label a parameter sample maximum as sharp.
-
-The package does not implement the required complex-Schur search denominator or exact global upper-bound certificate.
-
-## EX24 — Compare inverse and logarithmic coefficients
-
-**Disposition:** implemented fixed-jet comparison; class-wide optimization remains unsupported.
-
-**Replay:** evaluate `functional_value("inv_a3", coefficients)` and `functional_value("log_gamma2", coefficients)` on the same exact member coefficients in the maintained Schur tests.
-
-This compares two exact functionals at specified members; it does not maximize either over a class.
-
-## EX25 — Investigate $H_3(1)$
-
-**Disposition:** bounded ABSTAIN for a missing higher-order engine.
-
-**Replay:** verify that unsupported key `hankel3_1` fails closed, then retain the proposed functional and coefficient order in the negative ledger.
-
-The current bounded grammar stops below the necessary order and does not provide complex-Schur search, checkpoints, or a global upper-bound certificate.
-
-## EX26 — Disprove a custom coefficient inequality
-
-**Disposition:** bounded ABSTAIN for arbitrary functionals; one maintained polynomial-family repair exists.
-
-**Replay:** use `conjecture_counterexample.py` for its declared coefficient family and certified witness, but reject arbitrary expression strings.
-
-The package does not parse caller-supplied functional code or search an undeclared parameter space. A general route depends on the same safe grammar and certificate engine as EX23/EX25.
-
-## EX27 — Locate special-function loss of starlikeness
-
-**Disposition:** bounded ABSTAIN for a missing parameter-family boundary engine.
-
-**Replay:** use `verify_function` only at explicitly supplied specializations and record screens or certified point violations; do not infer the first loss parameter from a finite grid.
-
-The package does not provide rigorous continuation over a family parameter, singularity tracking, or a certified boundary root with branch exclusions.
-
-## EX28 — Test an integral transform
-
-**Disposition:** implemented exact Alexander-transform workflow.
-
-**Replay:** run `alexander_transform.py` for `starlike` and `sine`; verify the coefficient transfer and the exact identity connecting starlike and convex forms.
-
-Plots remain sampled explanations of an exact operator identity.
-
-## EX29 — Reproduce a published table
-
-**Disposition:** implemented source-version-specific coefficient audit.
-
-**Replay:** run `literature_coefficient_audit.py`, compare the emitted exact coefficients with the cited equation/table locator, and retain the source version in the record.
-
-A discrepancy is tied to the inspected version; correction priority and novelty require separate source reconciliation.
-
-## EX30 — Bundle an experiment for a collaborator
-
-**Disposition:** implemented deterministic checksum-manifest workflow.
-
-**Replay:** run `custom_class.py`, then call `verify_research_bundle_manifest` on its `research_bundle_manifest.json`; rerun in a fresh directory and compare manifest bytes.
-
-Bundle verification checks file identity and closed schema only. It does not execute the entrypoint, certify the mathematics inside the files, or establish novelty.
+Run [Share a reproducible result](collaborator_bundle.md). **Ready.** Checksums detect changed files.

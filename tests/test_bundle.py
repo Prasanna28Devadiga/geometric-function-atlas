@@ -144,12 +144,13 @@ def test_research_bundle_verifier_rejects_symlinked_parent_directory(
         verify_research_bundle_manifest(alias / manifest.name)
 
 
-def test_collaborator_bundle_workflow_documents_replay_boundary() -> None:
+def test_collaborator_bundle_workflow_explains_verification_plainly() -> None:
     guide = (ROOT / "docs" / "workflows" / "collaborator_bundle.md").read_text(
         encoding="utf-8"
     )
+    plain_guide = " ".join(guide.lower().split())
 
     assert "verify_research_bundle_manifest" in guide
-    assert "does not execute" in guide
-    assert "does not certify" in guide
+    assert "checks the files, not the mathematics" in plain_guide
+    assert "does not run the recorded workflow" in plain_guide
     assert "research_bundle_manifest.json" in guide

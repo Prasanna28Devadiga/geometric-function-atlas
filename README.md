@@ -8,33 +8,21 @@ This repository is intentionally separate from the registry website and its rese
 
 ## Install
 
-**No Python required.** The installer sets up `uv`, an isolated Python 3.12,
-the `gfa` command, and verifies the result. The
-[getting-started guide](https://prasanna28devadiga.github.io/geometric-function-atlas/getting-started/)
-also provides inspect-first and direct-uv alternatives.
-
-macOS and Linux:
+**No Python required.** Run:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh
 ```
 
-Windows PowerShell:
-
-```powershell
-powershell -ExecutionPolicy Bypass -c "irm https://gft-registry.fly.dev/install.ps1 | iex"
-```
-
-Then start here:
+Then take the guided tour:
 
 ```text
 gfa walkthrough
 ```
 
-The install is user-local: no administrator access, system-Python replacement,
-`pip`, virtual environment, or activation step. See the
-[installation guide](https://prasanna28devadiga.github.io/geometric-function-atlas/getting-started/)
-for script inspection, upgrades, removal, optional labs, and maintainer installs.
+The installer creates the `gfa` command with its own Python. The
+[getting-started guide](https://prasanna28devadiga.github.io/geometric-function-atlas/getting-started/)
+walks through the first calculations.
 
 ## What you can do
 
@@ -97,15 +85,6 @@ The URL above is an illustrative caller input, not a package-hosted release
 asset. Snapshot hashes, required tables, populations, and SQLite integrity
 checks are authoritative; a snapshot does not certify the underlying claims.
 
-The optional Image Lab and Cryptography Lab operations need NumPy. Install with
-the `lab` extra:
-
-```bash
-uv tool install geometric-function-atlas --extra lab
-# or locally:
-uv tool install --with "numpy>=1.24" dist/geometric_function_atlas-*.whl
-```
-
 The optional crypto lab covers five named registry functions and two
 deterministic S-box constructions. Its outputs are benchmark metrics, never
 security claims; invertibility and empirical comparisons do not amount to
@@ -124,12 +103,10 @@ special-function or conformal-warp parity.
 For problem-led examples rather than an API tour, see the
 [research workflows](docs/workflows/README.md): custom classes, class geometry,
 sharp radii, coefficient comparisons, conjecture repair, operator transfer, and
-deterministic [collaborator bundles](docs/workflows/collaborator_bundle.md). The
-[thirty-recipe catalogue](docs/workflows/catalogue.md) gives one terminal route
-for every reviewer example without presenting missing research engines as shipped. The
-[recent-literature case studies](docs/workflows/recent_literature.md) connect
-these tools to a source-bound sharp coefficient repair and an all-order
-convex-subordination argument, with explicit prior-art limitations.
+[collaborator bundles](docs/workflows/collaborator_bundle.md). The
+[thirty-example catalogue](docs/workflows/catalogue.md) collects more ideas, and
+the [recent-paper examples](docs/workflows/recent_literature.md) show how the
+same tools can find and repair a coefficient error.
 
 ### Exact generator series
 

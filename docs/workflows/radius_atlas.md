@@ -1,40 +1,58 @@
-# Read the directed-radius atlas
+# Read the radius map
 
-**Problem.** A list of inclusion radii is hard to audit for direction, missing pairs, and evidence strength. A symmetric heatmap is worse: reversing source and target is generally a different mathematical problem.
+This page puts every stored class-inclusion radius in one matrix. Use it to find
+known pairs, spot gaps, and choose the next problem to work on.
 
-Generate the deterministic atlas:
+## Run it
 
-```sh
+```bash
 python examples/research_workflows/radius_atlas.py \
   --output /tmp/gfa-radius-atlas
 ```
 
-The workflow writes `radius_atlas.json` and `radius_atlas.svg`. In the current immutable package snapshot there are 28 class labels, hence 756 possible non-diagonal directed pairs. The snapshot contains 702 records and leaves 54 directed pairs absent. The exporter includes every matrix cell and labels those 54 cells `missing_snapshot_row`; it does not invent a value or infer one from the reverse direction.
+## What you will see
 
-## Direction is mathematical data
+Open `/tmp/gfa-radius-atlas/radius_atlas.svg`. The same data are available in
+`radius_atlas.json`.
 
-The anchor pair makes the asymmetry visible:
+- **Rows are source classes.**
+- **Columns are target classes.**
+- A cell answers: “How far can every function in this row class be dilated while
+  remaining in this column class?”
+- Gray cells are pairs for which the package has no stored radius.
 
-- `sine→sigmoid` has exact value
-  $\arcsin((e-1)/(e+1))$, status `touch_proven_exact`, and a bundled replay certificate;
-- `sigmoid→sine` has value $1$, status `trivial_containment`, and no local replay certificate.
+Source and target cannot be swapped. The two directions can have different
+answers.
 
-These entries are not interchangeable. JSON uses source rows and target columns, and each cell repeats its full `source->target` direction.
+## Read one pair
 
-## Read the evidence colors
+For example:
 
-The SVG colors reproduce the snapshot's five evidence statuses:
+- `sine→sigmoid` has radius
+  $\arcsin((e-1)/(e+1))$ and a local proof certificate;
+- `sigmoid→sine` has radius $1$ because the whole source class is contained in
+  the target.
 
-- `touch_proven_exact`;
-- `closed_form_confirmed`;
-- `trivial_containment`;
-- `unidentified`; and
-- `audit_required`.
+Hover over a cell to see its direction, value, status, and whether a local
+certificate is available.
 
-Gray cells are missing snapshot rows, and pale diagonal cells are not stored radius problems. A color is a compact status display, not a proof. Hovering a cell shows its direction, exact value when present, status label, and whether a local replay certificate exists.
+## Read the status
 
-Read the current `record_count` and `replayable_certificate_count` from the generated JSON. For the snapshot shipped with this release they are 702 and 8, respectively. Other exact-looking strings remain immutable snapshot data with their own evidence status; the atlas does not upgrade them. Use `verify_radius_certificate(source, target)` only on a reviewed certificate lane, and treat `not_replayable` as unavailable local evidence rather than artifact corruption.
+| Status | Meaning |
+|---|---|
+| `touch_proven_exact` | The exact boundary contact and global bound have been proved. |
+| `closed_form_confirmed` | A closed form has been matched, but this label does not promise a full local proof check. |
+| `trivial_containment` | The full source class is contained in the target, so the radius is $1$. |
+| `unidentified` | A numerical radius is stored, but no exact formula has been identified. |
+| `audit_required` | The record needs mathematical review before use. |
 
-## Use the JSON as a shortlist
+With 28 classes there are 756 possible non-diagonal directions. The current map
+contains 702 records, leaving 54 gaps; eight have a local certificate that the
+package can check.
 
-`radius_atlas.json` records status counts, the 756-pair denominator, missing-pair count, certificate count, class order, and all 784 cells including the diagonal. Filter cells by `status == "audit_required"` or `status == "unidentified"` to form an investigation list. Reconcile sources and prove branch, containment, contact, and sharpness obligations before promoting any row.
+## Use it to choose a problem
+
+Filter `radius_atlas.json` for `audit_required`, `unidentified`, or missing
+cells. That gives a concrete list of pairs whose exact value or proof is still
+open. Start by fixing the direction, drawing the two generator domains, and
+looking for the first boundary contact.

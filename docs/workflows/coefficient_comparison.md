@@ -1,63 +1,91 @@
-# Compare sharp coefficient bounds and locate extremal changes
+# Compare coefficient bounds
 
-**Problem.** For normalized functions `f(z)=z+a2*z^2+a3*z^3+...` in a selected Ma–Minda class, determine the sharp bound for `|a3-mu*a2^2|` as real `mu` varies. What makes the graph change slope?
+For
 
-This workflow solves the problem for the classical starlike and sine-associated classes using a known general theorem. It does not claim a new coefficient inequality.
+$$
+f(z)=z+a_2z^2+a_3z^3+\cdots,
+$$
 
-## Run it and change the problem
+the Fekete–Szegő problem asks for the largest possible value of
+$|a_3-\mu a_2^2|$. This workflow shows how the answer changes as the real
+parameter $\mu$ moves.
 
-From a source checkout with the package installed:
+## Run it
 
-```sh
-python examples/research_workflows/coefficient_comparison.py --generator starlike --output /tmp/gfa-starlike-fs
-python examples/research_workflows/coefficient_comparison.py --generator sine --output /tmp/gfa-sine-fs
+```bash
+python examples/research_workflows/coefficient_comparison.py \
+  --generator starlike \
+  --output /tmp/gfa-coefficients
 ```
 
-Each run writes `coefficient_comparison.json` and `coefficient_comparison.svg`. The JSON preserves exact rational parameter values and equality examples. The plot samples the formula; it is not the proof. The starlike transition parameters are `1/2, 1`; changing the class to sine gives `0, 1`. Read the derivation below to understand why.
+## What you will see
 
-The script restricts its class choices to these two worked examples. It calls the public `fekete_szego` function, not private registry code, and works without the website or a registry database. In your own calculation, use that public function with another documented generator; analytic admissibility must still be justified.
+Open `/tmp/gfa-coefficients/coefficient_comparison.svg`. The graph has a flat
+middle section and two sloping sides. The JSON file gives the exact transition
+points and an equality example for each part.
 
-## Why the answer is piecewise
+For the classical starlike class, the answer is
 
-Write the admissible generator as
+$$
+\max\{1,|3-4\mu|\}.
+$$
 
-`phi(z)=1+B1*z+B2*z^2+...`, with `B1>0` and real `B2`.
+The graph changes at $\mu=1/2$ and $\mu=1$.
 
-Subordination means `z*f'(z)/f(z)=phi(omega(z))`, where `omega(z)=c1*z+c2*z^2+...` is a Schwarz function. Comparing coefficients gives
+## Why the graph has corners
 
-- `a2=B1*c1`;
-- `2*a3=B1*c2+(B2+B1^2)*c1^2`.
+Write
 
-Consequently
+$$
+\phi(z)=1+B_1z+B_2z^2+\cdots
+$$
 
-`a3-mu*a2^2 = B1/2 * [c2 + Q*c1^2]`,
+and
 
-where `Q=B2/B1+(1-2*mu)*B1`. The Schwarz coefficient inequality `|c2|<=1-|c1|^2` implies
+$$
+\frac{zf'(z)}{f(z)}=\phi(\omega(z)),
+\qquad \omega(z)=c_1z+c_2z^2+\cdots.
+$$
 
-`|c2+Q*c1^2| <= 1+(|Q|-1)*|c1|^2 <= max(1,|Q|)`.
+Comparing coefficients gives
 
-Thus the bound is `B1/2*max(1,|Q|)`. The maximum of two different contributions explains the corners in its graph.
+$$
+a_3-\mu a_2^2
+=\frac{B_1}{2}\left(c_2+Qc_1^2\right),
+\qquad
+Q=\frac{B_2}{B_1}+(1-2\mu)B_1.
+$$
 
-**Equality is visible, not merely asserted by the bound routine.** For `omega(z)=z`, the expression attains `|B1^2+B2-2*mu*B1^2|/2`. For `omega(z)=z^2`, it attains `B1/2`. The script independently computes these two coefficient examples and checks that the appropriate one equals every tabulated bound. At a transition both examples attain; this is not a classification of all equality cases.
+The Schwarz coefficient inequality yields
 
-For each such Schwarz function the normalized analytic solution is
+$$
+|a_3-\mu a_2^2|
+\leq \frac{B_1}{2}\max\{1,|Q|\}.
+$$
 
-`f(z)=z*exp(integral_0^z (phi(omega(t))-1)/t dt)`.
+Two functions compete for equality: $\omega(z)=z$ supplies the sloping pieces,
+while $\omega(z)=z^2$ supplies the flat piece. A corner appears when the winner
+changes.
 
-The integrand has a removable singularity at zero. This constructs genuine class members under the stated admissibility assumptions, rather than assuming that a finite polynomial with the same first coefficients is itself in the class.
+## Try the sine class
 
-## The two solutions
+```bash
+python examples/research_workflows/coefficient_comparison.py \
+  --generator sine \
+  --output /tmp/gfa-sine-coefficients
+```
 
-For the classical starlike class, `phi(z)=(1+z)/(1-z)`, so `B1=B2=2`. The answer is `max(1,|3-4*mu|)`, flat between `1/2` and `1`.
+Here $B_1=1$ and $B_2=0$, so the bound is
 
-For the sine class, `phi(z)=1+sin(z)`, so `B1=1, B2=0`. The answer is `max(1,|1-2*mu|)/2`, flat between `0` and `1`.
+$$
+\frac12\max\{1,|1-2\mu|\},
+$$
 
-A candidate universal starlike bound of `2` is false at `mu=0`: the Koebe function `z/(1-z)^2` has `a3=3`. This simple negative anchor prevents confusing a convenient numerical bound with the correct sharp one.
+with transitions at $\mu=0$ and $\mu=1$.
 
-## What is assumed, and what is established?
+The formulas above prove the bounds for every real $\mu$. The SVG simply makes
+the piecewise formula easier to see.
 
-The generator is analytic and univalent on the unit disk, normalized at one, with positive real part, real-axis symmetry, and an image starlike about one in the Ma–Minda setting. The package's coefficient checks do not prove all these analytic hypotheses for arbitrary supplied generators.
-
-The displayed derivation applies to the real-parameter continuum. The rational table is a reproducible selection of examples, not a proof by enumeration. Numerical SVG coordinates are for presentation only.
-
-**Attribution:** W. C. Ma and D. Minda, *A unified treatment of some special classes of univalent functions*, Proceedings of the Conference on Complex Analysis, Tianjin 1992, International Press (1994), 157–169; see the package's theorem provenance. A formula-critical primary-source locator is still pending independent source review. This pending locator does not turn a known theorem into a novelty claim; the elementary reduction used here is stated above for inspection.
+Source: W. C. Ma and D. Minda, *A unified treatment of some special classes of
+univalent functions*, Proceedings of the Conference on Complex Analysis,
+Tianjin 1992, International Press (1994), 157–169.

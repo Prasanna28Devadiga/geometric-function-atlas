@@ -69,31 +69,26 @@ def test_windows_installer_has_the_same_managed_python_contract() -> None:
     assert "--version" in script
 
 
-def test_public_installation_is_front_loaded_with_short_and_inspectable_paths() -> None:
+def test_public_installation_is_one_command_without_an_options_menu() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     install = (ROOT / "docs" / "getting-started.md").read_text(encoding="utf-8")
     unix_command = (
         "curl --proto '=https' --tlsv1.2 -LsSf "
         "https://gft-registry.fly.dev/install.sh | sh"
     )
-    short_windows = (
-        'powershell -ExecutionPolicy Bypass -c "irm '
-        'https://gft-registry.fly.dev/install.ps1 | iex"'
-    )
 
     assert readme.index("## Install") < readme.index("## What you can do")
     assert "No Python required" in readme
     assert unix_command in readme
-    assert short_windows in readme
     assert unix_command in install
-    assert short_windows in install
-    assert "install.sh -o gfa-install.sh" in install
-    assert "less gfa-install.sh" in install
-    assert "sh gfa-install.sh" in install
-    assert "uv tool install --managed-python --python 3.12" in install
-    assert "read the hosted installer" in install
+    assert readme.count("https://gft-registry.fly.dev/install.sh") == 1
+    assert install.count("https://gft-registry.fly.dev/install.sh") == 1
     assert "gfa walkthrough" in readme
-    assert 'f="$(mktemp)"' not in readme
+    for public_guide in (readme, install):
+        assert "install.ps1" not in public_guide
+        assert "uv tool install" not in public_guide
+        assert "Review before running" not in public_guide
+        assert "inspect-first" not in public_guide
 
 
 def test_pypi_project_links_prioritize_the_product_and_installer() -> None:
@@ -106,7 +101,7 @@ def test_pypi_project_links_prioritize_the_product_and_installer() -> None:
     )
     assert (
         'Installer = "https://prasanna28devadiga.github.io/'
-        'geometric-function-atlas/getting-started/#0-install"'
+        'geometric-function-atlas/getting-started/#install"'
         in pyproject
     )
     assert (
