@@ -1,4 +1,4 @@
-# Work from a paper
+# Reproduce and adapt a published result
 
 These two examples begin with a recent coefficient claim and ask a practical
 question: can the package reproduce it from the class definition? One claim

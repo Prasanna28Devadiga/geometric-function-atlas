@@ -1,4 +1,4 @@
-# Compare coefficient bounds
+# Investigate a coefficient problem
 
 For
 

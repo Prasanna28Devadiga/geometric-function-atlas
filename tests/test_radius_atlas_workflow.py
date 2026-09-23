@@ -75,8 +75,8 @@ def test_radius_atlas_exports_all_directed_cells_deterministically(tmp_path: Pat
     guide = (
         Path(__file__).resolve().parents[1]
         / "docs"
-        / "workflows"
-        / "radius_atlas.md"
+        / "reference"
+        / "radii.md"
     ).read_text(encoding="utf-8")
     assert "702" in guide
     assert "756" in guide

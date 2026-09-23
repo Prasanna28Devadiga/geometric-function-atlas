@@ -100,13 +100,10 @@ special-function or conformal-warp parity.
 
 ## Python API
 
-For problem-led examples rather than an API tour, see the
-[research workflows](docs/workflows/README.md): custom classes, class geometry,
-sharp radii, coefficient comparisons, conjecture repair, operator transfer, and
-[collaborator bundles](docs/workflows/collaborator_bundle.md). The
-[thirty-example catalogue](docs/workflows/catalogue.md) collects more ideas, and
-the [recent-paper examples](docs/workflows/recent_literature.md) show how the
-same tools can find and repair a coefficient error.
+For problem-led examples rather than an API tour, choose one of five
+[research workflows](docs/workflows/README.md): understand a Ma–Minda class,
+investigate a coefficient problem, prove an inclusion radius, test a conjecture,
+or reproduce and adapt a published result.
 
 ### Exact generator series
 

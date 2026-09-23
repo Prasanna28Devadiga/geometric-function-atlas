@@ -1,4 +1,4 @@
-# Find a sharp radius
+# Find and verify an inclusion radius
 
 Suppose every function in one Ma–Minda class is dilated by
 $f_r(z)=f(rz)/r$. How large can $r$ be before the dilated function leaves a

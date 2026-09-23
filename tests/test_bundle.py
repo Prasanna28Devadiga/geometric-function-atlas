@@ -144,8 +144,8 @@ def test_research_bundle_verifier_rejects_symlinked_parent_directory(
         verify_research_bundle_manifest(alias / manifest.name)
 
 
-def test_collaborator_bundle_workflow_explains_verification_plainly() -> None:
-    guide = (ROOT / "docs" / "workflows" / "collaborator_bundle.md").read_text(
+def test_bundle_reference_explains_verification_plainly() -> None:
+    guide = (ROOT / "docs" / "reference" / "bundles-and-records.md").read_text(
         encoding="utf-8"
     )
     plain_guide = " ".join(guide.lower().split())
