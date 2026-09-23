@@ -69,23 +69,27 @@ def test_windows_installer_has_the_same_managed_python_contract() -> None:
     assert "--version" in script
 
 
-def test_public_installation_is_one_command_without_an_options_menu() -> None:
+def test_public_installation_has_one_command_per_supported_shell() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     install = (ROOT / "docs" / "getting-started.md").read_text(encoding="utf-8")
     unix_command = (
         "curl --proto '=https' --tlsv1.2 -LsSf "
         "https://gft-registry.fly.dev/install.sh | sh"
     )
+    windows_command = "irm https://gft-registry.fly.dev/install.ps1 | iex"
 
     assert readme.index("## Install") < readme.index("## What you can do")
     assert "No Python required" in readme
     assert unix_command in readme
     assert unix_command in install
+    assert windows_command in readme
+    assert windows_command in install
     assert readme.count("https://gft-registry.fly.dev/install.sh") == 1
     assert install.count("https://gft-registry.fly.dev/install.sh") == 1
+    assert readme.count("https://gft-registry.fly.dev/install.ps1") == 1
+    assert install.count("https://gft-registry.fly.dev/install.ps1") == 1
     assert "gfa walkthrough" in readme
     for public_guide in (readme, install):
-        assert "install.ps1" not in public_guide
         assert "uv tool install" not in public_guide
         assert "Review before running" not in public_guide
         assert "inspect-first" not in public_guide

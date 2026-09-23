@@ -84,12 +84,13 @@ def test_mkdocs_site_presents_five_curated_research_workflows() -> None:
     assert "Thirty things to try" not in config
 
 
-def test_getting_started_is_a_short_tutorial_with_one_install_path() -> None:
+def test_getting_started_is_short_with_one_command_per_shell() -> None:
     assert GETTING_STARTED.is_file()
     tutorial = GETTING_STARTED.read_text(encoding="utf-8")
 
     expected_commands = (
         "curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh",
+        "irm https://gft-registry.fly.dev/install.ps1 | iex",
         "gfa fekete-szego exponential --mu 0",
         "gfa fekete-szego exponential --mu 1/2",
         "gfa walkthrough",
@@ -98,6 +99,7 @@ def test_getting_started_is_a_short_tutorial_with_one_install_path() -> None:
         assert command in tutorial
 
     assert tutorial.count("https://gft-registry.fly.dev/install.sh") == 1
+    assert tutorial.count("https://gft-registry.fly.dev/install.ps1") == 1
     assert len(tutorial.splitlines()) <= 81
     assert tutorial.count("## ") <= 5
     assert tutorial.count("```bash") <= 4
@@ -108,7 +110,6 @@ def test_getting_started_is_a_short_tutorial_with_one_install_path() -> None:
     assert "optional" in tutorial.lower()
     for unwanted in (
         '=== "macOS / Linux"',
-        '=== "Windows PowerShell"',
         "Review before running",
         "Already have uv?",
         "Optional labs",
