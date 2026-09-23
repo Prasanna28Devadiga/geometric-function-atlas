@@ -8,10 +8,16 @@ This repository is intentionally separate from the registry website and its rese
 
 ## Install
 
-**No Python required.** Run:
+**No Python required.** On macOS or Linux, run:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh
+```
+
+On Windows, open PowerShell and run:
+
+```powershell
+irm https://gft-registry.fly.dev/install.ps1 | iex
 ```
 
 Then take the guided tour:

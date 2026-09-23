@@ -5,8 +5,16 @@ question.
 
 ## Install
 
+On macOS or Linux:
+
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh
+```
+
+On Windows, open PowerShell and run:
+
+```powershell
+irm https://gft-registry.fly.dev/install.ps1 | iex
 ```
 
 The installer supplies the `gfa` command and its own Python.
