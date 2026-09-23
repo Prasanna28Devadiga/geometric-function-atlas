@@ -1,7 +1,11 @@
-# Explore your own class
+# Understand a new Ma–Minda class
 
-Use this workflow when you have an exact generator $\phi$ and want to see the
-class it defines. The example uses the starlike-of-order-$\alpha$ family
+Use this workflow when you have an exact generator $\phi$ and want to connect
+it to the functions in the class it defines. A Ma–Minda class constrains the
+logarithmic derivative $zf'(z)/f(z)$; it is not defined directly by the image
+$f(\mathbb D)$.
+
+The example uses the starlike-of-order-$\alpha$ family
 
 $$
 \phi_\alpha(z)=\frac{1+(1-2\alpha)z}{1-z},
@@ -29,8 +33,10 @@ Open `/tmp/gfa-custom-class`. It contains:
 - `custom_class_f_phi.svg`, the image of the canonical member; and
 - `research_bundle_manifest.json`, a file list with checksums.
 
-The three pictures show different functions. In particular, a plot of
-$z\phi(z)$ is not a plot of the canonical member.
+The three pictures show different functions. The generator domain
+$\phi(\mathbb D)$ constrains $zf'/f$, while $f_\phi(\mathbb D)$ is the image of
+one distinguished function in the class. A plot of $z\phi(z)$ is neither of
+those objects.
 
 ## Work through the example
 
@@ -46,6 +52,12 @@ The canonical member is defined by
 $$
 \frac{z f_\phi'(z)}{f_\phi(z)}=\phi(z),
 \qquad f_\phi(0)=0,\quad f_\phi'(0)=1.
+$$
+
+In general,
+
+$$
+f_\phi(z)=z\exp\!\left(\int_0^z\frac{\phi(t)-1}{t}\,dt\right).
 $$
 
 For this generator the solution is
@@ -79,6 +91,3 @@ The formulas, Taylor coefficients, canonical-member identity, and displayed
 coefficient bounds are symbolic calculations. The class-containment checks and
 SVGs use sampled points. Treat a sampled picture as a clue to investigate, not
 as a proof of containment.
-
-To send the output directory to someone else, continue with
-[Share a reproducible result](collaborator_bundle.md).

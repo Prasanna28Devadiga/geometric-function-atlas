@@ -20,8 +20,9 @@ Install `gfa`, take the guided tour, and run your first exact calculation.
 
 ## Follow a research question
 
-Start with a concrete question about a class, a radius, a coefficient bound, or
-a conjecture.
+Choose one of five complete investigations: understand a class, study a
+coefficient functional, prove a radius, test a conjecture, or check a published
+claim.
 
 [Choose a workflow →](workflows/README.md)
 
@@ -56,6 +57,6 @@ Use the Python package for calculations on your own machine. Use the
 papers, open problems, and interactive labs.
 
 - [Install the package](getting-started.md#install)
-- [Browse all research workflows](workflows/README.md)
+- [Choose a research question](workflows/README.md)
 - [Read the provenance policy](PROVENANCE.md)
 - [Open the source repository](https://github.com/Prasanna28Devadiga/geometric-function-atlas)

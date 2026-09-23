@@ -7,19 +7,22 @@ MKDOCS = ROOT / "mkdocs.yml"
 GETTING_STARTED = ROOT / "docs" / "getting-started.md"
 PYPROJECT = ROOT / "pyproject.toml"
 DOCS_WORKFLOW = ROOT / ".github" / "workflows" / "docs.yml"
-WORKFLOW_PAGES = (
+PUBLIC_WORKFLOW_PAGES = (
     "workflows/README.md",
     "workflows/custom_class.md",
-    "workflows/class_geometry.md",
-    "workflows/sharp_radius.md",
-    "workflows/radius_atlas.md",
     "workflows/coefficient_comparison.md",
+    "workflows/sharp_radius.md",
     "workflows/conjecture_counterexample.md",
+    "workflows/recent_literature.md",
+)
+RETIRED_WORKFLOW_PAGES = (
+    "workflows/class_geometry.md",
+    "workflows/radius_atlas.md",
     "workflows/alexander_transform.md",
     "workflows/collaborator_bundle.md",
-    "workflows/recent_literature.md",
     "workflows/catalogue.md",
 )
+ADVANCED_REFERENCE_PAGES = ("reference/alexander-transform.md",)
 REFERENCE_PAGES = {
     "reference/generators-and-coefficients.md": (
         "geometric_function_atlas.catalog",
@@ -44,7 +47,7 @@ REFERENCE_PAGES = {
 }
 
 
-def test_mkdocs_site_declares_every_research_workflow_once() -> None:
+def test_mkdocs_site_presents_five_curated_research_workflows() -> None:
     assert MKDOCS.is_file(), "mkdocs.yml must define the package documentation site"
     config = MKDOCS.read_text(encoding="utf-8")
 
@@ -54,9 +57,31 @@ def test_mkdocs_site_declares_every_research_workflow_once() -> None:
     assert "- search" in config
     assert "- mkdocstrings" in config
 
-    for relative_path in WORKFLOW_PAGES:
+    for relative_path in PUBLIC_WORKFLOW_PAGES:
         assert (ROOT / "docs" / relative_path).is_file(), relative_path
         assert config.count(relative_path) == 1, relative_path
+
+    for relative_path in RETIRED_WORKFLOW_PAGES:
+        assert not (ROOT / "docs" / relative_path).exists(), relative_path
+        assert relative_path not in config
+
+    for relative_path in ADVANCED_REFERENCE_PAGES:
+        assert (ROOT / "docs" / relative_path).is_file(), relative_path
+        assert config.count(relative_path) == 1, relative_path
+
+    nav = config.split("nav:\n", maxsplit=1)[1]
+    top_level = [
+        line.removeprefix("  - ").removesuffix(":")
+        for line in nav.splitlines()
+        if line.startswith("  - ")
+    ]
+    assert top_level == [
+        "Getting started",
+        "Research workflows",
+        "Reference",
+        "Developer documentation",
+    ]
+    assert "Thirty things to try" not in config
 
 
 def test_getting_started_is_a_short_tutorial_with_one_install_path() -> None:
@@ -65,19 +90,22 @@ def test_getting_started_is_a_short_tutorial_with_one_install_path() -> None:
 
     expected_commands = (
         "curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh",
+        "gfa fekete-szego exponential --mu 0",
+        "gfa fekete-szego exponential --mu 1/2",
         "gfa walkthrough",
-        "gfa generators",
-        "gfa coefficients sine --order 5 --json",
-        "gfa fekete-szego exponential --mu 0 --json",
-        "gfa verify-counterexample --coefficients 1 --point=-0.75,0 --property starlike",
-        "gfa verify-radius-certificate sine sigmoid",
-        "gfa plot domain exponential --output exponential-domain.svg",
     )
     for command in expected_commands:
         assert command in tutorial
 
     assert tutorial.count("https://gft-registry.fly.dev/install.sh") == 1
-    assert len(tutorial.splitlines()) < 220
+    assert len(tutorial.splitlines()) <= 81
+    assert tutorial.count("## ") <= 5
+    assert tutorial.count("```bash") <= 4
+    assert "f(z)=z+a_2z^2+a_3z^3" in tutorial.replace(" ", "")
+    normalized_tutorial = " ".join(tutorial.split())
+    assert "coefficients of functions in the class" in normalized_tutorial
+    assert "not the coefficients of the generator" in normalized_tutorial
+    assert "optional" in tutorial.lower()
     for unwanted in (
         '=== "macOS / Linux"',
         '=== "Windows PowerShell"',
@@ -88,20 +116,29 @@ def test_getting_started_is_a_short_tutorial_with_one_install_path() -> None:
         "Invoke-WebRequest",
         "uv tool install",
         "uv tool uninstall",
+        "gfa generators",
+        "gfa coefficients",
+        "gfa verify-counterexample",
+        "gfa verify-radius-certificate",
+        "gfa plot",
+        "from geometric_function_atlas",
+        "sine",
+        "cardioid",
+        "sigmoid",
     ):
         assert unwanted not in tutorial
     assert "replay" not in tutorial.lower()
 
 
 def test_workflow_guides_lead_with_actions_not_review_vocabulary() -> None:
-    primary_pages = WORKFLOW_PAGES[1:-1]
+    primary_pages = PUBLIC_WORKFLOW_PAGES[1:]
 
     for relative_path in primary_pages:
         guide = (ROOT / "docs" / relative_path).read_text(encoding="utf-8")
         assert "## Run it" in guide, relative_path
         assert "## What you will see" in guide, relative_path
 
-    for relative_path in WORKFLOW_PAGES:
+    for relative_path in PUBLIC_WORKFLOW_PAGES:
         guide = (ROOT / "docs" / relative_path).read_text(encoding="utf-8")
         for unwanted in (
             "**Problem.**",
@@ -114,6 +151,36 @@ def test_workflow_guides_lead_with_actions_not_review_vocabulary() -> None:
         ):
             assert unwanted not in guide, f"{relative_path}: {unwanted}"
         assert "replay" not in guide.lower(), f"{relative_path}: replay"
+
+
+def test_public_docs_do_not_present_a_brainstorming_catalogue() -> None:
+    public_pages = (ROOT / "README.md", ROOT / "docs" / "index.md") + tuple(
+        ROOT / "docs" / relative_path for relative_path in PUBLIC_WORKFLOW_PAGES
+    )
+
+    for page in public_pages:
+        text = page.read_text(encoding="utf-8")
+        assert "Thirty things to try" not in text, str(page)
+        assert "thirty-example catalogue" not in text, str(page)
+
+
+def test_workflow_landing_uses_five_mobile_readable_choices() -> None:
+    landing = (ROOT / "docs" / "workflows" / "README.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "| Research question |" not in landing
+    choices = (
+        "Understand a new Ma–Minda class",
+        "Investigate a coefficient problem",
+        "Find and verify an inclusion radius",
+        "Test a conjecture",
+        "Reproduce and adapt a published result",
+    )
+    positions = [landing.index(f"[{choice}]") for choice in choices]
+    assert positions == sorted(positions)
+    for index in range(1, 6):
+        assert f"{index}. **[" not in landing
 
 
 def test_docs_dependencies_and_canonical_url_are_declared() -> None:
