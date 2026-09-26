@@ -1160,21 +1160,21 @@ def replay_radius_certificate(
             return RadiusReplayResult(**base, status="candidate_mismatch", certified=False,
                                       error="candidate does not match the paper exact radius",
                                       method="paper_analytic_radius_replay")
-        steps: list[ReplayStep] = []
+        paper_steps: list[ReplayStep] = []
         # This decimal comparison is only an identity guard for the stored row;
         # the proof is the analytic majorant/attainment argument below.
         expected_value = _parse_exact_expression(paper_exact)
         stored = resolved.value_decimal
         matches_snapshot = stored is not None and abs(sp.N(expected_value, 70) - sp.Float(stored, 70)) < sp.Rational(1, 10**58)
-        steps.append(ReplayStep("exact paper value agrees with historical 60-digit row",
+        paper_steps.append(ReplayStep("exact paper value agrees with historical 60-digit row",
                                 bool(matches_snapshot), scope="numeric identity guard, not containment proof",
                                 failure_reason=None if matches_snapshot else "stored decimal differs"))
-        passed = _replay_paper_analytic(resolved.source_class, resolved.target_class, steps)
-        if len(steps) > max_steps:
+        passed = _replay_paper_analytic(resolved.source_class, resolved.target_class, paper_steps)
+        if len(paper_steps) > max_steps:
             raise ResourceLimitError("paper replay exceeds the replay step limit")
-        status = "proven" if passed and all(s.verified for s in steps) else "unresolved"
+        status = "proven" if passed and all(s.verified for s in paper_steps) else "unresolved"
         return RadiusReplayResult(**base, status=status, certified=status == "proven",
-                                  steps=tuple(steps), method="paper_analytic_radius_replay",
+                                  steps=tuple(paper_steps), method="paper_analytic_radius_replay",
                                   error=None if status == "proven" else "analytic replay failed")
     blocker = _validate_record_for_replay(resolved)
     if blocker is not None:
