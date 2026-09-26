@@ -1223,6 +1223,17 @@ def _artifact_classes(args: argparse.Namespace) -> None:
     _artifact_emit(args, result_type="classes", record=records, record_count=len(records))
 
 
+def _artifact_coefficient_table(args: argparse.Namespace) -> None:
+    record = _artifact_data.coefficient_table(args.functional_key)
+    _artifact_emit(
+        args, result_type="coefficient_table", record=record,
+        canonical_inputs={"functional_key": args.functional_key},
+        record_count=len(record["rows"]),
+        evidence_status="screened" if args.functional_key == "hankel3_1"
+        else "proven_exact_under_declared_assumptions",
+    )
+
+
 def _artifact_class(args: argparse.Namespace) -> None:
     _artifact_emit(
         args,
@@ -1914,6 +1925,13 @@ def _parser() -> argparse.ArgumentParser:
     bound.add_argument("functional_key", nargs="?")
     bound.add_argument("--json", action="store_true", help="emit JSON")
     bound.set_defaults(handler=_artifact_bound)
+
+    coefficient_table = subparsers.add_parser(
+        "coefficient-table", help="exact coefficient tables with row-level proof status"
+    )
+    coefficient_table.add_argument("functional_key", choices=["hankel3_1", "a3", "a2a3"])
+    coefficient_table.add_argument("--json", action="store_true", help="emit JSON")
+    coefficient_table.set_defaults(handler=_artifact_coefficient_table)
 
     proofs = subparsers.add_parser("proofs", help="list baked proof certificates")
     proofs.add_argument("--class", dest="class_key")

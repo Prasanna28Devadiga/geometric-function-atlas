@@ -13,6 +13,10 @@
    "schema_version": 1,
    "sha256": "4751213869d69e2f4fedbe7f009f539b43cebf45f9d65d9fc03e89779b91e35a"
   },
+  "coefficient_supplement.json": {
+   "schema_version": 1,
+   "sha256": "eb70addea248e042ee5e560f0121c1ad203d54ec8ec12c63a271293f63e73e64"
+  },
   "expansions.json": {
    "schema_version": 1,
    "sha256": "41db7da6e45e92a3ba88ed9502c5aaafd70339183384fe7d6c09f12655fa2ac6"

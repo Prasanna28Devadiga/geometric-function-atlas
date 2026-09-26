@@ -59,6 +59,7 @@ MAX_REPLAY_ORDER = 3  # hankel2_2 / Zalcman need a2..a4 at most
 _SNAPSHOT_RESULT_TYPES = frozenset(
     {
         "certificate_replay",
+        "coefficient_table",
         "classes",
         "coefficient_bound",
         "expansion",
@@ -73,6 +74,7 @@ _SNAPSHOT_RESULT_TYPES = frozenset(
 
 _LOOKUP_METHODS = {
     "certificate_replay": "exact_schur_extremal_replay",
+    "coefficient_table": "versioned_coefficient_supplement_lookup",
     "classes": "baked_class_catalog_lookup",
     "coefficient_bound": "baked_coefficient_bound_lookup",
     "expansion": "baked_expansion_lookup",
@@ -403,7 +405,32 @@ def coefficient_bound(
 def _certificates() -> dict[str, dict[str, Any]]:
     payload = _load_json("certificates.json")
     _check_schema(payload, "certificates.json")
-    return payload["certificates"]
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    originals = payload["certificates"]
+    additions = supplement["certificates"]
+    if set(originals) & set(additions):
+        raise CorruptArtifactError("coefficient supplement overwrites an original certificate")
+    return originals | additions
+
+
+def coefficient_table(functional_key: str) -> dict[str, Any]:
+    """Return exact attained H3 witnesses or analytically sharp a3/a2a3 values.
+
+    H3 sharpness requires a cited direct-class theorem; all remaining rows are
+    lower witnesses, regardless of numerical optimization reports.
+    """
+    if functional_key not in {"hankel3_1", "a3", "a2a3"}:
+        raise UnsupportedError(f"unknown coefficient table {functional_key!r}")
+    payload = _load_json("coefficient_supplement.json")
+    _check_schema(payload, "coefficient_supplement.json")
+    return {
+        "functional_key": functional_key,
+        "supplement_version": payload["supplement_version"],
+        "source_class_artifact": payload["source_class_artifact"],
+        "assumptions": payload["theorem_scope"],
+        "rows": {key: dict(row) for key, row in payload["tables"][functional_key].items()},
+    }
 
 
 def _proof_summary(name: str, record: Mapping[str, Any]) -> dict[str, Any]:
