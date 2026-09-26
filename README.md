@@ -39,7 +39,7 @@ only panels and private research-workspace operations are explicit non-goals.
 | Website capability | CLI | Python function |
 |---|---|---|
 | Run a concise first-use tour | `gfa walkthrough` | — |
-| Browse the generator catalog (39 Ma–Minda generators) | `gfa generators` | `list_generators()` |
+| Browse the generator catalog (39 keys; 38 distinct formulas) | `gfa generators` | `list_generators()` |
 | Exact Taylor coefficients of a generator | `gfa coefficients <gen> --order N` | `generator_series()` |
 | Exact Ma–Minda Fekete–Szegő constants | `gfa fekete-szego <gen> --mu M` | `fekete_szego()` |
 | Re-check a supplied counterexample witness | `gfa verify-counterexample` | `verify_counterexample()` |
@@ -60,6 +60,12 @@ only panels and private research-workspace operations are explicit non-goals.
 | Query aliases, hierarchy, and stored witnesses | `gfa aliases|normalize-class|hierarchy|counterexamples` | `RegistrySnapshot.aliases()`, `.normalize_class()`, `.hierarchy()`, `.counterexamples()` |
 | Cryptography Lab S-box metrics (optional) | `gfa crypto-lab ...` | `geometric_function_atlas.lab.*` |
 | Image Lab finite coefficient-derived filters, metrics, and transforms (optional) | `gfa image-lab ...` | `geometric_function_atlas.lab.*` |
+
+The built-in catalog has **39 catalog keys, 38 distinct generator formulas**:
+`janowski_A0_B-1` and `order_0.5` both equal `1/(1-z)` exactly. Both keys
+remain supported for historical radius records and source locators; they are
+not independent mathematical generators. The directed-radius snapshot is
+alias-inclusive; see [the count reconciliation](docs/RADIUS_COUNT_RECONCILIATION.md).
 
 Result-printing commands accept `--json` for machine-readable output;
 file-writing commands (`plot`, `image-lab transform`, `image-lab sample`)

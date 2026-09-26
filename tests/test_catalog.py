@@ -161,6 +161,25 @@ def test_full_catalog_matches_website_class_keys() -> None:
     assert {generator.key for generator in list_generators()} == EXPECTED_FULL_CATALOG_KEYS
 
 
+def test_catalog_distinguishes_keys_from_exact_generator_formulas() -> None:
+    generators = list_generators()
+    equivalent = {
+        tuple(sorted((left.key, right.key)))
+        for index, left in enumerate(generators)
+        for right in generators[index + 1 :]
+        if sp.simplify(left.expression - right.expression) == 0
+    }
+    assert len(generators) == 39
+    assert equivalent == {("janowski_A0_B-1", "order_0.5")}
+    assert len(generators) - len(equivalent) == 38
+
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    for path in (root / "README.md", root / "docs/ROADMAP.md"):
+        assert "39 catalog keys, 38 distinct generator formulas" in path.read_text()
+
+
 def test_every_catalog_generator_is_exactly_normalized() -> None:
     for key in EXPECTED_FULL_CATALOG_KEYS:
         generator = get_generator(key)

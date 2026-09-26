@@ -15,8 +15,9 @@ nodes and search implementation details are not.
 
 Status: shipped.
 
-- Immutable generator definitions with bibliographic provenance (39 built-in
-  Ma–Minda generators).
+- Immutable generator definitions with bibliographic provenance (39 catalog keys, 38 distinct generator formulas).
+  `janowski_A0_B-1` and `order_0.5` are the same exact function `1/(1-z)`;
+  keep both public keys for compatibility and historical source locators.
 - Exact Taylor coefficients `B_1, …, B_n` via `generator_series`.
 - Exact Ma–Minda Fekete–Szegő constants under declared assumptions via
   `fekete_szego`.
