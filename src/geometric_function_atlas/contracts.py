@@ -477,8 +477,19 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
         "claim_label",
         "provenance_detail",
         "certificate",
+        "paper_theorem",
+        "paper_proof_status",
+        "axis_equation",
     }
     _check_mapping_keys(payload, allowed, "result")
+    if payload["result_type"] == "radius":
+        for key in ("paper_theorem", "axis_equation"):
+            if key in payload and payload[key] is not None and (not isinstance(payload[key], str) or not payload[key]):
+                raise TypeError(f"{key} must be a non-empty string or null")
+        if payload.get("paper_proof_status") not in (None, "written_proof"):
+            raise ValueError("unknown paper_proof_status")
+        if bool(payload.get("paper_theorem")) != (payload.get("paper_proof_status") == "written_proof"):
+            raise ValueError("paper theorem and proof status must agree")
     missing = required - payload.keys()
     if missing:
         raise ValueError(f"result is missing required keys: {sorted(missing)}")
@@ -535,7 +546,12 @@ def validate_result_payload(payload: Mapping[str, Any]) -> None:
     ):
         if not isinstance(payload[key], str) or not payload[key]:
             raise TypeError(f"{key} must be a non-empty string")
-    if payload["computational_status"] != payload["evidence_status"]:
+    paper_without_replay = (payload["result_type"] == "radius"
+                            and payload.get("paper_proof_status") == "written_proof"
+                            and payload.get("certificate") is None
+                            and payload["computational_status"] == "unresolved"
+                            and payload["evidence_status"] == "proven_exact_under_declared_assumptions")
+    if payload["computational_status"] != payload["evidence_status"] and not paper_without_replay:
         raise ValueError("computational_status must match evidence_status")
     for key in ("assumptions", "source_references"):
         if not isinstance(payload[key], list) or not all(
@@ -729,6 +745,7 @@ def _validate_radius_operation_contract(payload: Mapping[str, Any]) -> None:
 
     status = payload.get("status")
     evidence_by_status = {
+        "paper_proved_exact": "proven_exact_under_declared_assumptions",
         "touch_proven_exact": "proven_exact_under_declared_assumptions",
         "closed_form_confirmed": "certified_enclosure",
         "trivial_containment": "proven_exact_under_declared_assumptions",
@@ -737,6 +754,8 @@ def _validate_radius_operation_contract(payload: Mapping[str, Any]) -> None:
     }
     if status not in evidence_by_status:
         raise ValueError("radius status is not a package-owned value")
+    if (status == "paper_proved_exact") != (payload.get("paper_proof_status") == "written_proof"):
+        raise ValueError("paper-proved status requires a written theorem reference")
     if payload["evidence_status"] != evidence_by_status[status]:
         raise ValueError("radius evidence status does not match the stored radius status")
     if payload["method"] != "directed_radius_snapshot":

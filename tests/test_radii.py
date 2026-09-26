@@ -30,10 +30,11 @@ from geometric_function_atlas.contracts import (
 from geometric_function_atlas.models import canonical_expression_dag
 
 EXPECTED_COUNTS = {
-    RadiusStatus.TOUCH_PROVEN_EXACT: 323,
-    RadiusStatus.CLOSED_FORM_CONFIRMED: 140,
+    RadiusStatus.TOUCH_PROVEN_EXACT: 306,
+    RadiusStatus.CLOSED_FORM_CONFIRMED: 139,
+    RadiusStatus.PAPER_PROVED_EXACT: 19,
     RadiusStatus.TRIVIAL_CONTAINMENT: 142,
-    RadiusStatus.UNIDENTIFIED: 85,
+    RadiusStatus.UNIDENTIFIED: 84,
     RadiusStatus.AUDIT_REQUIRED: 12,
 }
 
@@ -51,7 +52,7 @@ def test_radius_snapshot_preserves_every_status_and_direction() -> None:
 def test_directed_lookup_keeps_exact_identity_and_review_metadata() -> None:
     record = radius("sine", "sigmoid")
 
-    assert record.status is RadiusStatus.TOUCH_PROVEN_EXACT
+    assert record.status is RadiusStatus.PAPER_PROVED_EXACT
     assert record.value_exact == "asin((E-1)/(E+1))"
     assert record.direction == "sine->sigmoid"
     assert record.inverse_branch_and_domain
@@ -199,7 +200,7 @@ def test_snapshot_row_without_bundled_certificate_is_not_replayable() -> None:
     record = radius("exponential", "sine")
 
     assert record.certificate is None
-    assert record.status is RadiusStatus.TOUCH_PROVEN_EXACT
+    assert record.status is RadiusStatus.PAPER_PROVED_EXACT
 
     result = replay_radius_certificate(record)
 
@@ -208,10 +209,10 @@ def test_snapshot_row_without_bundled_certificate_is_not_replayable() -> None:
     assert result.failure_state is FailureState.UNSUPPORTED
     assert result.error is not None
     assert "certificate" in result.error
-    assert "touch_proven_exact" in result.error
+    assert "paper_proved_exact" in result.error
     # A missing bundled certificate is not damage: the snapshot row keeps its
     # own evidence status and stays untouched.
-    assert radius("exponential", "sine").status is RadiusStatus.TOUCH_PROVEN_EXACT
+    assert radius("exponential", "sine").status is RadiusStatus.PAPER_PROVED_EXACT
     assert record.to_dict()["evidence_status"] == "proven_exact_under_declared_assumptions"
 
 
@@ -232,7 +233,7 @@ def test_radius_audit_reports_unavailable_replay_without_damaging_the_row() -> N
     payload = audit_radius("exponential", "sine")
 
     assert payload["status"] == "not_replayable"
-    assert payload["evidence_status"] == "touch_proven_exact"
+    assert payload["evidence_status"] == "paper_proved_exact"
     assert payload["attainment_verified"] is False
     assert payload["novelty_claim"] is False
     replay = payload["certificate_replay"]

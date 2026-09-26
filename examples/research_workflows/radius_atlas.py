@@ -12,6 +12,7 @@ from geometric_function_atlas import list_radii
 from geometric_function_atlas.version import __version__
 
 _STATUS_COLORS = {
+    "paper_proved_exact": "#134e40",
     "touch_proven_exact": "#176b4d",
     "closed_form_confirmed": "#3975a8",
     "trivial_containment": "#7a5ba6",
@@ -152,6 +153,7 @@ def write_svg(data: dict, path: Path) -> None:
     legend_x = left + cell_size * len(classes) + 28
     legend_y = top
     labels = [
+        ("paper_proved_exact", "written paper proof"),
         ("touch_proven_exact", "touch proven exact"),
         ("closed_form_confirmed", "closed form confirmed"),
         ("trivial_containment", "trivial containment"),

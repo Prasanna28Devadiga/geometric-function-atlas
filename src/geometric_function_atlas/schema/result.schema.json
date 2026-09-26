@@ -135,6 +135,9 @@
     "claim_label": {"type": "string", "minLength": 1},
     "provenance_detail": {"$ref": "#/$defs/json_value"},
     "certificate": {"$ref": "#/$defs/json_value"},
+    "paper_theorem": {"type": ["string", "null"], "minLength": 1},
+    "paper_proof_status": {"enum": ["written_proof", null]},
+    "axis_equation": {"type": ["string", "null"], "minLength": 1},
     "record": {"$ref": "#/$defs/json_value"}
   },
   "$defs": {

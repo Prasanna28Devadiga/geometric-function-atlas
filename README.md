@@ -339,9 +339,11 @@ gfa verify-certificate starlike__fekete_szego_mu1 --json
 
 ### Directed inclusion radii
 
-Radius rows preserve direction and the website's five evidence statuses. Only
-the eight reviewed exact lanes are replayable by the package; the other rows
-remain snapshot records with their original status and provenance.
+Radius rows preserve direction. The 2026.09.27-paper-review snapshot adds
+`paper_proved_exact` for 19 directed radii cited to written manuscript theorems;
+it does not mutate the published 0.4.0 snapshot. Only eight reviewed lanes
+have package-owned replay certificates. Axis recognition is a numerical
+contact route, not a global containment or sharpness certificate.
 
 ```python
 from geometric_function_atlas import (

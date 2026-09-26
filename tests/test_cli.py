@@ -314,7 +314,7 @@ def test_sibling_radius_replay_commands_match_the_unavailable_semantics() -> Non
         payload = json.loads(machine.stdout)
         assert payload["status"] == "not_replayable", command
         if command[0] == "radius-audit":
-            assert payload["evidence_status"] == "touch_proven_exact", command
+            assert payload["evidence_status"] == "paper_proved_exact", command
             assert payload["certificate_replay"]["failure_state"] == "unsupported", command
         else:
             assert payload["failure_state"] == "unsupported", command
