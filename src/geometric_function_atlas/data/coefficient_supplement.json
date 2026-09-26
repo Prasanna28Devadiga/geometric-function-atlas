@@ -1,0 +1,1272 @@
+{
+ "certificates": {
+  "booth_0.3__fekete_szego_mu0": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.3",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0",
+   "name": "booth_0.3__fekete_szego_mu0",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "1",
+     "0"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.3__fekete_szego_mu0.25": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.3",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0.25",
+   "name": "booth_0.3__fekete_szego_mu0.25",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "0",
+     "1"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0.25a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.3__fekete_szego_mu0.5": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.3",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0.5",
+   "name": "booth_0.3__fekete_szego_mu0.5",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "0",
+     "1"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0.5a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.3__fekete_szego_mu0.75": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.3",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0.75",
+   "name": "booth_0.3__fekete_szego_mu0.75",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "0",
+     "1"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0.75a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.3__fekete_szego_mu1": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.3",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu1",
+   "name": "booth_0.3__fekete_szego_mu1",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "1",
+     "0"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-1a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.3__fekete_szego_mu2": {
+   "bound": "3/2",
+   "bound_float": 1.5,
+   "class": "booth_0.3",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu2",
+   "name": "booth_0.3__fekete_szego_mu2",
+   "sharp": {
+    "candidate": {
+     "value_exact": "3/2",
+     "value_float": 1.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "1",
+     "0"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-2a2²| = 3/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.7__fekete_szego_mu0": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.7",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0",
+   "name": "booth_0.7__fekete_szego_mu0",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "1",
+     "0"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.7__fekete_szego_mu0.25": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.7",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0.25",
+   "name": "booth_0.7__fekete_szego_mu0.25",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "0",
+     "1"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0.25a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.7__fekete_szego_mu0.5": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.7",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0.5",
+   "name": "booth_0.7__fekete_szego_mu0.5",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "0",
+     "1"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0.5a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.7__fekete_szego_mu0.75": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.7",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu0.75",
+   "name": "booth_0.7__fekete_szego_mu0.75",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "0",
+     "1"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-0.75a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.7__fekete_szego_mu1": {
+   "bound": "1/2",
+   "bound_float": 0.5,
+   "class": "booth_0.7",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu1",
+   "name": "booth_0.7__fekete_szego_mu1",
+   "sharp": {
+    "candidate": {
+     "value_exact": "1/2",
+     "value_float": 0.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "1",
+     "0"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-1a2²| = 1/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  },
+  "booth_0.7__fekete_szego_mu2": {
+   "bound": "3/2",
+   "bound_float": 1.5,
+   "class": "booth_0.7",
+   "engine": "closed-form-single-harmonic",
+   "functional": "fekete_szego_mu2",
+   "name": "booth_0.7__fekete_szego_mu2",
+   "sharp": {
+    "candidate": {
+     "value_exact": "3/2",
+     "value_float": 1.5
+    },
+    "exact": true,
+    "extremal_gammas": [
+     "1",
+     "0"
+    ],
+    "proven": true,
+    "reference": "Ma–Minda Fekete–Szegő single-harmonic formula; linear maximum in r²"
+   },
+   "slack": 0.0,
+   "statement": "Sharp |a3-2a2²| = 3/2 under Ma–Minda assumptions",
+   "status": "PROVED"
+  }
+ },
+ "schema_version": 1,
+ "source_class_artifact": "classes.json:2026.08.11",
+ "supplement_version": "2026.09.27-coefficients-v1",
+ "tables": {
+  "a2a3": {
+   "bean_tanh": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "Schur(gamma0=sqrt(x), gamma1=sign(B2+B1**2))",
+    "extremal_r_squared": "4/9",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/18"
+   },
+   "bell": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1"
+   },
+   "booth_0.3": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "booth_0.7": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "cardioid": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "44/27"
+   },
+   "cardioid_exp": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1"
+   },
+   "cissoid_diocles": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/6"
+   },
+   "cosh_sqrt": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "Schur(gamma0=sqrt(x), gamma1=sign(B2+B1**2))",
+    "extremal_r_squared": "4/5",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "sqrt(5)/30"
+   },
+   "crescent": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "epicycloid_3": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "27/128"
+   },
+   "epicycloid_6": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "108/343"
+   },
+   "exponential": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "four_leaf": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "125/432"
+   },
+   "janowski_A0.5_B-0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "janowski_A0.75_B-0.25": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/8"
+   },
+   "janowski_A1_B-0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "9/4"
+   },
+   "janowski_A1_B0": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "lemniscate": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "Schur(gamma0=sqrt(x), gamma1=sign(B2+B1**2))",
+    "extremal_r_squared": "4/9",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/18"
+   },
+   "limacon_0.3": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "27/200"
+   },
+   "limacon_0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/8"
+   },
+   "limacon_0.707": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5*sqrt(2)/4"
+   },
+   "nephroid": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "nonconvex_sec": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "order_0.25": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "45/16"
+   },
+   "order_0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1"
+   },
+   "order_0.75": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/16"
+   },
+   "parabolic": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "64*(pi**2 + 12)/(3*pi**6)"
+   },
+   "petal_arcsinh": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "rational_kr": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "-21/2 + 15*sqrt(2)/2"
+   },
+   "sigmoid": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "Schur(gamma0=sqrt(x), gamma1=sign(B2+B1**2))",
+    "extremal_r_squared": "2/3",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "sqrt(6)/36"
+   },
+   "sine": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "starlike": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "6"
+   },
+   "strip_arctan": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "strongly_0.25": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/32"
+   },
+   "strongly_0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "strongly_0.75": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "81/32"
+   },
+   "tanh": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "three_leaf": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "32/125"
+   }
+  },
+  "a3": {
+   "bean_tanh": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/4"
+   },
+   "bell": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1"
+   },
+   "booth_0.3": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "booth_0.7": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "cardioid": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "11/9"
+   },
+   "cardioid_exp": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1"
+   },
+   "cissoid_diocles": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/6"
+   },
+   "cosh_sqrt": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/4"
+   },
+   "crescent": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "epicycloid_3": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/8"
+   },
+   "epicycloid_6": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/7"
+   },
+   "exponential": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "four_leaf": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/12"
+   },
+   "janowski_A0.5_B-0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "janowski_A0.75_B-0.25": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/8"
+   },
+   "janowski_A1_B-0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/2"
+   },
+   "janowski_A1_B0": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "lemniscate": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/4"
+   },
+   "limacon_0.3": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/10"
+   },
+   "limacon_0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/8"
+   },
+   "limacon_0.707": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "5/4"
+   },
+   "nephroid": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "nonconvex_sec": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "order_0.25": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "15/8"
+   },
+   "order_0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1"
+   },
+   "order_0.75": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/8"
+   },
+   "parabolic": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "8*(pi**2 + 12)/(3*pi**4)"
+   },
+   "petal_arcsinh": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "rational_kr": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "9/2 - 3*sqrt(2)"
+   },
+   "sigmoid": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/4"
+   },
+   "sine": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "starlike": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3"
+   },
+   "strip_arctan": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "strongly_0.25": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/4"
+   },
+   "strongly_0.5": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "3/4"
+   },
+   "strongly_0.75": {
+    "extremal_gamma1": "0",
+    "extremal_omega": "z",
+    "extremal_r_squared": "1",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "27/16"
+   },
+   "tanh": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "1/2"
+   },
+   "three_leaf": {
+    "extremal_gamma1": "1",
+    "extremal_omega": "z^2",
+    "extremal_r_squared": "0",
+    "method": "single_harmonic_schur_phase_and_one_variable_maximum",
+    "status": "analytic_sharp",
+    "value_exact": "2/5"
+   }
+  },
+  "hankel3_1": {
+   "bean_tanh": {
+    "B1": "1/2",
+    "citation": {
+     "locator": "https://arxiv.org/abs/2405.07995",
+     "theorem": "On Estimation of Hankel Determinants for Certain Class of Starlike Functions, Theorem 2.5"
+    },
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "published_direct_class_upper_bound; not_reproved_by_package",
+    "status": "literature_sharp",
+    "value_exact": "1/36"
+   },
+   "bell": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "booth_0.3": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "booth_0.7": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "cardioid": {
+    "B1": "4/3",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "16/81"
+   },
+   "cardioid_exp": {
+    "B1": "1",
+    "citation": {
+     "locator": "https://arxiv.org/abs/2208.02975",
+     "theorem": "A Conjecture on H_3(1) For Certain Starlike Functions, Theorem 2.1"
+    },
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "published_direct_class_upper_bound; not_reproved_by_package",
+    "status": "literature_sharp",
+    "value_exact": "1/9"
+   },
+   "cissoid_diocles": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "cosh_sqrt": {
+    "B1": "1/2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/36"
+   },
+   "crescent": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "epicycloid_3": {
+    "B1": "3/4",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/16"
+   },
+   "epicycloid_6": {
+    "B1": "6/7",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "4/49"
+   },
+   "exponential": {
+    "B1": "1",
+    "citation": {
+     "locator": "https://arxiv.org/abs/2206.13707",
+     "theorem": "Third Hankel determinant for a class of starlike functions associated with exponential function, Theorem 2.1"
+    },
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "published_direct_class_upper_bound; not_reproved_by_package",
+    "status": "literature_sharp",
+    "value_exact": "1/9"
+   },
+   "four_leaf": {
+    "B1": "5/6",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "25/324"
+   },
+   "janowski_A0.5_B-0.5": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "janowski_A0.75_B-0.25": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "janowski_A1_B-0.5": {
+    "B1": "3/2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/4"
+   },
+   "janowski_A1_B0": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "lemniscate": {
+    "B1": "1/2",
+    "citation": {
+     "locator": "https://arxiv.org/abs/1906.02681",
+     "theorem": "Banga & Sivaprasad Kumar, Theorem 2.1"
+    },
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "published_direct_class_upper_bound; not_reproved_by_package",
+    "status": "literature_sharp",
+    "value_exact": "1/36"
+   },
+   "limacon_0.3": {
+    "B1": "3/5",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/25"
+   },
+   "limacon_0.5": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "limacon_0.707": {
+    "B1": "sqrt(2)",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "2/9"
+   },
+   "nephroid": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "nonconvex_sec": {
+    "B1": "1",
+    "citation": {
+     "locator": "https://arxiv.org/abs/2412.04819",
+     "theorem": "Starlike Functions Associated with a Non-Convex Domain, Theorem 14"
+    },
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "published_direct_class_upper_bound; not_reproved_by_package",
+    "status": "literature_sharp",
+    "value_exact": "1/9"
+   },
+   "order_0.25": {
+    "B1": "3/2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/4"
+   },
+   "order_0.5": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "order_0.75": {
+    "B1": "1/2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/36"
+   },
+   "parabolic": {
+    "B1": "8/pi**2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "64/(9*pi**4)"
+   },
+   "petal_arcsinh": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "rational_kr": {
+    "B1": "-1 + sqrt(2)",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "(1 - sqrt(2))**2/9"
+   },
+   "sigmoid": {
+    "B1": "1/2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/36"
+   },
+   "sine": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "starlike": {
+    "B1": "2",
+    "citation": {
+     "locator": "10.1515/forum-2021-0308",
+     "theorem": "Kowalczyk, Lecko & Thomas, Forum Math. 34 (2022), 1249–1254"
+    },
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "published_direct_class_upper_bound; not_reproved_by_package",
+    "status": "literature_sharp",
+    "value_exact": "4/9"
+   },
+   "strip_arctan": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "strongly_0.25": {
+    "B1": "1/2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/36"
+   },
+   "strongly_0.5": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "strongly_0.75": {
+    "B1": "3/2",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/4"
+   },
+   "tanh": {
+    "B1": "1",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "1/9"
+   },
+   "three_leaf": {
+    "B1": "4/5",
+    "citation": null,
+    "extremal_omega": "z^3",
+    "method": "exact_attainment_at_schwarz_z_cubed",
+    "optimization_status": "global_upper_bound_not_established_here",
+    "status": "attained_lower_bound",
+    "value_exact": "16/225"
+   }
+  }
+ },
+ "theorem_scope": "Ma–Minda admissibility of each named generator"
+}

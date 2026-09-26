@@ -42,6 +42,7 @@ only panels and private research-workspace operations are explicit non-goals.
 | Browse the generator catalog (39 Ma–Minda generators) | `gfa generators` | `list_generators()` |
 | Exact Taylor coefficients of a generator | `gfa coefficients <gen> --order N` | `generator_series()` |
 | Exact Ma–Minda Fekete–Szegő constants | `gfa fekete-szego <gen> --mu M` | `fekete_szego()` |
+| Versioned coefficient tables (H₃ lower witnesses; sharp a₃ and a₂a₃) | `gfa coefficient-table hankel3_1|a3|a2a3 --json` | `coefficient_table()` |
 | Re-check a supplied counterexample witness | `gfa verify-counterexample` | `verify_counterexample()` |
 | Search for and certify a violation point | `gfa find-counterexample` | `find_counterexample()` |
 | Verify a function at a cost tier | `gfa verify --max-cost <tier>` | `verify_function()` |
@@ -335,6 +336,10 @@ gfa open-problems --kind enclosure --json
 gfa reconciliation --json
 gfa references --json
 gfa verify-certificate starlike__fekete_szego_mu1 --json
+gfa verify-certificate booth_0.3__fekete_szego_mu0.25 --json
+gfa coefficient-table hankel3_1 --json
+gfa coefficient-table a3 --json
+gfa coefficient-table a2a3 --json
 ```
 
 ### Directed inclusion radii

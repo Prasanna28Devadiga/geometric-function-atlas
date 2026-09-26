@@ -21,7 +21,7 @@ from geometric_function_atlas.contracts import (
 def test_snapshot_verify_passes_every_shipped_artifact() -> None:
     record = gfa.snapshot_verify()
 
-    assert record["files_verified"] == 8
+    assert record["files_verified"] == 9
     assert record["checks"]["success"] is True
     assert record["artifact_version"] == "2026.08.11"
 
@@ -35,6 +35,7 @@ def test_snapshot_info_reports_versioned_identity() -> None:
     assert set(record["files"]) == {
         "bounds.json",
         "certificates.json",
+        "coefficient_supplement.json",
         "classes.json",
         "expansions.json",
         "open_problems.json",
@@ -150,8 +151,8 @@ def test_coefficient_bound_unknown_functional_fails_closed() -> None:
 def test_proof_gallery_reports_corpus_size() -> None:
     record = gfa.list_proofs()
 
-    assert record["count"] == 306
-    assert len(record["rows"]) == 306
+    assert record["count"] == 318
+    assert len(record["rows"]) == 318
     assert all(row["status"] == "PROVED" for row in record["rows"])
 
 
