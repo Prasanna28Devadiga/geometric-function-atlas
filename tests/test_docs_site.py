@@ -1,6 +1,13 @@
 from __future__ import annotations
 
+import ast
+import importlib.util
+import re
+import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 MKDOCS = ROOT / "mkdocs.yml"
@@ -248,9 +255,72 @@ def test_docs_workflow_builds_strictly_and_deploys_with_pages_permissions() -> N
     assert "branches: [main]" in workflow
     assert "uv sync --extra docs --locked" in workflow
     assert "uv run --frozen --extra docs mkdocs build --strict" in workflow
+    assert "scripts/check_docs_site.py site" in workflow
     assert "actions/configure-pages@" in workflow
     assert "actions/upload-pages-artifact@" in workflow
     assert "actions/deploy-pages@" in workflow
     assert workflow.count("pages: write") == 1
     assert workflow.count("id-token: write") == 1
     assert "name: github-pages" in workflow
+
+
+# C0 control characters other than tab, newline and carriage return.  A LaTeX
+# command such as "\\frac" that passes through a non-raw Python string turns
+# into one of these ("\\f" is a form feed) and MathJax reports an input error.
+CONTROL_CHARACTERS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+RECENT_LITERATURE = ROOT / "docs" / "workflows" / "recent_literature.md"
+
+
+def test_docs_sources_contain_no_control_characters() -> None:
+    sources = [ROOT / "README.md", *sorted((ROOT / "docs").rglob("*.md"))]
+    offenders = []
+    for source in sources:
+        # split("\n") rather than splitlines(): splitlines() treats a form
+        # feed as a line break and would hide exactly the bug under test.
+        for number, line in enumerate(
+            source.read_text(encoding="utf-8").split("\n"), start=1
+        ):
+            if CONTROL_CHARACTERS.search(line):
+                offenders.append(f"{source.relative_to(ROOT)}:{number}: {line!r}")
+    assert offenders == []
+
+
+def test_docstrings_rendered_by_mkdocstrings_contain_no_control_characters() -> None:
+    offenders = []
+    for module in sorted((ROOT / "src").rglob("*.py")):
+        tree = ast.parse(module.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.Constant)
+                and isinstance(node.value, str)
+                and CONTROL_CHARACTERS.search(node.value)
+            ):
+                offenders.append(f"{module.relative_to(ROOT)}:{node.lineno}")
+    assert offenders == []
+
+
+def test_recent_literature_counterexample_series_is_valid_tex() -> None:
+    page = RECENT_LITERATURE.read_text(encoding="utf-8")
+    assert r"f_0(z)=z+z^2+\frac34z^3+\frac7{12}z^4+\frac5{12}z^5+\cdots." in page
+    assert "\f" not in page
+
+
+@pytest.mark.skipif(
+    importlib.util.find_spec("mkdocs") is None,
+    reason="docs extra not installed; the Documentation workflow runs this check",
+)
+def test_built_site_math_has_no_control_characters(tmp_path: Path) -> None:
+    site = tmp_path / "site"
+    subprocess.run(
+        [sys.executable, "-m", "mkdocs", "build", "--strict", "--site-dir", str(site)],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    )
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "check_docs_site.py"), str(site)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
