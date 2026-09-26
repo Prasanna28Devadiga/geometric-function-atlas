@@ -54,7 +54,7 @@ gfa.validate_result_payload(counterexample_payload)
 # Baked scientific artifacts must ship inside the wheel and resolve
 # fail-closed from the installed package.
 artifact_snapshot = gfa.snapshot_verify()
-assert artifact_snapshot["files_verified"] == 8
+assert artifact_snapshot["files_verified"] == 9
 assert artifact_snapshot["checks"]["success"] is True
 
 expansion = gfa.expansion("starlike")
@@ -67,7 +67,7 @@ assert bound["sharp"] is True
 assert bound["value_exact"] == "1"
 
 gallery = gfa.list_proofs()
-assert gallery["count"] == 306
+assert gallery["count"] == 318
 proof = gfa.get_proof("starlike__fekete_szego_mu1")
 assert proof["status"] == "PROVED"
 replay = gfa.verify_certificate("starlike__fekete_szego_mu1")
