@@ -1,8 +1,8 @@
 """Quarantined legacy touch failures: exact axis equations are not global proofs."""
 import pytest
 
-from geometric_function_atlas import radius, replay_radius_certificate
 import geometric_function_atlas.radii as radius_module
+from geometric_function_atlas import radius, replay_radius_certificate
 
 PAIRS = [
     ("bell", "janowski_A0.75_B-0.25"),

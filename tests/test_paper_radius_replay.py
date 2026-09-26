@@ -3,7 +3,11 @@ from dataclasses import replace
 
 import pytest
 
-from geometric_function_atlas import radius, replay_radius_certificate, verify_radius_certificate
+from geometric_function_atlas import (
+    radius,
+    replay_radius_certificate,
+    verify_radius_certificate,
+)
 
 
 @pytest.mark.parametrize("source,target,expected", [
