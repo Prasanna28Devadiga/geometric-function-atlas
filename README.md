@@ -342,8 +342,16 @@ gfa verify-certificate starlike__fekete_szego_mu1 --json
 Radius rows preserve direction. The 2026.09.27-paper-review snapshot adds
 `paper_proved_exact` for 19 directed radii cited to written manuscript theorems;
 it does not mutate the published 0.4.0 snapshot. Only eight reviewed lanes
-have package-owned replay certificates. Axis recognition is a numerical
-contact route, not a global containment or sharpness certificate.
+have package-owned replay certificates; the remaining 11 written-proof lanes
+are not machine-replayable here. Six axis contacts have numerical recognition,
+not a global containment or sharpness certificate. The 702 raw rows span a
+bounded 28-source × 26-target key grid, not every ordered pair of the 38
+distinct catalog classes. Canonical alias/self-pair accounting yields 650
+questions and 557 eligible closed-form-consistent questions. Twelve raw rows
+remain `audit_required` consistency failures (11 in the canonical off-diagonal
+view); neither the raw nor canonical count is a proof tally. The 0.4.0 release
+snapshot is frozen; until the new release assets exist, public installers still
+point to the 0.4.0 wheel.
 
 ```python
 from geometric_function_atlas import (

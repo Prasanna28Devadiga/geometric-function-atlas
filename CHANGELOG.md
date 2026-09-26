@@ -4,6 +4,31 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
+## 0.5.0 — 2026-09-27
+
+### Added
+
+- A derived, immutable 702-row directed-radius snapshot with 19
+  `paper_proved_exact` rows linked to written manuscript proofs. These are
+  theorem citations, not 19 machine-replay certificates: only eight reviewed
+  lanes have package-owned replay. Six previously unidentified real-axis
+  contacts are now numerically recognized; axis recognition is not global
+  containment or sharpness evidence.
+- A bounded canonical-scope analysis of the 28-source × 26-target raw-key
+  grid: 702 stored rows, 650 canonical off-diagonal questions, 557 eligible
+  closed-form-consistent questions, and an explicit 1,406-question future
+  full-catalog scope. Canonical alias and self-pair exclusions are tracked;
+  the grid is not a complete 38-class directed atlas.
+
+### Limitations
+
+- Eleven of the 19 paper-proof lanes have no package-owned machine replay.
+  Twelve raw snapshot rows remain `audit_required` consistency failures;
+  the canonical off-diagonal scope has 11 after exclusions. No such row is
+  promoted to a verified theorem by this release.
+- The published 0.4.0 snapshot remains immutable. Default public installers
+  continue to target its wheel until 0.5.0 GitHub assets and PyPI are live.
+
 ## 0.4.0 — 2026-09-16
 
 ### Added

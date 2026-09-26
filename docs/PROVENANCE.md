@@ -75,8 +75,15 @@ separate route; `unidentified` is an open closed-form question; and
 assumptions, the global-containment route, contact/attainment wording, and
 reconciliation status without collapsing them into one boolean.
 
-Only the eight reviewed certificate lanes are replayable. Replay uses a
-package-owned, bounded SymPy implementation of the recorded inverse,
+Only the eight reviewed certificate lanes are replayable; the other 11 of
+19 `paper_proved_exact` lanes cite written proofs without package-owned replay.
+Six real-axis contacts were numerically recognized, which does not establish
+global containment or sharpness. The bounded raw 28-source × 26-target grid
+holds 702 rows, of which 12 remain `audit_required` consistency failures.
+Canonical alias/self-pair accounting leaves 650 off-diagonal questions and
+11 audit-required rows (557 eligible closed-form-consistent questions); this
+is not the complete 1,406-direction grid for 38 distinct catalog classes.
+Replay uses a package-owned, bounded SymPy implementation of the recorded inverse,
 positive-majorant, boundary-contact, and monotonicity identities. It does not
 import the research repository and never evaluates a candidate as Python code.
 Malformed expressions, wrong direction, missing evidence, source/hash
