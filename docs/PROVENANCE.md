@@ -53,7 +53,8 @@ components are capped before symbolic arithmetic begins.
 
 The package ships two immutable data artifacts:
 
-- `radii_snapshot.json`, a 702-row directed snapshot from source commit
+- `radii_snapshot.json`, a 702-row derived 2026.09.27-paper-review snapshot
+  based on the 0.4.0 snapshot from source commit
   `cf0b2b0a3539ccc7ea9dcae679afd1cd0471b5bd`; and
 - `radius_certificate_fixture.json`, the eight-row reviewed source crosswalk
   from `73515129716c70d4287e2e228d15633e6ccb45f2`.
@@ -64,7 +65,9 @@ names and row/lane identifiers rather than checkout paths. A radius is always
 identified as `source->target`; lookup never silently swaps that direction.
 
 Radius status is evidence taxonomy, not a claim that every stored number has a
-proof. The five statuses are `touch_proven_exact`, `closed_form_confirmed`,
+proof. The new `paper_proved_exact` status cites a written manuscript theorem,
+but does not imply package-owned machine replay. The other five statuses are
+`touch_proven_exact`, `closed_form_confirmed`,
 `trivial_containment`, `unidentified`, and `audit_required`. The first two
 describe different strengths of radius evidence; `trivial_containment` is a
 separate route; `unidentified` is an open closed-form question; and

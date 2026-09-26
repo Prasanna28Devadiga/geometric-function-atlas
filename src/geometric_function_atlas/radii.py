@@ -32,7 +32,7 @@ from .version import (
     __version__,
 )
 
-RADIUS_SNAPSHOT_ID = "gft-radius-snapshot:2026.08.09"
+RADIUS_SNAPSHOT_ID = "gft-radius-snapshot:2026.09.27-paper-review"
 RADIUS_SCHEMA_VERSION = "1.0.0"
 MAX_CANDIDATE_LENGTH = 4096
 MAX_REPLAY_STEPS = 128
@@ -48,9 +48,11 @@ class RadiusStatus(str, Enum):
     TRIVIAL_CONTAINMENT = "trivial_containment"
     UNIDENTIFIED = "unidentified"
     AUDIT_REQUIRED = "audit_required"
+    PAPER_PROVED_EXACT = "paper_proved_exact"
 
 
 RADIUS_STATUS_LABELS = {
+    RadiusStatus.PAPER_PROVED_EXACT: "sharp exact radius in a written paper theorem; local certificate replay only where separately bundled",
     RadiusStatus.TOUCH_PROVEN_EXACT: (
         "touch equation proven exact (symbolic); global-max-over-theta validated "
         "numerically (8192-point) + monotone-in-r (max principle) — not yet discharged"
@@ -63,6 +65,7 @@ RADIUS_STATUS_LABELS = {
     RadiusStatus.AUDIT_REQUIRED: "symbolic touch check FAILED — quarantined, not a result",
 }
 _CONTRACT_EVIDENCE_STATUS = {
+    RadiusStatus.PAPER_PROVED_EXACT: "proven_exact_under_declared_assumptions",
     RadiusStatus.TOUCH_PROVEN_EXACT: "proven_exact_under_declared_assumptions",
     RadiusStatus.CLOSED_FORM_CONFIRMED: "certified_enclosure",
     RadiusStatus.TRIVIAL_CONTAINMENT: "proven_exact_under_declared_assumptions",
@@ -71,6 +74,7 @@ _CONTRACT_EVIDENCE_STATUS = {
 }
 RECONCILABLE_STATUSES = frozenset(
     {
+        RadiusStatus.PAPER_PROVED_EXACT,
         RadiusStatus.TOUCH_PROVEN_EXACT,
         RadiusStatus.CLOSED_FORM_CONFIRMED,
         RadiusStatus.TRIVIAL_CONTAINMENT,
@@ -166,6 +170,8 @@ class RadiusRecord:
     claim_label: str
     provenance: RadiusProvenance
     certificate: RadiusCertificate | None = None
+    paper_theorem: str | None = None
+    axis_equation: str | None = None
 
     @property
     def direction(self) -> str:
@@ -206,8 +212,8 @@ class RadiusRecord:
             "exact_expressions": exact,
             "exact_expression_dag": dag,
             "method": "directed_radius_snapshot",
-            "evidence_status": _CONTRACT_EVIDENCE_STATUS[self.status],
-            "computational_status": _CONTRACT_EVIDENCE_STATUS[self.status],
+            "evidence_status": "proven_exact_under_declared_assumptions" if self.paper_theorem else _CONTRACT_EVIDENCE_STATUS[self.status],
+            "computational_status": "unresolved" if self.paper_theorem and self.certificate is None else _CONTRACT_EVIDENCE_STATUS[self.status],
             "assumptions": list(self.assumptions),
             "source_references": list(self.provenance.source_references),
             "package_version": __version__,
@@ -277,6 +283,9 @@ class RadiusRecord:
                 "machine_status": self.certificate.machine_status,
                 "machine_steps": list(self.certificate.machine_steps),
             },
+            "paper_theorem": self.paper_theorem,
+            "paper_proof_status": "written_proof" if self.paper_theorem else None,
+            "axis_equation": self.axis_equation,
         }
 
 
@@ -721,6 +730,7 @@ def _record_from_snapshot(row: Mapping[str, Any], reviewed: Mapping[tuple[str, s
     source = str(row["inner"])
     target = str(row["target"])
     reviewed_row = reviewed.get((source, target))
+    paper_theorem = row.get("paper_theorem")
     certificate = None if reviewed_row is None else _certificate(reviewed_row, fixture_sha256=RADIUS_FIXTURE_SHA256)
     value_exact: str | None
     value_decimal: str | None
@@ -738,13 +748,17 @@ def _record_from_snapshot(row: Mapping[str, Any], reviewed: Mapping[tuple[str, s
     else:
         value_exact = None if row.get("value_exact") is None else str(row["value_exact"])
         value_decimal = None if row.get("value_str") is None else str(row["value_str"])
-        assumptions = ("This row is read from the immutable radius snapshot.",)
+        assumptions = (("Written paper proof is cited; local replay is not bundled.",)
+                       if paper_theorem else ("This row is read from the immutable radius snapshot.",))
         inverse = "The snapshot does not record a branch/domain certificate for this row."
-        route = "The snapshot record is not a global-containment proof."
-        contact = "Contact data is recorded only as the stored angle and mode; no attainment claim is added."
-        sharpness = RADIUS_STATUS_LABELS[RadiusStatus(str(row["status"]))]
+        route = (f"Written global-containment argument: {paper_theorem}; not locally replayed."
+                 if paper_theorem else "The snapshot record is not a global-containment proof.")
+        contact = (f"Written sharpness/contact argument: {paper_theorem}; not locally replayed."
+                   if paper_theorem else "Contact data is recorded only as the stored angle and mode; no attainment claim is added.")
+        sharpness = (f"Sharp radius proved in {paper_theorem}; not locally replayable."
+                     if paper_theorem else RADIUS_STATUS_LABELS[RadiusStatus(str(row["status"]))])
         reconciliation = None
-        claim = RADIUS_STATUS_LABELS[RadiusStatus(str(row["status"]))]
+        claim = sharpness
         locator = (("snapshot", f"radii_snapshot.json:{source}->{target}"),)
     status = RadiusStatus(str(row["status"]))
     value_float = row.get("value_float")
@@ -771,13 +785,15 @@ def _record_from_snapshot(row: Mapping[str, Any], reviewed: Mapping[tuple[str, s
         reconciliation_status=reconciliation,
         claim_label=claim,
         provenance=_provenance(
-            locator,
+            tuple(locator) + (("paper", f"Experimental Mathematics manuscript (2026-09-27), {paper_theorem}"),) if paper_theorem else locator,
             fixture_sha256=(
                 RADIUS_FIXTURE_SHA256 if certificate is not None else RADIUS_SNAPSHOT_SHA256
             ),
             fixture_id=(RADIUS_FIXTURE_ID if certificate is not None else RADIUS_SNAPSHOT_ID),
         ),
         certificate=certificate,
+        paper_theorem=paper_theorem,
+        axis_equation=row.get("axis_equation"),
     )
 
 
@@ -839,6 +855,50 @@ def radius(source: str, target: str) -> RadiusRecord:
     for row in list_radii(source=source, target=target):
         return row
     raise KeyError(f"unknown directed radius {source!r}->{target!r}")
+
+
+def recognize_axis_radius(source: str, target: str) -> float:
+    """Numerically recognize the first real-axis contact; NOT a containment proof.
+
+    Bounded bisection on each side of the catalog's normalized generators.
+    A non-crossing side is omitted. This route is diagnostic and never changes
+    a row's proof status or creates a replayable certificate.
+    """
+    import mpmath as mp
+
+    from .catalog import get_generator
+
+    with mp.workdps(40):
+        z = sp.Symbol('z')
+        source_fn = sp.lambdify(z, get_generator(source).expression, "mpmath")
+        target_fn = sp.lambdify(z, get_generator(target).expression, "mpmath")
+
+        def real(fn: Any, x: Any) -> float | None:
+            try:
+                value = complex(fn(x))
+                return value.real if math.isfinite(value.real) and abs(value.imag) < 1e-12 else None
+            except (ArithmeticError, ValueError, TypeError, OverflowError):
+                return None
+
+        roots: list[float] = []
+        for sign in (1, -1):
+            bound = real(target_fn, sign * (mp.mpf(1) - mp.mpf('1e-15')))
+            lo, hi = mp.mpf('1e-12'), mp.mpf(1) - mp.mpf('1e-9')
+            left, right = real(source_fn, sign * lo), real(source_fn, sign * hi)
+            if bound is None or left is None or right is None or (left - bound) * (right - bound) > 0:
+                continue
+            for _ in range(120):
+                mid = (lo + hi) / 2
+                middle = real(source_fn, sign * mid)
+                if middle is None:
+                    break
+                if (middle - bound) * (left - bound) > 0:
+                    lo, left = mid, middle
+                else:
+                    hi = mid
+            else:
+                roots.append(float((lo + hi) / 2))
+        return min(roots, default=1.0)
 
 
 @dataclass(frozen=True, slots=True)
@@ -923,7 +983,11 @@ def _validate_record_for_replay(record: RadiusRecord) -> _ReplayBlocker | None:
         or certificate.target_class != record.target_class
     ):
         return corrupt("certificate direction does not match the directed radius")
-    if certificate.baked_status != record.status.value:
+    if certificate.baked_status != record.status.value and not (
+        record.status is RadiusStatus.PAPER_PROVED_EXACT
+        and record.paper_theorem
+        and certificate.baked_status in ("touch_proven_exact", "closed_form_confirmed")
+    ):
         return corrupt("certificate status does not match the radius status")
     trusted = trusted_snapshot_row()
     if trusted is None:
@@ -1032,6 +1096,8 @@ def _coerce_record(value: RadiusRecord | Mapping[str, Any]) -> RadiusRecord:
         claim_label=str(value.get("claim_label", "")),
         provenance=provenance,
         certificate=certificate,
+        paper_theorem=value.get("paper_theorem"),
+        axis_equation=value.get("axis_equation"),
     )
 
 

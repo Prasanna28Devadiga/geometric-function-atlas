@@ -51,10 +51,11 @@ def test_radius_atlas_exports_all_directed_cells_deterministically(tmp_path: Pat
     assert len(data["cells"]) == 28 * 28
     assert data["status_counts"] == {
         "audit_required": 12,
-        "closed_form_confirmed": 140,
-        "touch_proven_exact": 323,
+        "closed_form_confirmed": 139,
+        "paper_proved_exact": 19,
+        "touch_proven_exact": 306,
         "trivial_containment": 142,
-        "unidentified": 85,
+        "unidentified": 84,
     }
     assert data["replayable_certificate_count"] == 8
 
@@ -119,11 +120,14 @@ def test_alias_inclusive_counts_do_not_masquerade_as_distinct_problems() -> None
     distinct = {key: members for key, members in groups.items() if key[0] != key[1]}
     assert len(distinct) == 650
     assert Counter(members[0]["status"] for members in distinct.values()) == {
-        "touch_proven_exact": 290,
-        "closed_form_confirmed": 133,
+        "touch_proven_exact": 275,
+        "paper_proved_exact": 17,
+        "closed_form_confirmed": 132,
         "trivial_containment": 133,
-        "unidentified": 83,
+        "unidentified": 82,
         "audit_required": 11,
     }
-    assert all(len({member["status"] for member in members}) == 1 for members in groups.values())
+    # Alias duplicates retain their historical evidence lanes independently:
+    # a paper theorem for one key does not automatically prove the alias row.
+    assert all(len({member["value_str"] for member in members}) == 1 for members in groups.values())
     assert all(len({member["value_exact"] for member in members}) == 1 for members in groups.values())
