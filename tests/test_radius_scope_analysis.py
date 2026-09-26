@@ -12,7 +12,7 @@ SCRIPT = ROOT / "scripts/build_radius_scope.py"
 def test_scope_artifact_is_deterministic_and_preserves_public_keys():
     artifact = json.loads((DATA / "radius_scope_2026_09_27.json").read_text())
     actual = subprocess.run([sys.executable, str(SCRIPT), "--check"], cwd=ROOT,
-                            capture_output=True, text=True)
+                            capture_output=True, text=True, check=False)
     assert actual.returncode == 0, actual.stdout + actual.stderr
     scope = artifact["scope"]
     assert scope["source_key_count"] == 28

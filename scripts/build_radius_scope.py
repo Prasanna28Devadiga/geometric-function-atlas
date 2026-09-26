@@ -5,9 +5,9 @@ Usage: python scripts/build_radius_scope.py [--check]
 from __future__ import annotations
 
 import argparse
-from collections import Counter
 import hashlib
 import json
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
