@@ -5,7 +5,10 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from collections import Counter, defaultdict
 from pathlib import Path
+
+import sympy as sp
 
 EXAMPLE = (
     Path(__file__).resolve().parents[1]
@@ -83,3 +86,44 @@ def test_radius_atlas_exports_all_directed_cells_deterministically(tmp_path: Pat
     assert "54" in guide
     assert "sine→sigmoid" in guide
     assert "sigmoid→sine" in guide
+
+
+def test_alias_inclusive_counts_do_not_masquerade_as_distinct_problems() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data = root / "src" / "geometric_function_atlas" / "data"
+    classes = json.loads((data / "classes.json").read_text())["classes"]
+    z = sp.Symbol("z")
+    assert classes["janowski_A0_B-1"]["phi_formula"] == "(1+(0)*z)/(1+(-1)*z)"
+    assert classes["order_0.5"]["phi_formula"] == "(1+(1-2*(1/2))*z)/(1-z)"
+    janowski = (1 + 0 * z) / (1 + (-1) * z)
+    order_half = (1 + (1 - 2 * sp.Rational(1, 2)) * z) / (1 - z)
+    assert sp.simplify(janowski - order_half) == 0
+    assert sp.simplify(janowski - 1 / (1 - z)) == 0
+
+    rows = json.loads((data / "radii_snapshot.json").read_text())["radii"]
+    keys = {key for row in rows for key in (row["inner"], row["target"])}
+    raw_directions = {(row["inner"], row["target"]) for row in rows}
+    assert len(keys) == 28
+    assert len(raw_directions) == len(rows) == 702
+    missing = {(a, b) for a in keys for b in keys if a != b} - raw_directions
+    assert len(missing) == 54
+    assert {target for _, target in missing} == {"nephroid", "three_leaf"}
+
+    def canonical(key: str) -> str:
+        return "order_0.5" if key == "janowski_A0_B-1" else key
+
+    groups = defaultdict(list)
+    for row in rows:
+        groups[canonical(row["inner"]), canonical(row["target"])].append(row)
+    assert {key for key in groups if key[0] == key[1]} == {("order_0.5", "order_0.5")}
+    distinct = {key: members for key, members in groups.items() if key[0] != key[1]}
+    assert len(distinct) == 650
+    assert Counter(members[0]["status"] for members in distinct.values()) == {
+        "touch_proven_exact": 290,
+        "closed_form_confirmed": 133,
+        "trivial_containment": 133,
+        "unidentified": 83,
+        "audit_required": 11,
+    }
+    assert all(len({member["status"] for member in members}) == 1 for members in groups.values())
+    assert all(len({member["value_exact"] for member in members}) == 1 for members in groups.values())
