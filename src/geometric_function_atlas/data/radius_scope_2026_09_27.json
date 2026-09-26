@@ -1,0 +1,137 @@
+{
+  "analysis_version": "2026.09.27-paper-review-canonical-v1",
+  "canonical_aliases": {
+    "janowski_A0_B-1": "order_0.5"
+  },
+  "count_rules": {
+    "contact_status_table": "nontrivial-status rows only, by axis/axis_bisect vs other mode; not a proof or coefficient-sign classification",
+    "eligible": "canonical off-diagonal status excludes unidentified and audit_required",
+    "nontrivial": "eligible and numerical radius < 1 - 1e-10; identical value_str groups",
+    "reciprocal": "both directions eligible; unequal when value_str differs"
+  },
+  "counts": {
+    "alias_identity_rows": 2,
+    "canonical_questions": 650,
+    "contact_status_table": {
+      "off_axis": {
+        "closed_form_confirmed": 56,
+        "paper_proved_exact": 1,
+        "unidentified": 76
+      },
+      "real_axis": {
+        "closed_form_confirmed": 76,
+        "paper_proved_exact": 18,
+        "touch_proven_exact": 273,
+        "unidentified": 6
+      }
+    },
+    "eligible_closed_form_consistent": 557,
+    "nontrivial_shared": 148,
+    "nontrivial_shared_groups": 42,
+    "nontrivial_total": 424,
+    "raw_key_rows": 702,
+    "reciprocal_total": 240,
+    "reciprocal_unequal": 234,
+    "status_buckets": {
+      "audit_required": 11,
+      "closed_form_confirmed": 132,
+      "paper_proved_exact": 19,
+      "touch_proven_exact": 273,
+      "trivial_containment": 133,
+      "unidentified": 82
+    }
+  },
+  "next_release_todo": {
+    "description": "Expand radii to every ordered non-self pair of 38 distinct generator classes",
+    "directed_questions": 1406,
+    "distinct_classes": 38,
+    "status": "not_in_this_release"
+  },
+  "schema_version": 1,
+  "scope": {
+    "catalog_key_count": 39,
+    "distinct_catalog_generator_count": 38,
+    "full_catalog": false,
+    "never_source_keys": [
+      "bean_tanh",
+      "booth_0.3",
+      "booth_0.7",
+      "cardioid_exp",
+      "cissoid_diocles",
+      "epicycloid_3",
+      "epicycloid_6",
+      "four_leaf",
+      "nonconvex_sec",
+      "petal_arcsinh",
+      "strip_arctan"
+    ],
+    "never_target_among_source_keys": [
+      "nephroid",
+      "three_leaf"
+    ],
+    "raw_grid_non_diagonal_key_questions": 702,
+    "source_key_count": 28,
+    "source_keys": [
+      "bell",
+      "cardioid",
+      "cosh_sqrt",
+      "crescent",
+      "exponential",
+      "janowski_A0.5_B-0.5",
+      "janowski_A0.75_B-0.25",
+      "janowski_A0_B-1",
+      "janowski_A1_B-0.5",
+      "janowski_A1_B0",
+      "lemniscate",
+      "limacon_0.3",
+      "limacon_0.5",
+      "limacon_0.707",
+      "nephroid",
+      "order_0.25",
+      "order_0.5",
+      "order_0.75",
+      "parabolic",
+      "rational_kr",
+      "sigmoid",
+      "sine",
+      "starlike",
+      "strongly_0.25",
+      "strongly_0.5",
+      "strongly_0.75",
+      "tanh",
+      "three_leaf"
+    ],
+    "target_key_count": 26,
+    "target_keys": [
+      "bell",
+      "cardioid",
+      "cosh_sqrt",
+      "crescent",
+      "exponential",
+      "janowski_A0.5_B-0.5",
+      "janowski_A0.75_B-0.25",
+      "janowski_A0_B-1",
+      "janowski_A1_B-0.5",
+      "janowski_A1_B0",
+      "lemniscate",
+      "limacon_0.3",
+      "limacon_0.5",
+      "limacon_0.707",
+      "order_0.25",
+      "order_0.5",
+      "order_0.75",
+      "parabolic",
+      "rational_kr",
+      "sigmoid",
+      "sine",
+      "starlike",
+      "strongly_0.25",
+      "strongly_0.5",
+      "strongly_0.75",
+      "tanh"
+    ],
+    "unpopulated_incoming_key_directions": 54
+  },
+  "source_snapshot_sha256": "6a4fa701aaeada2f0b063604ad65c4ebed7b555e4f47894ea652d4c7ab3c617c",
+  "source_snapshot_version": "2026.09.27-paper-review"
+}
