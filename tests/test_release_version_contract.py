@@ -12,8 +12,8 @@ def test_stable_050_identity_is_consistent() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     assert __version__ == "0.5.0"
     assert "\nversion: 0.5.0\n" in citation
-    assert "\ndate-released:" not in citation  # Not published yet.
-    assert "\n## 0.5.0 — release pending\n" in changelog
+    assert "\ndate-released: 2026-09-27\n" in citation
+    assert "\n## 0.5.0 — 2026-09-27\n" in changelog
 
 
 def test_prepublication_installers_keep_the_public_040_wheel() -> None:

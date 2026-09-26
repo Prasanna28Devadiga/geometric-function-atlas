@@ -4,7 +4,7 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
-## 0.5.0 — release pending
+## 0.5.0 — 2026-09-27
 
 ### Added
 

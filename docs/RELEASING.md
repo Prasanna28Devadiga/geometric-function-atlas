@@ -20,8 +20,9 @@ explicit approval from the repository owner.
 1. Start from a clean branch/worktree at the current `origin/main` commit;
    keep the published 0.4.0 tag, artifact snapshot, and installer URLs unchanged.
 2. Update `src/geometric_function_atlas/version.py`, `CITATION.cff`, and
-   `CHANGELOG.md` together. For a prerelease PR, omit `date-released` from
-   `CITATION.cff`; add the actual publication date only at the release step.
+   `CHANGELOG.md` together. Set `date-released` and the changelog date in the
+   reviewed release commit before tagging; if publication slips to another day,
+   update both and rerun CI before creating the tag.
    Run the version-contract test red before the bump and green afterward.
    Review `README.md` and `docs/PROVENANCE.md` for bounded evidence claims.
 3. Regenerate `uv.lock` when the version changes (`uv lock`), then run the
