@@ -44,7 +44,7 @@ $$
 so $f_0$ belongs to the class. Expanding directly gives
 
 $$
-f_0(z)=z+z^2+\frac34z^3+\frac7{12}z^4+rac5{12}z^5+\cdots.
+f_0(z)=z+z^2+\frac34z^3+\frac7{12}z^4+\frac5{12}z^5+\cdots.
 $$
 
 Thus $a_5=5/12>1/3$. The proposed bound is false.
