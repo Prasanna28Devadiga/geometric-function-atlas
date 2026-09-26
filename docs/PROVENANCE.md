@@ -72,16 +72,19 @@ separate route; `unidentified` is an open closed-form question; and
 assumptions, the global-containment route, contact/attainment wording, and
 reconciliation status without collapsing them into one boolean.
 
-Only the eight reviewed certificate lanes are replayable. Replay uses a
-package-owned, bounded SymPy implementation of the recorded inverse,
-positive-majorant, boundary-contact, and monotonicity identities. It does not
+The eight historical crosswalk lanes use the package-owned, bounded SymPy
+implementation of the recorded inverse, positive-majorant, boundary-contact,
+and monotonicity identities. Two additional reciprocal lanes replay separate
+paper-analytic arguments without changing the historical snapshot or fixture;
+see `docs/PAPER_RADIUS_REPLAY_AUDIT.md`. Replay does not
 import the research repository and never evaluates a candidate as Python code.
 Malformed expressions, wrong direction, missing evidence, source/hash
 mismatch, and resource exhaustion fail closed; only all required replay steps
 passing yields `certified: true`. A candidate that parses but differs from the
 reviewed exact expression is reported as `candidate_mismatch`, not as a new
-radius. An unchanged snapshot row outside the eight reviewed lanes has no
-bundled certificate and is reported as `not_replayable` with the `unsupported`
+radius. An unchanged snapshot row outside the historical eight lanes and two
+paper-analytic reciprocal lanes has no local replay route and is reported as
+`not_replayable` with the `unsupported`
 failure state while keeping its own evidence status; `corrupt_artifact` is
 reserved for malformed records and for any record that is not its unchanged
 trusted snapshot row, including a reviewed lane whose bundled certificate was

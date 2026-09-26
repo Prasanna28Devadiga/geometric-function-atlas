@@ -339,9 +339,9 @@ gfa verify-certificate starlike__fekete_szego_mu1 --json
 
 ### Directed inclusion radii
 
-Radius rows preserve direction and the website's five evidence statuses. Only
-the eight reviewed exact lanes are replayable by the package; the other rows
-remain snapshot records with their original status and provenance.
+Radius rows preserve direction and the website's five evidence statuses. The eight historical crosswalk lanes and two separately audited paper-analytic
+reciprocal lanes are replayable. The other rows remain historical snapshot
+records with their original status and provenance; replay does not mutate them.
 
 ```python
 from geometric_function_atlas import (
@@ -379,7 +379,7 @@ gfa verify-radius-certificate sine sigmoid --json
 The radius certificate replay checks the declared branch, containment,
 contact/attainment evidence, exact candidate, and bounded symbolic steps. A
 stored decimal or a candidate expression is not silently upgraded to a global
-sharpness proof. An unchanged snapshot row without a bundled replay certificate
+sharpness proof. An unchanged snapshot row without a replay route
 is reported as `not_replayable` (`unsupported`, exit code 3) and keeps its own
 evidence status; a malformed record, a certificate removed from a reviewed
 lane, or any other record that is not its unchanged trusted snapshot row is
