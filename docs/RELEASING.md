@@ -17,10 +17,15 @@ explicit approval from the repository owner.
 
 ## Software release
 
-1. Start from a clean `main` checkout.
+1. Start from a clean branch/worktree at the current `origin/main` commit;
+   keep the published 0.4.0 tag, artifact snapshot, and installer URLs unchanged.
 2. Update `src/geometric_function_atlas/version.py`, `CITATION.cff`, and
-   `CHANGELOG.md` together.
-3. Run the local gate:
+   `CHANGELOG.md` together. For a prerelease PR, omit `date-released` from
+   `CITATION.cff`; add the actual publication date only at the release step.
+   Run the version-contract test red before the bump and green afterward.
+   Review `README.md` and `docs/PROVENANCE.md` for bounded evidence claims.
+3. Regenerate `uv.lock` when the version changes (`uv lock`), then run the
+   local gate:
 
    ```bash
    uv sync --extra test --extra build --extra lab --locked
@@ -32,9 +37,9 @@ explicit approval from the repository owner.
    uv run --frozen --extra build python -m twine check dist/*
    uv run --frozen python scripts/check_distribution.py dist
    uv run --frozen python scripts/check_clean_install.py \
-     dist/geometric_function_atlas-0.4.0-py3-none-any.whl
+     dist/geometric_function_atlas-*.whl
    uv run --frozen python scripts/check_uv_tool_install.py \
-     dist/geometric_function_atlas-0.4.0-py3-none-any.whl --python 3.12
+     dist/geometric_function_atlas-*.whl --python 3.12
    ```
 
 4. Obtain an independent review of the exact diff.
