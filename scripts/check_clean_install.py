@@ -73,6 +73,24 @@ assert proof["status"] == "PROVED"
 replay = gfa.verify_certificate("starlike__fekete_szego_mu1")
 assert replay["matched"] is True
 
+# The replay schema and all written-paper lanes must work from the installed
+# wheel, without source checkout or optional test dependencies.
+from importlib import resources
+schema = json.loads(resources.files("geometric_function_atlas").joinpath(
+    "schema/radius-replay.schema.json").read_text(encoding="utf-8"))
+assert schema["additionalProperties"] is False
+paper_rows = [row for row in gfa.list_radii() if row.status is gfa.RadiusStatus.PAPER_PROVED_EXACT]
+assert len(paper_rows) == 19
+outcomes = {"proven": 0, "symbolic_replay_only": 0, "not_replayable": 0}
+for row in paper_rows:
+    result = gfa.replay_radius_certificate(row).to_dict()
+    outcomes[result["status"]] += 1
+    assert result["direction"] == row.direction
+    assert result["global_containment_check"] == (
+        "bounded_chain_replayed" if result["certified"] else "not_mechanized"
+    )
+assert outcomes == {"proven": 8, "symbolic_replay_only": 2, "not_replayable": 9}
+
 plot = gfa.write_domain_plot("sine.svg", generator="sine", order=3)
 assert plot.output.name == "sine.svg"
 assert "<svg" in open("sine.svg", encoding="utf-8").read()

@@ -314,7 +314,11 @@ class RadiusReplayResult:
     failure_state: FailureState | None = None
     error: str | None = None
     method: str = "bounded_exact_radius_certificate_replay"
-    global_containment_check: str = "not_mechanized"
+
+    @property
+    def global_containment_check(self) -> str:
+        """Describe the route actually replayed, never the manuscript proof."""
+        return "bounded_chain_replayed" if self.certified and self.status == "proven" else "not_mechanized"
 
     @property
     def direction(self) -> str:

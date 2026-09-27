@@ -399,7 +399,12 @@ gfa verify-radius-certificate sine sigmoid --json
 ```
 
 The radius certificate replay checks the declared branch, containment,
-contact/attainment evidence, exact candidate, and bounded symbolic steps. A
+contact/attainment evidence, exact candidate, and bounded symbolic steps. The
+closed replay JSON contract is `schema/radius-replay.schema.json`, not the
+generic `result.schema.json`; see [the exact validator call](docs/RESULT_CONTRACT.md#failure-states-and-cli-exit-codes).
+Eight historical lanes report `global_containment_check: bounded_chain_replayed`
+for their bounded checks (not a fully formalized global theorem); other routes
+report `not_mechanized`. A
 stored decimal or a candidate expression is not silently upgraded to a global
 sharpness proof. An unchanged snapshot row without a bundled replay route
 is reported as `not_replayable` (`unsupported`, exit code 3) and keeps its own

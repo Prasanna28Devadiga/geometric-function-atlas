@@ -91,6 +91,38 @@ no traceback and the stable code above. Without `--json`, a structured failure
 prints one concise explanation (status, direction, reason) plus a pointer to
 `--json` on stderr.
 
+Radius certificate replay has its own **closed** envelope, distinct from
+`result.schema.json` (which requires a verification report and an expression DAG
+that radius replay does not emit). Validate the complete `gfa
+verify-radius-certificate SOURCE TARGET --json` stdout, including nonzero-exit
+JSON, against the packaged
+`geometric_function_atlas/schema/radius-replay.schema.json` using JSON Schema
+Draft 2020-12. With the `test` extra installed, an exact validator call is:
+
+```python
+import json
+from importlib import resources
+from jsonschema import Draft202012Validator
+
+from geometric_function_atlas import verify_radius_certificate
+
+schema = json.loads(resources.files("geometric_function_atlas").joinpath(
+    "schema/radius-replay.schema.json").read_text(encoding="utf-8"))
+Draft202012Validator.check_schema(schema)
+payload = verify_radius_certificate("sine", "sigmoid").to_dict()
+Draft202012Validator(schema).validate(payload)
+```
+
+This schema is shipped in wheel/sdist and checks closed top-level, input,
+expression and step keys, status/method/failure combinations, and `certified`
+versus `global_containment_check`. `bounded_chain_replayed` means the eight
+fixture lanes passed their bounded package checks (some inequality steps are
+recorded analytic premises), **not** that every global theorem was formally
+proved by software. The two paper-symbolic routes have
+`symbolic_replay_only`, `certified: false`, `not_mechanized`; nine other written
+paper lanes are `not_replayable`, also `not_mechanized`. No written-paper label
+is upgraded by schema validation.
+
 Radius certificate replay keeps "unavailable" separate from "damaged": an
 unchanged snapshot row that has no bundled replay certificate reports the
 `not_replayable` status with the `unsupported` failure state (exit code 3),
