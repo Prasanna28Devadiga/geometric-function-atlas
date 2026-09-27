@@ -60,10 +60,15 @@ jobs:
         with:
           version: "0.12.3"
           enable-cache: false
-      - name: Install local source as an isolated managed-Python tool
+      - name: Install published wheel as an isolated managed-Python tool
         shell: pwsh
         run: |
-          $env:GFA_PACKAGE_SPEC = (Get-Location).Path
           $env:GFA_PYTHON_VERSION = "3.12"
+          $env:UV_TOOL_DIR = Join-Path $env:RUNNER_TEMP "gfa-tools"
+          $env:UV_TOOL_BIN_DIR = Join-Path $env:RUNNER_TEMP "gfa-bin"
+          $env:UV_PYTHON_INSTALL_DIR = Join-Path $env:RUNNER_TEMP "gfa-python"
           ./scripts/install.ps1
-          gfa --version
+          $gfa = Join-Path ((uv tool dir --bin).Trim()) "gfa.exe"
+          if ((& $gfa --version) -ne "geometric-function-atlas 0.6.0") { throw "Unexpected gfa version" }
+          & $gfa walkthrough
+          if ($LASTEXITCODE -ne 0) { throw "Walkthrough failed" }

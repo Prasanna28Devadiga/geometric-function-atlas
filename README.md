@@ -27,8 +27,9 @@ gfa walkthrough
 ```
 
 These commands use the package repository's installers (the website-hosted
-installer endpoints are maintained separately). The installer creates the
-`gfa` command with its own Python. The
+installer endpoints are maintained separately). Both scripts install the immutable
+published v0.6.0 wheel and create the `gfa` command with a uv-managed Python;
+they do not require a preinstalled Python. The
 [getting-started guide](https://prasanna28devadiga.github.io/geometric-function-atlas/getting-started/)
 walks through the first calculations.
 
@@ -384,7 +385,7 @@ questions and 557 eligible closed-form-consistent questions. Twelve raw rows
 remain `audit_required` consistency failures (11 in the canonical off-diagonal
 view); neither the raw nor canonical count is a proof tally. The 0.4.0 release
 snapshot is frozen; the package repository's installers now target the published
-0.5.0 wheel.
+0.6.0 wheel.
 
 ```python
 from geometric_function_atlas import (

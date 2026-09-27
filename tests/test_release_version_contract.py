@@ -25,8 +25,8 @@ def test_release_procedure_selects_single_current_wheel() -> None:
     assert 'dist/geometric_function_atlas-0.5.0-py3-none-any.whl' not in procedure
 
 
-def test_installers_remain_at_published_050_until_pypi_060_is_live() -> None:
-    wheel = "releases/download/v0.5.0/geometric_function_atlas-0.5.0-py3-none-any.whl"
+def test_installers_target_published_060_after_pypi_release() -> None:
+    wheel = "releases/download/v0.6.0/geometric_function_atlas-0.6.0-py3-none-any.whl"
     for name in ("install.sh", "install.ps1"):
         assert wheel in (ROOT / "scripts" / name).read_text(encoding="utf-8")
 
