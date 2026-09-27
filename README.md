@@ -41,7 +41,7 @@ only panels and private research-workspace operations are explicit non-goals.
 | Website capability | CLI | Python function |
 |---|---|---|
 | Run a concise first-use tour | `gfa walkthrough` | — |
-| Browse the generator catalog (39 Ma–Minda generators) | `gfa generators` | `list_generators()` |
+| Browse the generator catalog (39 keys; 38 distinct formulas) | `gfa generators` | `list_generators()` |
 | Exact Taylor coefficients of a generator | `gfa coefficients <gen> --order N` | `generator_series()` |
 | Exact Ma–Minda Fekete–Szegő constants | `gfa fekete-szego <gen> --mu M` | `fekete_szego()` |
 | Re-check a supplied counterexample witness | `gfa verify-counterexample` | `verify_counterexample()` |
@@ -62,6 +62,12 @@ only panels and private research-workspace operations are explicit non-goals.
 | Query aliases, hierarchy, and stored witnesses | `gfa aliases|normalize-class|hierarchy|counterexamples` | `RegistrySnapshot.aliases()`, `.normalize_class()`, `.hierarchy()`, `.counterexamples()` |
 | Cryptography Lab S-box metrics (optional) | `gfa crypto-lab ...` | `geometric_function_atlas.lab.*` |
 | Image Lab finite coefficient-derived filters, metrics, and transforms (optional) | `gfa image-lab ...` | `geometric_function_atlas.lab.*` |
+
+The built-in catalog has **39 catalog keys, 38 distinct generator formulas**:
+`janowski_A0_B-1` and `order_0.5` both equal `1/(1-z)` exactly. Both keys
+remain supported for historical radius records and source locators; they are
+not independent mathematical generators. The directed-radius snapshot is
+alias-inclusive; see [the count reconciliation](docs/RADIUS_COUNT_RECONCILIATION.md).
 
 Result-printing commands accept `--json` for machine-readable output;
 file-writing commands (`plot`, `image-lab transform`, `image-lab sample`)
@@ -214,7 +220,7 @@ from geometric_function_atlas import (
     list_classes,
 )
 
-list_classes()                    # all 39 Ma–Minda classes
+list_classes()                    # all 39 catalog keys
 class_admissibility("exponential")  # exact phi(0)=1, phi'(0)>0 + region screens
 
 # Screen f(z) = z + 0.25 z^2 + 0.1 z^3 for membership in S*(exp(z)).
@@ -346,9 +352,10 @@ Radius rows preserve direction. The 2026.09.27-paper-review snapshot adds
 it does not mutate the published 0.4.0 snapshot. Only eight reviewed lanes
 have package-owned replay certificates; the remaining 11 written-proof lanes
 are not machine-replayable here. Six axis contacts have numerical recognition,
-not a global containment or sharpness certificate. The 702 raw rows span a
-bounded 28-source × 26-target key grid, not every ordered pair of the 38
-distinct catalog classes. Canonical alias/self-pair accounting yields 650
+not a global containment or sharpness certificate. The 39 catalog keys
+represent 38 distinct formulas, but the 702 raw radius rows span only a
+28-source × 26-target key grid, not every ordered pair of the catalog.
+Canonical alias/self-pair accounting yields 650
 questions and 557 eligible closed-form-consistent questions. Twelve raw rows
 remain `audit_required` consistency failures (11 in the canonical off-diagonal
 view); neither the raw nor canonical count is a proof tally. The 0.4.0 release

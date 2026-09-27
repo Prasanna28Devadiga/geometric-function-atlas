@@ -4,6 +4,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from geometric_function_atlas import list_generators
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "src/geometric_function_atlas/data"
 SCRIPT = ROOT / "scripts/build_radius_scope.py"
@@ -35,3 +37,25 @@ def test_scope_artifact_is_deterministic_and_preserves_public_keys():
     assert any(r["inner"] == "janowski_A0_B-1" for r in raw["radii"])
     classes = json.loads((DATA / "classes.json").read_text())["classes"]
     assert "janowski_A0_B-1" in classes and "order_0.5" in classes
+
+
+def test_catalog_grid_and_paper_counts_stay_separate():
+    """Catalog identities must not be confused with the partial radius grid."""
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "all 39 catalog keys" in readme
+    assert "all 39 Ma–Minda classes" not in readme
+    assert "39 catalog keys, 38 distinct generator formulas" in readme
+
+    catalog_keys = {generator.key for generator in list_generators()}
+    classes = json.loads((DATA / "classes.json").read_text())["classes"]
+    scope = json.loads((DATA / "radius_scope_2026_09_27.json").read_text())
+    rows = json.loads((DATA / "radii_snapshot.json").read_text())["radii"]
+    assert len(catalog_keys) == len(classes) == 39
+    assert catalog_keys == set(classes)
+    assert scope["canonical_aliases"] == {"janowski_A0_B-1": "order_0.5"}
+    assert len(catalog_keys) - len(scope["canonical_aliases"]) == 38
+    assert scope["scope"]["full_catalog"] is False
+    assert (scope["scope"]["source_key_count"], scope["scope"]["target_key_count"]) == (28, 26)
+    assert scope["counts"]["raw_key_rows"] == len(rows) == 702
+    assert scope["counts"]["canonical_questions"] == 650
+    assert sum(row["status"] == "paper_proved_exact" for row in rows) == 19
