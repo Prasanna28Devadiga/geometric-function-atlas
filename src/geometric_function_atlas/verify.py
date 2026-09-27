@@ -63,6 +63,10 @@ _THRESHOLDS = {
     "becker_univalent": 1.0,
     "nehari_univalent": 2.0,
 }
+_VIA_C01 = (
+    "C01 sum(n*|a_n|) <= 1 (starlike, hence univalent); "
+    "the Becker/Nehari criterion itself is not checked symbolically"
+)
 MAX_VERIFY_COEFFICIENTS = 128
 MAX_CLOSED_FORM_ORDER = 40
 _REFERENCE = (
@@ -503,7 +507,7 @@ def _symbolic_verdict(
         )
         outcome = "undecidable"
         evidence_kind = "inconclusive"
-    elif polynomial and c01_decided:
+    elif polynomial and c01_decided and (property_name != "convex" or convex_decided):
         outcome = "proven"
         evidence_kind = "exact_proof"
         c01_check = VerificationCheck(
@@ -543,11 +547,17 @@ def _symbolic_verdict(
         checked="Alexander condition: sum(n^2*|a_n|) <= 1",
         expected="decided comparison",
         observed=f"sum = {convex_str}" + ("" if convex_decided is not None else " (undecidable)"),
-        status=CheckStatus.SKIP if convex_decided is None else CheckStatus.PASS,
-        required=polynomial and convex_decided is not None,
+        status=(
+            CheckStatus.SKIP
+            if convex_decided is None
+            else CheckStatus.PASS if convex_decided else CheckStatus.FAIL
+        ),
+        required=polynomial and bool(convex_decided),
         scope="exact symbolic arithmetic",
         failure_reason=(
             None
+            if convex_decided
+            else "sum > 1"
             if convex_decided is not None
             else "comparison undecidable in exact arithmetic"
         ),
@@ -564,6 +574,8 @@ def _symbolic_verdict(
             details["convex_proven"] = True
         if property_name == "univalent":
             details["univalent_proven"] = True
+        if property_name in ("becker_univalent", "nehari_univalent"):
+            details["proven_via"] = _VIA_C01
     return FunctionVerificationResult(
         property=property_name,
         coefficients=values,
@@ -586,9 +598,10 @@ def _rigorous_verdict(
     grid_theta: int,
     rmax: float,
 ) -> FunctionVerificationResult:
-    c01, _ = _criterion_sums(values)
+    c01, convex = _criterion_sums(values)
     c01_str = sp.sstr(c01)
     c01_decided = _decide_le_one(c01)
+    proof_decided = _decide_le_one(convex) if property_name == "convex" else c01_decided
     c01_check = VerificationCheck(
         name="c01_exact_sum",
         checked="C01: sum(n*|a_n|) <= 1 in exact arithmetic",
@@ -662,12 +675,12 @@ def _rigorous_verdict(
                 "interval_threshold": threshold,
             }
 
-    if polynomial and c01_decided:
-        outcome = "proven"
-        evidence_kind = "exact_proof"
-    elif certified:
+    if certified:
         outcome = "certified_violation"
         evidence_kind = "certified_enclosure"
+    elif polynomial and proof_decided:
+        outcome = "proven"
+        evidence_kind = "exact_proof"
     else:
         outcome = "no_certified_violation_on_grid"
         evidence_kind = "numerical_screen"
@@ -683,10 +696,16 @@ def _rigorous_verdict(
         ),
         details={
             "c01_sum": c01_str,
+            "convex_sum": sp.sstr(convex),
             "polynomial": polynomial,
             "grid_points": evaluated,
             "worst_point": None if point is None else list(point),
             **interval_details,
+            **(
+                {"proven_via": _VIA_C01}
+                if outcome == "proven" and property_name in ("becker_univalent", "nehari_univalent")
+                else {}
+            ),
         },
         witness_point=point,
         certified=certified,

@@ -48,6 +48,36 @@ def test_symbolic_tier_proves_convex_and_univalent_by_implication() -> None:
     assert result.details["convex_sum"] == "1"
 
 
+def test_symbolic_tier_convex_uses_alexander_sum() -> None:
+    # z + 0.3z^2: C01 sum 0.6 <= 1 but sum(n^2|a_n|) = 1.2 > 1, and
+    # 1 + z f''/f' < 0 for real z < -1/1.2, so it is not convex.
+    result = verify_function(coefficients=[0.3], property="convex", max_cost="symbolic")
+    assert result.outcome == "c01_fails_sufficient_condition"
+    assert result.evidence_kind == "inconclusive"
+    checks = {check.name: check for check in result.verification_report.checks}
+    assert checks["alexander_convexity_sum"].status.value == "fail"
+    proven = verify_function(coefficients=[0.2], property="convex", max_cost="symbolic")
+    assert proven.outcome == "proven"
+    assert proven.evidence_kind == "exact_proof"
+
+
+def test_rigorous_tier_certified_violation_beats_c01_for_convex() -> None:
+    result = verify_function(coefficients=[0.3], property="convex", max_cost="rigorous")
+    assert result.outcome == "certified_violation"
+    assert result.certified
+    assert verify_function(
+        coefficients=[0.2], property="convex", max_cost="rigorous"
+    ).outcome == "proven"
+
+
+def test_becker_symbolic_proof_states_it_comes_from_c01() -> None:
+    result = verify_function(
+        coefficients=[0.25], property="becker_univalent", max_cost="symbolic"
+    )
+    assert result.outcome == "proven"
+    assert "C01" in result.details["proven_via"]
+
+
 def test_symbolic_tier_record_serializes_without_nan() -> None:
     # The symbolic tier has no grid margin; its record must serialize as a
     # closed JSON payload with min_margin null (NaN breaks the JSON contract).
