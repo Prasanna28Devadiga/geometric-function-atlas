@@ -1,5 +1,14 @@
 # Paper-radius replay audit (v0.5.0 snapshot unchanged)
 
+**Update:** all eleven lanes below now replay as `proven` (`certified: true`,
+`bounded_chain_replayed`), following the paper proofs step by step. Identities,
+branch normalisation, thresholds, domain margins and contacts are checked;
+Lemma 4.1, Lemma 4.2 and Lemma 3.1 are recorded as cited steps (as the eight
+fixture lanes record their majorant premises). The Theorem 4.8 lanes re-run
+`analysis/thm48_interval_check.py` (resultant, cusp, exact endpoint, radius
+enclosure, 2,000 bulk boxes and 50 endpoint boxes at `iv.dps=30`); the Jordan
+domain step is cited. The text below records the earlier deferral.
+
 Input: handoff §4; paper `atlas_em_rewrite.tex`, Theorems 4.4–4.8 and Lemmas 4.1–4.2 (local submission is **read-only**). The 702-row v0.5.0 radius snapshot and historical eight-lane fixture are intentionally unchanged. Nineteen rows retain their written-paper-theorem labels. A successful symbolic replay checks finite identities against the *unaltered* snapshot row and its stored decimal; it does not alter the row's status, value, certificate, artifact identity or literature verdict. The decimal comparison guards identity, **not** containment.
 
 ## Completed analytic lanes

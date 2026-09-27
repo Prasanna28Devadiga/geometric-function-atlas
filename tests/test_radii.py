@@ -197,10 +197,10 @@ def test_replay_rejects_source_hash_mismatch() -> None:
 
 
 def test_snapshot_row_without_bundled_certificate_is_not_replayable() -> None:
-    record = radius("exponential", "sine")
+    record = radius("bell", "exponential")
 
     assert record.certificate is None
-    assert record.status is RadiusStatus.PAPER_PROVED_EXACT
+    assert record.status is RadiusStatus.TOUCH_PROVEN_EXACT
 
     result = replay_radius_certificate(record)
 
@@ -209,18 +209,18 @@ def test_snapshot_row_without_bundled_certificate_is_not_replayable() -> None:
     assert result.failure_state is FailureState.UNSUPPORTED
     assert result.error is not None
     assert "certificate" in result.error
-    assert "paper_proved_exact" in result.error
+    assert "touch_proven_exact" in result.error
     # A missing bundled certificate is not damage: the snapshot row keeps its
     # own evidence status and stays untouched.
-    assert radius("exponential", "sine").status is RadiusStatus.PAPER_PROVED_EXACT
+    assert radius("bell", "exponential").status is RadiusStatus.TOUCH_PROVEN_EXACT
     assert record.to_dict()["evidence_status"] == "proven_exact_under_declared_assumptions"
 
 
 def test_recompute_verify_and_attainment_report_unavailable_replay() -> None:
     results = {
-        "recompute": recompute_radius("exponential", "sine"),
-        "verify": verify_radius_certificate("exponential", "sine"),
-        "attainment": verify_radius_attainment("exponential", "sine"),
+        "recompute": recompute_radius("bell", "exponential"),
+        "verify": verify_radius_certificate("bell", "exponential"),
+        "attainment": verify_radius_attainment("bell", "exponential"),
     }
 
     for label, result in results.items():
@@ -230,10 +230,10 @@ def test_recompute_verify_and_attainment_report_unavailable_replay() -> None:
 
 
 def test_radius_audit_reports_unavailable_replay_without_damaging_the_row() -> None:
-    payload = audit_radius("exponential", "sine")
+    payload = audit_radius("bell", "exponential")
 
     assert payload["status"] == "not_replayable"
-    assert payload["evidence_status"] == "paper_proved_exact"
+    assert payload["evidence_status"] == "touch_proven_exact"
     assert payload["attainment_verified"] is False
     assert payload["novelty_claim"] is False
     replay = payload["certificate_replay"]
@@ -297,7 +297,7 @@ def test_every_mutated_certificate_bearing_record_fails_closed(mutation: str) ->
 
 
 def test_not_replayable_payload_remains_deterministic_json() -> None:
-    payload = replay_radius_certificate(radius("exponential", "sine")).to_dict()
+    payload = replay_radius_certificate(radius("bell", "exponential")).to_dict()
 
     assert payload["status"] == "not_replayable"
     assert payload["failure_state"] == "unsupported"
@@ -336,7 +336,7 @@ MUTATED_SNAPSHOT_ROW_WITHOUT_CERTIFICATE = {
 
 @pytest.mark.parametrize("mutation", sorted(MUTATED_SNAPSHOT_ROW_WITHOUT_CERTIFICATE))
 def test_mutating_an_uncertificated_snapshot_row_is_corrupt_artifact(mutation: str) -> None:
-    record = radius("exponential", "sine")
+    record = radius("bell", "exponential")
     assert record.certificate is None
 
     result = replay_radius_certificate(MUTATED_SNAPSHOT_ROW_WITHOUT_CERTIFICATE[mutation](record))
@@ -369,7 +369,7 @@ def test_mapping_without_a_certificate_cannot_downgrade_a_reviewed_lane() -> Non
 
 
 def test_mapping_form_of_a_pristine_uncertificated_row_stays_unavailable() -> None:
-    result = replay_radius_certificate(radius("exponential", "sine").to_dict())
+    result = replay_radius_certificate(radius("bell", "exponential").to_dict())
 
     assert result.status == "not_replayable"
     assert result.failure_state is FailureState.UNSUPPORTED
@@ -377,7 +377,7 @@ def test_mapping_form_of_a_pristine_uncertificated_row_stays_unavailable() -> No
 
 
 def test_uncertificated_row_absent_from_the_snapshot_is_corrupt_artifact() -> None:
-    payload = radius("exponential", "sine").to_dict()
+    payload = radius("bell", "exponential").to_dict()
     payload["canonical_inputs"] = {"inner": "no_such_inner", "target": "no_such_target"}
 
     result = replay_radius_certificate(payload)

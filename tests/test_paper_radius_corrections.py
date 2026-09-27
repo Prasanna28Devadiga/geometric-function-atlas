@@ -35,7 +35,7 @@ def test_paper_theorems_are_marked_without_inventing_machine_replays():
         assert row.value_exact
         assert row.to_dict()['verification']['success'] is False
     assert len([r for r in proved.values() if r.certificate is not None]) == 8
-    assert replay_radius_certificate(radius('crescent', 'exponential')).certified is False
+    assert replay_radius_certificate(radius('crescent', 'exponential')).certified is True
     assert radius('crescent', 'exponential').to_dict()['computational_status'] == 'unresolved'
     assert radius('crescent', 'exponential').value_exact == 'sin(1)'
     assert abs(float(sp.N(sp.sin(1), 18)) - radius('crescent', 'exponential').value_float) < 1e-14
