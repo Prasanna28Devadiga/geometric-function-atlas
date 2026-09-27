@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
+
+import jsonschema
 import pytest
 import sympy as sp
 
@@ -9,7 +12,10 @@ from geometric_function_atlas.contracts import (
     InvalidInputError,
     ResourceLimitError,
 )
-from geometric_function_atlas.records import validate_screen_record
+from geometric_function_atlas.records import (
+    load_verify_result_schema,
+    validate_screen_record,
+)
 from geometric_function_atlas.verify import (
     TIERS,
     verify_function,
@@ -243,3 +249,65 @@ def test_coefficient_length_is_bounded() -> None:
 
 def test_tiers_are_exactly_the_documented_set() -> None:
     assert TIERS == ("screen", "symbolic", "rigorous")
+
+
+@pytest.mark.parametrize("rmax", [10, 1, 0, -0.2, float("nan"), float("inf"), True, "0.5"])
+@pytest.mark.parametrize("tier", ["screen", "rigorous", "symbolic"])
+def test_invalid_grid_radius_is_rejected_even_for_symbolic(tier: str, rmax: object) -> None:
+    with pytest.raises((TypeError, ValueError), match="rmax"):
+        verify_function([0.2], property="nehari_univalent", max_cost=tier, rmax=rmax)
+
+
+@pytest.mark.parametrize("grid_r,grid_theta", [(0, 4), (2, 0), (True, 4), (2, 1.5), (2, 1000001)])
+def test_invalid_grid_resolution_fails_closed(grid_r: object, grid_theta: object) -> None:
+    with pytest.raises((TypeError, ValueError), match="grid_"):
+        verify_function([0.2], grid_r=grid_r, grid_theta=grid_theta)
+
+
+def test_all_screened_witnesses_stay_inside_unit_disk() -> None:
+    for tier in ("screen", "rigorous"):
+        result = verify_function([0.2], property="nehari_univalent", max_cost=tier,
+                                 rmax=0.999999, grid_r=2, grid_theta=4)
+        assert result.witness_point is not None
+        assert sum(x*x for x in result.witness_point) < 1
+
+
+def test_truncation_changes_canonical_inputs() -> None:
+    whole = verify_function([0.2], max_cost="symbolic").to_dict()
+    partial = verify_function([0.2], max_cost="symbolic", truncation=True).to_dict()
+    assert whole["canonical_inputs"]["truncation"] is False
+    assert partial["canonical_inputs"]["truncation"] is True
+    assert whole["canonical_inputs"] != partial["canonical_inputs"]
+
+
+def test_shipped_verification_schema_accepts_all_tiers_and_cli_shape() -> None:
+    schema = load_verify_result_schema()
+    jsonschema.Draft202012Validator.check_schema(schema)
+    for tier in TIERS:
+        for truncation in (False, True):
+            for property_name in ("starlike", "convex", "becker_univalent", "nehari_univalent"):
+                for coefficient in (0.2, 1.0):
+                    record = verify_function([coefficient], property=property_name, max_cost=tier,
+                                             truncation=truncation).to_dict()
+                    jsonschema.validate(record, schema)
+                    validate_screen_record(record)
+    jsonschema.validate(verify_function([0.2], property="univalent", max_cost="symbolic").to_dict(), schema)
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda r: r.update(extra=1),
+    lambda r: r["canonical_inputs"].update(extra=True),
+    lambda r: r["canonical_inputs"].update(truncation="false"),
+    lambda r: r["canonical_inputs"].pop("truncation"),
+    lambda r: r["details"].update(outcome="invented"),
+    lambda r: r["details"].update(certified="true"),
+    lambda r: r["details"].update(witness_point=[10, 0]),
+    lambda r: r["details"].update(unknown_detail=1),
+    lambda r: r.update(evidence_kind="certified_enclosure"),
+    lambda r: r["canonical_inputs"].update(tier="symbolic"),
+])
+def test_verification_contract_rejects_adversarial_payloads(mutate) -> None:
+    record = deepcopy(verify_function([0.2], max_cost="rigorous").to_dict())
+    mutate(record)
+    with pytest.raises((jsonschema.ValidationError, ValueError, TypeError)):
+        jsonschema.validate(record, load_verify_result_schema())

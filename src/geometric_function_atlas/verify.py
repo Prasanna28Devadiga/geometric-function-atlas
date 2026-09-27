@@ -239,6 +239,8 @@ def _certified_interval(
     coefficients: tuple[float, ...],
     point: tuple[float, float],
 ) -> tuple[float, float, float, bool]:
+    if not all(math.isfinite(value) for value in point) or sum(value * value for value in point) >= 1:
+        raise InvalidInputError("certification witness must lie in the open unit disk")
     if property_name == "convex":
         return _evaluate_convex_interval(coefficients, point[0], point[1])
     return _evaluate_counterexample_interval(
@@ -337,6 +339,7 @@ class FunctionVerificationResult:
     certified: bool = False
     min_margin: float | None = None
     exact_coefficients: tuple[str, ...] = ()
+    truncation: bool = False
 
     @builtins.property
     def passes(self) -> bool:
@@ -349,6 +352,7 @@ class FunctionVerificationResult:
                 "property": self.property,
                 "coefficients": list(self.exact_coefficients),
                 "tier": self.tier,
+                "truncation": self.truncation,
             },
             method="tiered_function_verification",
             evidence_kind=self.evidence_kind,
@@ -402,6 +406,13 @@ def verify_function(
         )
     if not isinstance(truncation, bool):
         raise TypeError("truncation must be a bool")
+    if isinstance(rmax, bool) or not isinstance(rmax, (int, float)) or not math.isfinite(rmax) or not 0.05 <= rmax < 1:
+        raise InvalidInputError("rmax must be finite and in [0.05, 1) within the open unit disk")
+    for name, value in (("grid_r", grid_r), ("grid_theta", grid_theta)):
+        if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 10000:
+            raise InvalidInputError(f"{name} must be an integer in [1, 10000]")
+    if grid_r * grid_theta > 100000:
+        raise ResourceLimitError("grid_r * grid_theta must be at most 100000")
     if property == "univalent" and max_cost != "symbolic":
         raise InvalidInputError(
             "univalence has no pointwise screen; use max_cost='symbolic' or "
@@ -425,13 +436,13 @@ def verify_function(
     )
 
     if max_cost == "screen":
-        return _screen_verdict(property, values, exact_coefficients, grid_r, grid_theta, rmax)
+        return replace(_screen_verdict(property, values, exact_coefficients, grid_r, grid_theta, rmax), truncation=not polynomial)
     if max_cost == "symbolic":
-        return _symbolic_verdict(property, values, exact_values, exact_coefficients, polynomial)
-    return _rigorous_verdict(
+        return replace(_symbolic_verdict(property, values, exact_values, exact_coefficients, polynomial), truncation=not polynomial)
+    return replace(_rigorous_verdict(
         property, values, exact_values, exact_coefficients, polynomial,
         interval_transfer, grid_r, grid_theta, rmax
-    )
+    ), truncation=not polynomial)
 
 
 def _finite_check() -> VerificationCheck:
