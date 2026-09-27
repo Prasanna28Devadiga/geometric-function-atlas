@@ -199,11 +199,12 @@ def validate_screen_record(record: Mapping[str, Any]) -> None:
         inputs = record["canonical_inputs"]
         if not isinstance(inputs["truncation"], bool):
             raise RecordError("canonical_inputs.truncation must be a bool")
-        point = record["details"].get("witness_point") if isinstance(record["details"], Mapping) else None
-        if point is not None and (not isinstance(point, list) or len(point) != 2 or
-                                  any(isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) for x in point) or
-                                  sum(x*x for x in point) >= 1):
-            raise RecordError("witness_point must lie in the open unit disk")
+        for field in ("witness_point", "worst_point"):
+            point = record["details"].get(field) if isinstance(record["details"], Mapping) else None
+            if point is not None and (not isinstance(point, list) or len(point) != 2 or
+                                      any(isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) for x in point) or
+                                      sum(x*x for x in point) >= 1):
+                raise RecordError(f"{field} must lie in the open unit disk")
     for value in record["canonical_inputs"].values():
         _json_value(value)
     for key in ("assumptions", "source_references"):

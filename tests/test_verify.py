@@ -311,3 +311,13 @@ def test_verification_contract_rejects_adversarial_payloads(mutate) -> None:
     mutate(record)
     with pytest.raises((jsonschema.ValidationError, ValueError, TypeError)):
         jsonschema.validate(record, load_verify_result_schema())
+
+
+@pytest.mark.parametrize("field", ["witness_point", "worst_point"])
+def test_schema_is_only_a_coordinate_bound_not_a_disk_proof(field: str) -> None:
+    record = deepcopy(verify_function([0.2], max_cost="screen").to_dict())
+    record["details"][field] = [0.9, 0.9]
+    # Draft 2020-12 validates each coordinate, not x² + y² < 1.
+    jsonschema.validate(record, load_verify_result_schema())
+    with pytest.raises(ValueError, match="open unit disk"):
+        validate_screen_record(record)
