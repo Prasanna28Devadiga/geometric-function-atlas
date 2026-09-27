@@ -4,9 +4,36 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
-- The package repository's public installers and installation examples now
-  target the published 0.5.0 wheel. Website-hosted installers are maintained
-  separately and may still point to 0.4.0 until updated there.
+## 0.6.0 — 2026-09-27
+
+### Added
+
+- A coefficient-bound supplement with versioned, claim-scoped provenance,
+  merged proof-gallery results, and independently checked shipped schemas.
+- Two additional symbolic-only reciprocal paper-radius replays with a dedicated
+  closed JSON contract. Nine deferred lanes and quarantined touches remain
+  explicitly unsupported rather than promoted to certificates.
+
+### Fixed
+
+- Convexity verification uses the Alexander criterion rather than a starlikeness
+  check. Incomplete coefficient lists and rounded closed-form expansions can no
+  longer receive whole-function certificates; outside-unit-disk
+  Becker/Nehari violations cannot certify a unit-disk conclusion.
+- Canonical verification inputs preserve the exact structural identity of
+  preconstructed closed forms, so functions sharing the first 39 coefficients
+  but differing in a higher-order term cannot be conflated (#39).
+- Coefficient-table H3 literature-sharp rows require theorem and locator
+  citations and a published upper-bound qualifier; attained lower-bound rows
+  cannot claim a global upper bound (#40).
+- Catalog documentation distinguishes 39 supported keys from 38 distinct
+  formulas (two keys name the same generator).
+
+### Release boundary
+
+- Public installers remain pinned to the published 0.5.0 wheel until 0.6.0
+  GitHub assets and PyPI are live; the 0.5.0 PyPI manifest stays frozen.
+  The 0.5.0 release and its immutable artifact snapshots are unchanged.
 
 ## 0.5.0 — 2026-09-27
 

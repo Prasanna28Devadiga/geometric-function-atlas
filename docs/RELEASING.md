@@ -18,7 +18,8 @@ explicit approval from the repository owner.
 ## Software release
 
 1. Start from a clean branch/worktree at the current `origin/main` commit;
-   keep the published 0.4.0 tag, artifact snapshot, and installer URLs unchanged.
+   keep the published previous-version tag/assets, artifact snapshots, frozen
+   PyPI manifest, and installer URLs unchanged.
 2. Update `src/geometric_function_atlas/version.py`, `CITATION.cff`, and
    `CHANGELOG.md` together. Set `date-released` and the changelog date in the
    reviewed release commit before tagging; if publication slips to another day,
@@ -37,10 +38,10 @@ explicit approval from the repository owner.
    uv run --frozen --extra build python -m build
    uv run --frozen --extra build python -m twine check dist/*
    uv run --frozen python scripts/check_distribution.py dist
-   uv run --frozen python scripts/check_clean_install.py \
-     dist/geometric_function_atlas-*.whl
-   uv run --frozen python scripts/check_uv_tool_install.py \
-     dist/geometric_function_atlas-*.whl --python 3.12
+   # The build directory must contain exactly one current wheel.
+   wheel=$(uv run --frozen python -c 'from pathlib import Path; wheels = list(Path("dist").glob("geometric_function_atlas-*.whl")); assert len(wheels) == 1, wheels; print(wheels[0])')
+   uv run --frozen python scripts/check_clean_install.py "$wheel"
+   uv run --frozen python scripts/check_uv_tool_install.py "$wheel" --python 3.12
    ```
 
 4. Obtain an independent review of the exact diff.
