@@ -199,6 +199,13 @@ tail (`truncation=True` or a nonpolynomial `closed_form`) cannot transfer a
 point interval or partial-sum proof to the full function. Closed-form symbolic
 proofs use the original SymPy coefficients, not their binary64 grid approximations;
 point intervals on rounded coefficients remain non-certifying.
+Verification records include `canonical_inputs.closed_form_srepr`: the exact
+SymPy structural representation of a supplied `closed_form` (up to 65,536
+characters), or `null` for coefficient input and CLI `gfa verify`. This keeps
+different functions with identical first 39 Taylor coefficients distinct in
+the record. It is data for identification, **not** a formula to evaluate or
+parse from untrusted JSON; compare it within a pinned SymPy version if relying
+on byte-for-byte identity. Longer representations raise `ResourceLimitError`.
 
 ### Counterexample witness replay and search
 

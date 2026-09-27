@@ -25,6 +25,7 @@ def test_verify_cli_json_contract(truncation: bool) -> None:
     jsonschema.validate(record, load_verify_result_schema())
     validate_screen_record(record)
     assert record["canonical_inputs"]["truncation"] is truncation
+    assert record["canonical_inputs"]["closed_form_srepr"] is None
     assert record["details"]["outcome"] != "certified_violation"
 
 
