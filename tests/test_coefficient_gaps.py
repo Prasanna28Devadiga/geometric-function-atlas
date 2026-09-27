@@ -1,4 +1,5 @@
 """Regression anchors for the versioned coefficient supplement."""
+import copy
 import json
 from importlib.resources import files
 
@@ -61,6 +62,38 @@ def test_cli_coefficient_table_is_versioned(capsys):
     assert rows["sine"]["citation"] is None
     assert rows["starlike"]["status"] == "literature_sharp"
     assert rows["starlike"]["citation"]["locator"] == "10.1515/forum-2021-0308"
+    schema = json.loads(files("geometric_function_atlas").joinpath("schema/result.schema.json").read_text())
+    Draft202012Validator(schema).validate(payload)
+
+
+@pytest.mark.parametrize("row,field,value", [
+    ("starlike", "citation", None),
+    ("starlike", "citation", {}),
+    ("starlike", "citation", {"theorem": "claim", "locator": ""}),
+    ("starlike", "citation", {"theorem": "claim"}),
+    ("starlike", "optimization_status", "global_upper_bound_not_established_here"),
+    ("sine", "status", "literature_sharp"),
+    ("sine", "citation", {"theorem": "claim", "locator": "doi"}),
+    ("sine", "optimization_status", "published_direct_class_upper_bound; not_reproved_by_package"),
+    ("sine", "status", "analytic_sharp"),
+    ("sine", "value_exact", None),
+])
+def test_h3_claim_schema_rejects_row_mutations(capsys, row, field, value):
+    assert main(["coefficient-table", "hankel3_1", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    validator = Draft202012Validator(json.loads(files("geometric_function_atlas").joinpath("schema/result.schema.json").read_text()))
+    assert validator.is_valid(payload)
+    mutated = copy.deepcopy(payload)
+    mutated["record"]["rows"][row][field] = value
+    assert not validator.is_valid(mutated), (row, field, value)
+    del mutated["record"]["rows"][row][field]
+    assert not validator.is_valid(mutated), (row, field, "missing")
+
+
+@pytest.mark.parametrize("functional", ["a3", "a2a3"])
+def test_other_coefficient_tables_remain_valid(capsys, functional):
+    assert main(["coefficient-table", functional, "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
     schema = json.loads(files("geometric_function_atlas").joinpath("schema/result.schema.json").read_text())
     Draft202012Validator(schema).validate(payload)
 

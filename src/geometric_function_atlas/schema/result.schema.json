@@ -149,6 +149,42 @@
         {"type": "object", "additionalProperties": {"$ref": "#/$defs/json_value"}}
       ]
     },
+    "h3_coefficient_row": {
+      "type": "object", "additionalProperties": false,
+      "required": ["B1", "value_exact", "extremal_omega", "method", "status", "optimization_status", "citation"],
+      "properties": {
+        "B1": {"type": "string", "minLength": 1},
+        "value_exact": {"type": "string", "minLength": 1},
+        "extremal_omega": {"const": "z^3"},
+        "method": {"const": "exact_attainment_at_schwarz_z_cubed"},
+        "status": {"enum": ["literature_sharp", "attained_lower_bound"]},
+        "optimization_status": {"enum": ["published_direct_class_upper_bound; not_reproved_by_package", "global_upper_bound_not_established_here"]},
+        "citation": {"type": ["object", "null"]}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "status": {"const": "literature_sharp"},
+            "optimization_status": {"const": "published_direct_class_upper_bound; not_reproved_by_package"},
+            "citation": {
+              "type": "object", "additionalProperties": false,
+              "required": ["theorem", "locator"],
+              "properties": {
+                "theorem": {"type": "string", "minLength": 1},
+                "locator": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "status": {"const": "attained_lower_bound"},
+            "optimization_status": {"const": "global_upper_bound_not_established_here"},
+            "citation": {"type": "null"}
+          }
+        }
+      ]
+    },
     "dag_ref": {"type": "string", "pattern": "^n[0-9]+$"},
     "dag_node": {
       "oneOf": [
@@ -301,6 +337,29 @@
                   {"contains": {"properties": {"name": {"const": "interval_is_ordered"}}, "required": ["name"]}, "minContains": 1}
                 ]
               }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"result_type": {"const": "coefficient_table"}},
+        "required": ["result_type"],
+        "anyOf": [
+          {"properties": {"canonical_inputs": {"properties": {"functional_key": {"const": "hankel3_1"}}, "required": ["functional_key"]}}},
+          {"properties": {"record": {"properties": {"functional_key": {"const": "hankel3_1"}}, "required": ["functional_key"]}}, "required": ["record"]}
+        ]
+      },
+      "then": {
+        "required": ["record"],
+        "properties": {
+          "canonical_inputs": {"required": ["functional_key"], "properties": {"functional_key": {"const": "hankel3_1"}}},
+          "record": {
+            "type": "object", "required": ["functional_key", "rows"],
+            "properties": {
+              "functional_key": {"const": "hankel3_1"},
+              "rows": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/h3_coefficient_row"}}
             }
           }
         }
