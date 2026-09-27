@@ -11,13 +11,13 @@ This repository is intentionally separate from the registry website and its rese
 **No Python required.** On macOS or Linux, run:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh
+curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.sh | sh
 ```
 
 On Windows, open PowerShell and run:
 
 ```powershell
-irm https://gft-registry.fly.dev/install.ps1 | iex
+irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
 ```
 
 Then take the guided tour:
@@ -26,7 +26,9 @@ Then take the guided tour:
 gfa walkthrough
 ```
 
-The installer creates the `gfa` command with its own Python. The
+These commands use the package repository's installers (the website-hosted
+installer endpoints are maintained separately). The installer creates the
+`gfa` command with its own Python. The
 [getting-started guide](https://prasanna28devadiga.github.io/geometric-function-atlas/getting-started/)
 walks through the first calculations.
 
@@ -350,8 +352,8 @@ distinct catalog classes. Canonical alias/self-pair accounting yields 650
 questions and 557 eligible closed-form-consistent questions. Twelve raw rows
 remain `audit_required` consistency failures (11 in the canonical off-diagonal
 view); neither the raw nor canonical count is a proof tally. The 0.4.0 release
-snapshot is frozen; until the new release assets exist, public installers still
-point to the 0.4.0 wheel.
+snapshot is frozen; the package repository's installers now target the published
+0.5.0 wheel.
 
 ```python
 from geometric_function_atlas import (

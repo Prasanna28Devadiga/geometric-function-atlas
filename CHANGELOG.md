@@ -4,6 +4,10 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
+- The package repository's public installers and installation examples now
+  target the published 0.5.0 wheel. Website-hosted installers are maintained
+  separately and may still point to 0.4.0 until updated there.
+
 ## 0.5.0 — 2026-09-27
 
 ### Added

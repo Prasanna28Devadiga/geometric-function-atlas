@@ -56,8 +56,11 @@ explicit approval from the repository owner.
 11. Only after both the GitHub assets and PyPI version are live, open a small
    follow-up pull request that switches `install.sh`, `install.ps1`, their tests,
    and public installation examples from the previous release to the new one.
-12. Merge that follow-up after CI, run both public installer commands, and verify
-   `gfa --version` plus the new first-use command. This order prevents a broken
+12. Merge that follow-up after CI, run both package-repository public installer
+   commands, and verify `gfa --version` plus the new first-use command. The
+   website-hosted `/install.sh` and `/install.ps1` endpoints are maintained in
+   the website repository: check their live versions separately and update them
+   there before advertising those URLs as current. This order prevents a broken
    installer URL or a PyPI command that names an unpublished version.
 
 ## PyPI publication

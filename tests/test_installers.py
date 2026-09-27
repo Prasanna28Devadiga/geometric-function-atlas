@@ -23,7 +23,7 @@ def test_posix_installer_uses_uv_as_a_managed_python_tool(tmp_path: Path) -> Non
     fake_uv.chmod(0o755)
     fake_gfa = tool_bin / "gfa"
     fake_gfa.write_text(
-        "#!/bin/sh\nprintf 'geometric-function-atlas 0.4.0\\n'\n",
+        "#!/bin/sh\nprintf 'geometric-function-atlas 0.5.0\\n'\n",
         encoding="utf-8",
     )
     fake_gfa.chmod(0o755)
@@ -49,7 +49,7 @@ def test_posix_installer_uses_uv_as_a_managed_python_tool(tmp_path: Path) -> Non
     assert "tool install --managed-python --python 3.12 --force local-wheel.whl" in invocations
     assert "tool update-shell" in invocations
     assert "tool dir --bin" in invocations
-    assert "geometric-function-atlas 0.4.0" in completed.stdout
+    assert "geometric-function-atlas 0.5.0" in completed.stdout
 
 
 def test_windows_installer_has_the_same_managed_python_contract() -> None:
@@ -74,9 +74,9 @@ def test_public_installation_has_one_command_per_supported_shell() -> None:
     install = (ROOT / "docs" / "getting-started.md").read_text(encoding="utf-8")
     unix_command = (
         "curl --proto '=https' --tlsv1.2 -LsSf "
-        "https://gft-registry.fly.dev/install.sh | sh"
+        "https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.sh | sh"
     )
-    windows_command = "irm https://gft-registry.fly.dev/install.ps1 | iex"
+    windows_command = "irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex"
 
     assert readme.index("## Install") < readme.index("## What you can do")
     assert "No Python required" in readme
@@ -84,10 +84,10 @@ def test_public_installation_has_one_command_per_supported_shell() -> None:
     assert unix_command in install
     assert windows_command in readme
     assert windows_command in install
-    assert readme.count("https://gft-registry.fly.dev/install.sh") == 1
-    assert install.count("https://gft-registry.fly.dev/install.sh") == 1
-    assert readme.count("https://gft-registry.fly.dev/install.ps1") == 1
-    assert install.count("https://gft-registry.fly.dev/install.ps1") == 1
+    assert readme.count("/main/scripts/install.sh") == 1
+    assert install.count("/main/scripts/install.sh") == 1
+    assert readme.count("/main/scripts/install.ps1") == 1
+    assert install.count("/main/scripts/install.ps1") == 1
     assert "gfa walkthrough" in readme
     for public_guide in (readme, install):
         assert "uv tool install" not in public_guide
@@ -117,8 +117,8 @@ def test_pypi_project_links_prioritize_the_product_and_installer() -> None:
 def test_installers_default_to_the_latest_github_release_wheel() -> None:
     release_wheel = (
         "https://github.com/Prasanna28Devadiga/geometric-function-atlas/"
-        "releases/download/v0.4.0/"
-        "geometric_function_atlas-0.4.0-py3-none-any.whl"
+        "releases/download/v0.5.0/"
+        "geometric_function_atlas-0.5.0-py3-none-any.whl"
     )
 
     posix = (ROOT / "scripts" / "install.sh").read_text(encoding="utf-8")

@@ -1,4 +1,4 @@
-"""Stable release-candidate identity and pre-publication installer boundary."""
+"""Stable release identity and post-publication installer boundary."""
 
 from pathlib import Path
 
@@ -16,7 +16,7 @@ def test_stable_050_identity_is_consistent() -> None:
     assert "\n## 0.5.0 — 2026-09-27\n" in changelog
 
 
-def test_prepublication_installers_keep_the_public_040_wheel() -> None:
-    wheel = "releases/download/v0.4.0/geometric_function_atlas-0.4.0-py3-none-any.whl"
+def test_postpublication_installers_use_the_public_050_wheel() -> None:
+    wheel = "releases/download/v0.5.0/geometric_function_atlas-0.5.0-py3-none-any.whl"
     for name in ("install.sh", "install.ps1"):
         assert wheel in (ROOT / "scripts" / name).read_text(encoding="utf-8")

@@ -96,8 +96,8 @@ def test_getting_started_is_short_with_one_command_per_shell() -> None:
     tutorial = GETTING_STARTED.read_text(encoding="utf-8")
 
     expected_commands = (
-        "curl --proto '=https' --tlsv1.2 -LsSf https://gft-registry.fly.dev/install.sh | sh",
-        "irm https://gft-registry.fly.dev/install.ps1 | iex",
+        "curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.sh | sh",
+        "irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex",
         "gfa fekete-szego exponential --mu 0",
         "gfa fekete-szego exponential --mu 1/2",
         "gfa walkthrough",
@@ -105,8 +105,8 @@ def test_getting_started_is_short_with_one_command_per_shell() -> None:
     for command in expected_commands:
         assert command in tutorial
 
-    assert tutorial.count("https://gft-registry.fly.dev/install.sh") == 1
-    assert tutorial.count("https://gft-registry.fly.dev/install.ps1") == 1
+    assert tutorial.count("/main/scripts/install.sh") == 1
+    assert tutorial.count("/main/scripts/install.ps1") == 1
     assert len(tutorial.splitlines()) <= 81
     assert tutorial.count("## ") <= 5
     assert tutorial.count("```bash") <= 4
