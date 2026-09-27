@@ -370,12 +370,13 @@ gfa coefficient-table a2a3 --json
 
 Radius rows preserve direction. The 2026.09.27-paper-review snapshot adds
 `paper_proved_exact` for 19 directed radii cited to written manuscript theorems;
-it does not mutate the published 0.4.0 snapshot. Eight reviewed lanes have
-package-owned replay certificates. Two reciprocal paper lanes now check bounded
-symbolic identities, but not the written global-containment arguments; they
-report `symbolic_replay_only`, `certified: false`, and
-`global_containment_check: not_mechanized`. The other nine written-proof lanes
-remain unsupported for local replay. Six axis contacts have numerical recognition,
+it does not mutate the published 0.4.0 snapshot. All 19 replay with
+`gfa verify-radius-certificate`: eight through the historical reviewed fixture
+and eleven through package-owned chains that follow the paper proofs
+(Theorems 4.4, 4.5(a)-(e), 4.6(b)-(c), 4.8). As in the eight fixture lanes, the
+coefficient-majorant, sine-ray and sharpness lemmas are recorded as cited steps
+(`scope` says so); identities, thresholds and contacts are checked, and the two
+Theorem 4.8 lanes re-run the paper's outward-rounded interval certificate. Six axis contacts have numerical recognition,
 not a global containment or sharpness certificate. The 39 catalog keys represent
 38 distinct formulas, but the 702 raw radius rows span only a bounded
 28-source × 26-target key grid, not every ordered pair of the catalog.
@@ -423,7 +424,7 @@ The radius certificate replay checks the declared branch, containment,
 contact/attainment evidence, exact candidate, and bounded symbolic steps. The
 closed replay JSON contract is `schema/radius-replay.schema.json`, not the
 generic `result.schema.json`; see [the exact validator call](docs/RESULT_CONTRACT.md#failure-states-and-cli-exit-codes).
-Eight historical lanes report `global_containment_check: bounded_chain_replayed`
+The 19 paper lanes report `global_containment_check: bounded_chain_replayed`
 for their bounded checks (not a fully formalized global theorem); other routes
 report `not_mechanized`. A
 stored decimal or a candidate expression is not silently upgraded to a global
