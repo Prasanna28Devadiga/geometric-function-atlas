@@ -220,7 +220,7 @@ from geometric_function_atlas import (
     list_classes,
 )
 
-list_classes()                    # all 39 Ma–Minda classes
+list_classes()                    # all 39 catalog keys
 class_admissibility("exponential")  # exact phi(0)=1, phi'(0)>0 + region screens
 
 # Screen f(z) = z + 0.25 z^2 + 0.1 z^3 for membership in S*(exp(z)).
@@ -352,9 +352,10 @@ Radius rows preserve direction. The 2026.09.27-paper-review snapshot adds
 it does not mutate the published 0.4.0 snapshot. Only eight reviewed lanes
 have package-owned replay certificates; the remaining 11 written-proof lanes
 are not machine-replayable here. Six axis contacts have numerical recognition,
-not a global containment or sharpness certificate. The 702 raw rows span a
-bounded 28-source × 26-target key grid, not every ordered pair of the 38
-distinct catalog classes. Canonical alias/self-pair accounting yields 650
+not a global containment or sharpness certificate. The 39 catalog keys
+represent 38 distinct formulas, but the 702 raw radius rows span only a
+28-source × 26-target key grid, not every ordered pair of the catalog.
+Canonical alias/self-pair accounting yields 650
 questions and 557 eligible closed-form-consistent questions. Twelve raw rows
 remain `audit_required` consistency failures (11 in the canonical off-diagonal
 view); neither the raw nor canonical count is a proof tally. The 0.4.0 release
