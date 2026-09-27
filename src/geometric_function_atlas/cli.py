@@ -1166,6 +1166,9 @@ def _artifact_emit(
     evidence_status: str = "screened",
     record_count: int | None = None,
     verification: VerificationReport | None = None,
+    supplement_version: str | None = None,
+    assumptions: tuple[str, ...] = _ARTIFACT_ASSUMPTIONS,
+    source_references: tuple[str, ...] = ("Geometric Function Atlas versioned package snapshot",),
 ) -> None:
     if isinstance(record, list):
         record = {"count": len(record), "rows": record}
@@ -1192,10 +1195,11 @@ def _artifact_emit(
         },
         record=record,
         evidence_status=evidence_status,
-        assumptions=_ARTIFACT_ASSUMPTIONS,
-        source_references=("Geometric Function Atlas versioned package snapshot",),
+        assumptions=assumptions,
+        source_references=source_references,
         verification=verification,
         record_count=record_count,
+        supplement_version=supplement_version,
     )
     if args.json:
         _write(payload, as_json=True)
@@ -1221,6 +1225,20 @@ def _artifact_snapshot(args: argparse.Namespace) -> None:
 def _artifact_classes(args: argparse.Namespace) -> None:
     records = _artifact_data.list_classes()
     _artifact_emit(args, result_type="classes", record=records, record_count=len(records))
+
+
+def _artifact_coefficient_table(args: argparse.Namespace) -> None:
+    record = _artifact_data.coefficient_table(args.functional_key)
+    h3 = args.functional_key == "hankel3_1"
+    _artifact_emit(
+        args, result_type="coefficient_table", record=record,
+        canonical_inputs={"functional_key": args.functional_key},
+        record_count=len(record["rows"]),
+        evidence_status="mixed_row_level_claims" if h3 else "proven_exact_under_declared_assumptions",
+        supplement_version=record["supplement_version"],
+        assumptions=(record["assumptions"],),
+        source_references=("Versioned coefficient supplement",),
+    )
 
 
 def _artifact_class(args: argparse.Namespace) -> None:
@@ -1260,15 +1278,39 @@ def _artifact_proofs(args: argparse.Namespace) -> None:
         status=args.status,
         search=args.search,
     )
-    _artifact_emit(args, result_type="proofs", record=record, record_count=record["count"])
+    origins = {row["artifact_source"] for row in record["rows"]}
+    supplemented = "coefficient_supplement" in origins
+    assumptions = (
+        (("records are transcribed from the versioned website snapshot",) if "website_snapshot" in origins else ())
+        + (("supplement certificates use the single-harmonic formula under Ma–Minda admissibility",) if supplemented else ())
+        + ("sharpness, enclosure, and novelty semantics remain those of each source record",)
+    )
+    references = (
+        (("Geometric Function Atlas versioned package snapshot",) if "website_snapshot" in origins else ())
+        + (("Versioned coefficient supplement; single-harmonic formula",) if supplemented else ())
+        or ("Geometric Function Atlas versioned package snapshot",)
+    )
+    _artifact_emit(
+        args, result_type="proofs", record=record, record_count=record["count"],
+        canonical_inputs={key: value for key, value in {
+            "class_key": args.class_key, "functional_key": args.functional_key,
+            "status": args.status, "search": args.search,
+        }.items() if value is not None},
+        supplement_version=_artifact_data.coefficient_supplement_version() if supplemented else None,
+        assumptions=assumptions, source_references=references,
+    )
 
 
 def _artifact_proof(args: argparse.Namespace) -> None:
+    supplemented = _artifact_data.is_supplement_certificate(args.name)
     _artifact_emit(
         args,
         result_type="proof",
         record=_artifact_data.get_proof(args.name, raw=args.raw),
         canonical_inputs={"name": args.name, "raw": args.raw},
+        supplement_version=_artifact_data.coefficient_supplement_version() if supplemented else None,
+        assumptions=("Ma–Minda admissibility of the named generator",) if supplemented else _ARTIFACT_ASSUMPTIONS,
+        source_references=("Versioned coefficient supplement; single-harmonic formula",) if supplemented else ("Geometric Function Atlas versioned package snapshot",),
     )
 
 
@@ -1308,6 +1350,7 @@ def _artifact_references(args: argparse.Namespace) -> None:
 
 def _artifact_certificate(args: argparse.Namespace) -> None:
     record = _artifact_data.verify_certificate(args.name)
+    supplemented = _artifact_data.is_supplement_certificate(args.name)
     checks = [
         VerificationCheck(
             name="artifact_lookup",
@@ -1361,6 +1404,9 @@ def _artifact_certificate(args: argparse.Namespace) -> None:
         canonical_inputs={"name": args.name},
         evidence_status=record["evidence_status"],
         verification=VerificationReport(tuple(checks)),
+        supplement_version=_artifact_data.coefficient_supplement_version() if supplemented else None,
+        assumptions=("Ma–Minda admissibility of the named generator",) if supplemented else _ARTIFACT_ASSUMPTIONS,
+        source_references=("Versioned coefficient supplement; single-harmonic formula",) if supplemented else ("Geometric Function Atlas versioned package snapshot",),
     )
 
 
@@ -1914,6 +1960,13 @@ def _parser() -> argparse.ArgumentParser:
     bound.add_argument("functional_key", nargs="?")
     bound.add_argument("--json", action="store_true", help="emit JSON")
     bound.set_defaults(handler=_artifact_bound)
+
+    coefficient_table = subparsers.add_parser(
+        "coefficient-table", help="exact coefficient tables with row-level proof status"
+    )
+    coefficient_table.add_argument("functional_key", choices=["hankel3_1", "a3", "a2a3"])
+    coefficient_table.add_argument("--json", action="store_true", help="emit JSON")
+    coefficient_table.set_defaults(handler=_artifact_coefficient_table)
 
     proofs = subparsers.add_parser("proofs", help="list baked proof certificates")
     proofs.add_argument("--class", dest="class_key")

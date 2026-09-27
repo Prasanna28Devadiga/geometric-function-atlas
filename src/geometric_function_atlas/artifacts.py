@@ -59,6 +59,7 @@ MAX_REPLAY_ORDER = 3  # hankel2_2 / Zalcman need a2..a4 at most
 _SNAPSHOT_RESULT_TYPES = frozenset(
     {
         "certificate_replay",
+        "coefficient_table",
         "classes",
         "coefficient_bound",
         "expansion",
@@ -73,6 +74,7 @@ _SNAPSHOT_RESULT_TYPES = frozenset(
 
 _LOOKUP_METHODS = {
     "certificate_replay": "exact_schur_extremal_replay",
+    "coefficient_table": "versioned_coefficient_supplement_lookup",
     "classes": "baked_class_catalog_lookup",
     "coefficient_bound": "baked_coefficient_bound_lookup",
     "expansion": "baked_expansion_lookup",
@@ -403,16 +405,58 @@ def coefficient_bound(
 def _certificates() -> dict[str, dict[str, Any]]:
     payload = _load_json("certificates.json")
     _check_schema(payload, "certificates.json")
-    return payload["certificates"]
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    originals = payload["certificates"]
+    additions = supplement["certificates"]
+    if set(originals) & set(additions):
+        raise CorruptArtifactError("coefficient supplement overwrites an original certificate")
+    return originals | additions
 
 
-def _proof_summary(name: str, record: Mapping[str, Any]) -> dict[str, Any]:
+def coefficient_supplement_version() -> str:
+    """Return the independently checksummed supplement identity."""
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    return str(supplement["supplement_version"])
+
+
+def is_supplement_certificate(name: str) -> bool:
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    return name in supplement["certificates"]
+
+
+def coefficient_table(functional_key: str) -> dict[str, Any]:
+    """Return exact attained H3 witnesses or analytically sharp a3/a2a3 values.
+
+    H3 sharpness requires a cited direct-class theorem; all remaining rows are
+    lower witnesses, regardless of numerical optimization reports.
+    """
+    if functional_key not in {"hankel3_1", "a3", "a2a3"}:
+        raise UnsupportedError(f"unknown coefficient table {functional_key!r}")
+    payload = _load_json("coefficient_supplement.json")
+    _check_schema(payload, "coefficient_supplement.json")
+    return {
+        "functional_key": functional_key,
+        "supplement_version": payload["supplement_version"],
+        "source_class_artifact": payload["source_class_artifact"],
+        "assumptions": payload["theorem_scope"],
+        "rows": {key: dict(row) for key, row in payload["tables"][functional_key].items()},
+    }
+
+
+def _proof_summary(
+    name: str, record: Mapping[str, Any], *, artifact_source: str, artifact_version: str
+) -> dict[str, Any]:
     sharp = record.get("sharp") or {}
     # ``sharp`` means proven sharpness. The certificate's ``exact`` flag only
     # says the candidate is an exact constant; without ``proven`` it remains a
     # certified upper enclosure. The two must stay distinct.
     return {
         "name": name,
+        "artifact_source": artifact_source,
+        "artifact_version": artifact_version,
         "class_key": record["class"],
         "functional_key": record["functional"],
         "status": record["status"],
@@ -434,6 +478,11 @@ def list_proofs(
     match set is a valid result (the corpus simply has no such row).
     """
     certificates = _certificates()
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    supplement_names = supplement["certificates"]
+    snapshot_version = f"gfa_artifacts:{_manifest()['artifact_version']}"
+    supplement_version = f"gfa_coefficients:{supplement['supplement_version']}"
     if class_key is not None:
         _require_class(class_key)
     if functional_key is not None:
@@ -457,7 +506,12 @@ def list_proofs(
             haystack = f"{name} {record.get('statement', '')}".lower()
             if needle not in haystack:
                 continue
-        rows.append(_proof_summary(name, record))
+        supplemented = name in supplement_names
+        rows.append(_proof_summary(
+            name, record,
+            artifact_source="coefficient_supplement" if supplemented else "website_snapshot",
+            artifact_version=supplement_version if supplemented else snapshot_version,
+        ))
     return {"count": len(rows), "rows": rows}
 
 
@@ -499,8 +553,11 @@ def get_proof(name: str, *, raw: bool = False) -> dict[str, Any]:
         "slack": record.get("slack"),
         "engine": record.get("engine"),
         "evaluator": (record.get("evaluator") or {}).get("definition"),
-        "method_label": f"{record.get('engine')} / "
-        f"{(record.get('evaluator') or {}).get('type', 'unknown')}",
+        "method_label": (
+            f"{record['engine']} / {record['evaluator']['type']}"
+            if record.get("engine") and (record.get("evaluator") or {}).get("type")
+            else record.get("engine")
+        ),
         "lemmas": list(record.get("lemmas") or []),
         "n_leaves": record.get("n_leaves"),
         "n_leaves_parts": record.get("n_leaves_parts"),
@@ -821,6 +878,7 @@ def snapshot_payload(
     verification: VerificationReport,
     exact_expressions: Mapping[str, Any] | None = None,
     record_count: int | None = None,
+    supplement_version: str | None = None,
 ) -> dict[str, Any]:
     """Assemble the closed snapshot result envelope for one operation."""
     if result_type not in _SNAPSHOT_RESULT_TYPES:
@@ -869,6 +927,10 @@ def snapshot_payload(
         "provenance": "built_in",
         "record": dict(record),
     }
+    if supplement_version is not None:
+        payload["artifact_versions"]["coefficient_supplement"] = (
+            f"gfa_coefficients:{supplement_version}"
+        )
     json.dumps(payload, allow_nan=False)
     validate_snapshot_payload(payload)
     return payload
