@@ -86,6 +86,7 @@ nav:
       - Find and verify an inclusion radius: workflows/sharp_radius.md
       - Test a conjecture: workflows/conjecture_counterexample.md
       - Reproduce and adapt a published result: workflows/recent_literature.md
+      - Reproducing the Experimental Mathematics paper: workflows/em_paper.md
   - Reference:
       - Generators and coefficients: reference/generators-and-coefficients.md
       - Classes and extremals: reference/classes.md
