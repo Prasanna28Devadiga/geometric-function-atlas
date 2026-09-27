@@ -12,7 +12,7 @@
   ],
   "properties": {
     "schema_version": {"const": 1},
-    "result_type": {"enum": ["generator_series", "fekete_szego", "counterexample_verification", "radius", "certificate_replay", "classes", "coefficient_bound", "expansion", "open_problems", "proof", "proofs", "reconciliation", "references", "snapshot_verify"]},
+    "result_type": {"enum": ["generator_series", "fekete_szego", "counterexample_verification", "radius", "certificate_replay", "classes", "coefficient_bound", "coefficient_table", "expansion", "open_problems", "proof", "proofs", "reconciliation", "references", "snapshot_verify"]},
     "canonical_inputs": {
       "type": "object", "additionalProperties": false,
       "properties": {
@@ -84,9 +84,9 @@
         }
       }
     },
-    "method": {"enum": ["exact_symbolic_taylor_series", "ma_minda_fekete_szego_closed_form", "certified_point_interval_evaluation", "directed_radius_snapshot", "exact_schur_extremal_replay", "baked_class_catalog_lookup", "baked_coefficient_bound_lookup", "baked_expansion_lookup", "baked_open_problems_query", "baked_proof_detail_lookup", "baked_proof_gallery_query", "baked_reconciliation_query", "baked_references_document", "baked_snapshot_integrity_verification"]},
-    "evidence_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
-    "computational_status": {"enum": ["screened", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
+    "method": {"enum": ["exact_symbolic_taylor_series", "ma_minda_fekete_szego_closed_form", "certified_point_interval_evaluation", "directed_radius_snapshot", "exact_schur_extremal_replay", "baked_class_catalog_lookup", "baked_coefficient_bound_lookup", "versioned_coefficient_supplement_lookup", "baked_expansion_lookup", "baked_open_problems_query", "baked_proof_detail_lookup", "baked_proof_gallery_query", "baked_reconciliation_query", "baked_references_document", "baked_snapshot_integrity_verification"]},
+    "evidence_status": {"enum": ["screened", "mixed_row_level_claims", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
+    "computational_status": {"enum": ["screened", "mixed_row_level_claims", "certified_enclosure", "proven_exact_under_declared_assumptions", "disproven", "unresolved", "unsupported", "invalid_input", "resource_limit", "corrupt_artifact"]},
     "assumptions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "source_references": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "package_version": {"type": "string", "minLength": 1},

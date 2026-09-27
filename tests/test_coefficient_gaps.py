@@ -1,7 +1,9 @@
 """Regression anchors for the versioned coefficient supplement."""
 import json
+from importlib.resources import files
 
 import sympy as sp
+from jsonschema import Draft202012Validator
 
 from geometric_function_atlas import artifacts
 from geometric_function_atlas.cli import main
@@ -50,4 +52,31 @@ def test_cli_coefficient_table_is_versioned(capsys):
     payload = json.loads(capsys.readouterr().out)
     assert payload["result_type"] == "coefficient_table"
     assert payload["record"]["rows"]["sine"]["status"] == "attained_lower_bound"
-    assert payload["artifact_versions"]["fixture_or_proof"]
+    assert payload["artifact_versions"]["coefficient_supplement"] == "gfa_coefficients:2026.09.27-coefficients-v1"
+    assert payload["evidence_status"] == "mixed_row_level_claims"
+    assert payload["computational_status"] == "mixed_row_level_claims"
+    rows = payload["record"]["rows"]
+    assert rows["sine"]["optimization_status"] == "global_upper_bound_not_established_here"
+    assert rows["sine"]["citation"] is None
+    assert rows["starlike"]["status"] == "literature_sharp"
+    assert rows["starlike"]["citation"]["locator"] == "10.1515/forum-2021-0308"
+    schema = json.loads(files("geometric_function_atlas").joinpath("schema/result.schema.json").read_text())
+    Draft202012Validator(schema).validate(payload)
+
+
+def test_cli_supplement_proof_and_replay_provenance(capsys):
+    name = "booth_0.3__fekete_szego_mu0.25"
+    for command in ("proof", "verify-certificate"):
+        assert main([command, name, "--json"]) == 0
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["artifact_versions"]["coefficient_supplement"] == "gfa_coefficients:2026.09.27-coefficients-v1"
+        assert "Ma–Minda" in payload["assumptions"][0]
+        if command == "proof":
+            assert payload["record"]["method_label"] == "closed-form-single-harmonic"
+            assert "unknown" not in payload["record"]["method_label"]
+        else:
+            assert payload["record"]["matched"] is True
+            assert payload["evidence_status"] == "proven_exact_under_declared_assumptions"
+    assert main(["proof", "starlike__fekete_szego_mu1", "--json"]) == 0
+    legacy = json.loads(capsys.readouterr().out)
+    assert "coefficient_supplement" not in legacy["artifact_versions"]

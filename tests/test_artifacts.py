@@ -70,8 +70,14 @@ def test_corrupt_artifact_fails_closed(monkeypatch, tmp_path) -> None:
         return artifacts_module._data_file(name)
 
     monkeypatch.setattr(artifacts_module, "_data_file", pointer)
-    with pytest.raises(CorruptArtifactError, match="not valid JSON"):
-        gfa.class_info("starlike")
+    # Earlier coefficient tests may have cached classes.json; test the loader,
+    # not a warmed process cache, and restore cache state for later tests.
+    artifacts_module._load_json.cache_clear()
+    try:
+        with pytest.raises(CorruptArtifactError, match="not valid JSON"):
+            gfa.class_info("starlike")
+    finally:
+        artifacts_module._load_json.cache_clear()
 
 
 # ── class catalog ─────────────────────────────────────────────────────────────

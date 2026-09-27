@@ -414,6 +414,19 @@ def _certificates() -> dict[str, dict[str, Any]]:
     return originals | additions
 
 
+def coefficient_supplement_version() -> str:
+    """Return the independently checksummed supplement identity."""
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    return str(supplement["supplement_version"])
+
+
+def is_supplement_certificate(name: str) -> bool:
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    return name in supplement["certificates"]
+
+
 def coefficient_table(functional_key: str) -> dict[str, Any]:
     """Return exact attained H3 witnesses or analytically sharp a3/a2a3 values.
 
@@ -526,8 +539,11 @@ def get_proof(name: str, *, raw: bool = False) -> dict[str, Any]:
         "slack": record.get("slack"),
         "engine": record.get("engine"),
         "evaluator": (record.get("evaluator") or {}).get("definition"),
-        "method_label": f"{record.get('engine')} / "
-        f"{(record.get('evaluator') or {}).get('type', 'unknown')}",
+        "method_label": (
+            f"{record['engine']} / {record['evaluator']['type']}"
+            if record.get("engine") and (record.get("evaluator") or {}).get("type")
+            else record.get("engine")
+        ),
         "lemmas": list(record.get("lemmas") or []),
         "n_leaves": record.get("n_leaves"),
         "n_leaves_parts": record.get("n_leaves_parts"),
@@ -848,6 +864,7 @@ def snapshot_payload(
     verification: VerificationReport,
     exact_expressions: Mapping[str, Any] | None = None,
     record_count: int | None = None,
+    supplement_version: str | None = None,
 ) -> dict[str, Any]:
     """Assemble the closed snapshot result envelope for one operation."""
     if result_type not in _SNAPSHOT_RESULT_TYPES:
@@ -896,6 +913,10 @@ def snapshot_payload(
         "provenance": "built_in",
         "record": dict(record),
     }
+    if supplement_version is not None:
+        payload["artifact_versions"]["coefficient_supplement"] = (
+            f"gfa_coefficients:{supplement_version}"
+        )
     json.dumps(payload, allow_nan=False)
     validate_snapshot_payload(payload)
     return payload
