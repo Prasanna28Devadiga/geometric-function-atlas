@@ -311,6 +311,23 @@ def test_closed_form_identity_is_bounded_before_series_expansion() -> None:
         verify_function(closed_form=z + huge_symbol, max_cost="symbolic")
 
 
+def test_shared_dag_is_rejected_before_srepr_expansion(monkeypatch: pytest.MonkeyPatch) -> None:
+    z = sp.Symbol("z")
+    expression = z
+    expanded_length = len(sp.srepr(z))
+    for _ in range(17):
+        expression = sp.Add(expression, expression, evaluate=False)
+        expanded_length = len("Add(, )") + 2 * expanded_length
+    assert expanded_length > 65536
+
+    def forbidden_srepr(*args: object, **kwargs: object) -> str:
+        raise AssertionError("srepr must not expand the shared DAG")
+
+    monkeypatch.setattr(sp, "srepr", forbidden_srepr)
+    with pytest.raises(ResourceLimitError, match="representation exceeds limit"):
+        verify_function(closed_form=expression, max_cost="symbolic")
+
+
 def test_shipped_verification_schema_accepts_all_tiers_and_cli_shape() -> None:
     schema = load_verify_result_schema()
     jsonschema.Draft202012Validator.check_schema(schema)

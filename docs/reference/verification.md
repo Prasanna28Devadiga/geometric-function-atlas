@@ -25,7 +25,12 @@ The first 39 Taylor coefficients of a nonpolynomial expression are only a
 finite projection; this field preserves the full supplied expression's
 structural identity, including a tail beyond that projection. It is bounded
 to 65,536 characters; larger expressions fail with `ResourceLimitError`
-before series expansion. Treat the string as inert data, never pass it to
+before series expansion. A DAG-aware preflight rejects expressions whose conservative
+expanded-size bound exceeds the limit, deeply nested expressions, and
+unsupported/custom printers before calling `srepr`; a small representation
+can therefore be rejected when its bound is too conservative. The final
+length check still enforces the exact cap for accepted inputs. Treat the
+string as inert data, never pass it to
 `eval` or a parser. SymPy's printed representation may change between SymPy
 versions, so pin the version for cross-run textual comparisons. This is not
 a proof that two syntactically different expressions define different
