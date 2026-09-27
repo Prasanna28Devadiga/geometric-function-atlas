@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geometric-function-atlas.org/schema/radius-replay-1.json",
+  "title": "Directed radius certificate replay (distinct from result.schema.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "result_type", "canonical_inputs", "exact_expressions", "method", "status", "certified", "global_containment_check", "candidate", "expected_candidate", "direction", "steps", "failure_state", "error", "novelty_claim"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "result_type": {"const": "radius_certificate_replay"},
+    "canonical_inputs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["inner", "target"],
+      "properties": {"inner": {"type": "string"}, "target": {"type": "string"}}
+    },
+    "exact_expressions": {
+      "type": "object", "additionalProperties": false,
+      "required": ["radius"],
+      "properties": {"radius": {"type": ["string", "null"]}}
+    },
+    "method": {"enum": ["bounded_exact_radius_certificate_replay", "paper_symbolic_radius_replay"]},
+    "status": {"enum": ["proven", "symbolic_replay_only", "not_replayable", "candidate_mismatch", "unresolved", "invalid_input", "corrupt_artifact"]},
+    "certified": {"type": "boolean"},
+    "global_containment_check": {"enum": ["bounded_chain_replayed", "not_mechanized"]},
+    "candidate": {"type": ["string", "null"]},
+    "expected_candidate": {"type": ["string", "null"]},
+    "direction": {"type": "string"},
+    "steps": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/step"}},
+    "failure_state": {"enum": [null, "invalid_input", "unsupported", "corrupt_artifact"]},
+    "error": {"type": ["string", "null"]},
+    "novelty_claim": {"const": false}
+  },
+  "$defs": {
+    "step": {
+      "type": "object", "additionalProperties": false,
+      "required": ["step", "verified", "scope", "failure_reason"],
+      "properties": {
+        "step": {"type": "string", "minLength": 1},
+        "verified": {"type": "boolean"},
+        "scope": {"type": "string", "minLength": 1},
+        "failure_reason": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "proven"}}}, "then": {
+      "properties": {"method": {"const": "bounded_exact_radius_certificate_replay"}, "certified": {"const": true}, "global_containment_check": {"const": "bounded_chain_replayed"}, "failure_state": {"type": "null"}, "error": {"type": "null"}, "steps": {"minItems": 1, "items": {"properties": {"verified": {"const": true}}}}}
+    }, "else": {"properties": {"certified": {"const": false}, "global_containment_check": {"const": "not_mechanized"}}}},
+    {"if": {"properties": {"status": {"const": "symbolic_replay_only"}}}, "then": {
+      "properties": {"method": {"const": "paper_symbolic_radius_replay"}, "failure_state": {"type": "null"}, "steps": {"minItems": 1, "items": {"properties": {"verified": {"const": true}}}}}
+    }},
+    {"if": {"properties": {"status": {"const": "not_replayable"}}}, "then": {"properties": {"failure_state": {"const": "unsupported"}, "steps": {"maxItems": 0}}}},
+    {"if": {"properties": {"status": {"const": "invalid_input"}}}, "then": {"properties": {"failure_state": {"const": "invalid_input"}, "steps": {"maxItems": 0}}}},
+    {"if": {"properties": {"status": {"const": "corrupt_artifact"}}}, "then": {"properties": {"failure_state": {"const": "corrupt_artifact"}, "steps": {"maxItems": 0}}}},
+    {"if": {"properties": {"status": {"enum": ["candidate_mismatch", "unresolved"]}}}, "then": {"properties": {"failure_state": {"type": "null"}}}}
+  ]
+}
