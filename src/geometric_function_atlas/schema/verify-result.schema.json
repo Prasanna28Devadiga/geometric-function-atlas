@@ -1,0 +1,60 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "$id":"https://geometric-function-atlas.org/schema/verify-result-1.json",
+ "$comment":"Point bounds constrain each coordinate only; JSON Schema draft 2020-12 does not prove x*x + y*y < 1. Consumers requiring open-unit-disk containment must additionally call geometric_function_atlas.records.validate_screen_record.",
+ "type":"object", "additionalProperties":false,
+ "required":["schema_version","record_type","canonical_inputs","method","evidence_kind","tier","assumptions","source_references","package_version","failure_state","novelty_claim","verification","details"],
+ "properties":{
+  "schema_version":{"const":1}, "record_type":{"const":"function_verification"},
+  "canonical_inputs":{"type":"object","additionalProperties":false,"required":["property","coefficients","tier","truncation"],"properties":{
+   "property":{"enum":["starlike","convex","univalent","becker_univalent","nehari_univalent"]},
+   "coefficients":{"type":"array","maxItems":128,"items":{"type":"string","minLength":1}},
+   "tier":{"enum":["screen","symbolic","rigorous"]},"truncation":{"type":"boolean"}
+  }},
+  "method":{"const":"tiered_function_verification"},
+  "evidence_kind":{"enum":["numerical_screen","certified_enclosure","exact_proof","inconclusive"]},
+  "tier":{"enum":["screen","symbolic","rigorous"]},
+  "assumptions":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+  "source_references":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}},
+  "package_version":{"type":"string","minLength":1},"failure_state":{"type":"null"},"novelty_claim":{"const":false},
+  "verification":{"type":"object","additionalProperties":false,"required":["status","success","checks"],"properties":{
+   "status":{"enum":["passed","failed","skipped"]},"success":{"type":"boolean"},
+   "checks":{"type":"array","minItems":2,"maxItems":6,"items":{"$ref":"#/$defs/check"}}
+  }},
+  "details":{"type":"object","additionalProperties":false,"required":["outcome","witness_point","certified","min_margin"],"properties":{
+   "outcome":{"enum":["passes_screen","fails_screen","proven","certified_violation","no_certified_violation_on_grid","inconclusive_truncation","c01_fails_sufficient_condition","convex_fails_sufficient_condition","undecidable"]},
+   "witness_point":{"anyOf":[{"type":"null"},{"$ref":"#/$defs/coordinate_bounded_point"}]},
+   "certified":{"type":"boolean"},"min_margin":{"type":["number","null"]},
+   "threshold":{"type":"number"},"grid_points":{"type":"integer","minimum":1},
+   "worst_point":{"anyOf":[{"type":"null"},{"$ref":"#/$defs/coordinate_bounded_point"}]},
+   "c01_sum":{"type":"string","minLength":1},"convex_sum":{"type":"string","minLength":1},
+   "polynomial":{"type":"boolean"},"c01_le_1":{"type":["boolean","null"]},
+   "convex_proven":{"const":true},"univalent_proven":{"const":true},"proven_via":{"type":"string","minLength":1},
+   "interval_lower":{"type":"number"},"interval_upper":{"type":"number"},"interval_threshold":{"type":"number"},
+   "violation_scope":{"type":["string","null"]}
+  }}
+ },
+ "$defs":{
+  "coordinate_bounded_point":{"type":"array","minItems":2,"maxItems":2,"items":{"type":"number","exclusiveMinimum":-1,"exclusiveMaximum":1}},
+  "json_value":{"anyOf":[{"type":"null"},{"type":"boolean"},{"type":"number"},{"type":"string"},{"type":"array","items":{"$ref":"#/$defs/json_value"}},{"type":"object","additionalProperties":{"$ref":"#/$defs/json_value"}}]},
+  "check":{"type":"object","additionalProperties":false,"required":["name","checked","expected","observed","status","scope","failure_reason","required"],"properties":{
+   "name":{"enum":["input_finite","criterion_grid_screen","c01_exact_sum","alexander_convexity_sum","interval_certification","full_function_proof_scope"]},
+   "checked":{"type":"string","minLength":1},"expected":{"$ref":"#/$defs/json_value"},"observed":{"$ref":"#/$defs/json_value"},
+   "status":{"enum":["pass","fail","skip"]},"scope":{"type":"string","minLength":1},
+   "failure_reason":{"type":["string","null"]},"required":{"type":"boolean"}
+  }}
+ },
+ "allOf":[
+  {"if":{"properties":{"tier":{"const":"screen"}}},"then":{"properties":{"canonical_inputs":{"properties":{"tier":{"const":"screen"}}},"evidence_kind":{"const":"numerical_screen"},"details":{"required":["threshold","grid_points","worst_point"],"properties":{"outcome":{"enum":["passes_screen","fails_screen"]},"certified":{"const":false}}}}}},
+  {"if":{"properties":{"tier":{"const":"symbolic"}}},"then":{"properties":{"canonical_inputs":{"properties":{"tier":{"const":"symbolic"}}},"details":{"required":["c01_sum","convex_sum","polynomial","c01_le_1"],"properties":{"witness_point":{"type":"null"},"min_margin":{"type":"null"},"certified":{"const":false}}}}}},
+  {"if":{"properties":{"tier":{"const":"rigorous"}}},"then":{"properties":{"canonical_inputs":{"properties":{"tier":{"const":"rigorous"}}}}}},
+  {"if":{"properties":{"details":{"properties":{"outcome":{"const":"certified_violation"}},"required":["outcome"]}}},"then":{"properties":{"tier":{"const":"rigorous"},"evidence_kind":{"const":"certified_enclosure"},"details":{"required":["interval_lower","interval_upper","interval_threshold"],"properties":{"certified":{"const":true},"witness_point":{"$ref":"#/$defs/coordinate_bounded_point"}}}}}},
+  {"if":{"properties":{"details":{"properties":{"outcome":{"const":"proven"}},"required":["outcome"]}}},"then":{"properties":{"evidence_kind":{"const":"exact_proof"},"details":{"properties":{"polynomial":{"const":true}}},"canonical_inputs":{"properties":{"truncation":{"const":false}}}}}},
+  {"if":{"properties":{"canonical_inputs":{"properties":{"truncation":{"const":true}}}}},"then":{"properties":{"details":{"properties":{"polynomial":{"const":false},"certified":{"const":false}}}}}},
+  {"if":{"properties":{"details":{"properties":{"certified":{"const":true}},"required":["certified"]}}},"then":{"properties":{"details":{"properties":{"outcome":{"const":"certified_violation"}}}}}},
+  {"if":{"properties":{"evidence_kind":{"const":"exact_proof"}}},"then":{"properties":{"details":{"properties":{"outcome":{"const":"proven"}}}}}},
+  {"if":{"properties":{"evidence_kind":{"const":"certified_enclosure"}}},"then":{"properties":{"details":{"properties":{"outcome":{"const":"certified_violation"}}}}}},
+  {"if":{"properties":{"details":{"properties":{"outcome":{"enum":["c01_fails_sufficient_condition","convex_fails_sufficient_condition","inconclusive_truncation","undecidable"]}}}}},"then":{"properties":{"evidence_kind":{"const":"inconclusive"}}}},
+  {"if":{"properties":{"canonical_inputs":{"properties":{"property":{"const":"convex"}}},"details":{"properties":{"outcome":{"const":"proven"}}}}},"then":{"properties":{"verification":{"properties":{"checks":{"contains":{"properties":{"name":{"const":"alexander_convexity_sum"},"required":{"const":true},"status":{"const":"pass"}},"required":["name","required","status"]}}}}}}}
+ ]
+}

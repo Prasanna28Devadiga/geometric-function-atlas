@@ -11,10 +11,12 @@ enclosure for sharpness, or a benchmark metric for a security claim.
 
 from __future__ import annotations
 
+import json
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum
+from importlib import resources
 from typing import Any
 
 from .contracts import (
@@ -64,7 +66,7 @@ _INPUT_SCHEMAS: dict[str, frozenset[str]] = {
     "class_admissibility": frozenset({"class_key"}),
     "class_membership": frozenset({"class_key", "coefficients"}),
     "class_containment": frozenset({"inner", "outer"}),
-    "function_verification": frozenset({"property", "coefficients", "tier"}),
+    "function_verification": frozenset({"property", "coefficients", "tier", "truncation"}),
     "witness_search": frozenset({"property", "coefficients"}),
     "lab_metrics": frozenset({"metric_family"}),
 }
@@ -193,6 +195,16 @@ def validate_screen_record(record: Mapping[str, Any]) -> None:
         raise RecordError(
             f"canonical_inputs must contain exactly {sorted(expected_inputs)}"
         )
+    if record["record_type"] == "function_verification":
+        inputs = record["canonical_inputs"]
+        if not isinstance(inputs["truncation"], bool):
+            raise RecordError("canonical_inputs.truncation must be a bool")
+        for field in ("witness_point", "worst_point"):
+            point = record["details"].get(field) if isinstance(record["details"], Mapping) else None
+            if point is not None and (not isinstance(point, list) or len(point) != 2 or
+                                      any(isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) for x in point) or
+                                      sum(x*x for x in point) >= 1):
+                raise RecordError(f"{field} must lie in the open unit disk")
     for value in record["canonical_inputs"].values():
         _json_value(value)
     for key in ("assumptions", "source_references"):
@@ -223,6 +235,7 @@ def validate_screen_record(record: Mapping[str, Any]) -> None:
     elif (
         failure_state is None
         and record["evidence_kind"] != "numerical_screen"
+        and not (record["record_type"] == "function_verification" and record["evidence_kind"] == "inconclusive")
     ):
         # A numerical screen may legitimately conclude a negative finding
         # ("not admissible", "not a member", "not contained"); that is a
@@ -250,3 +263,11 @@ def screen_payload_finite(record: Mapping[str, Any]) -> bool:
     """Return whether every numeric field in the record is finite."""
 
     return _finite(record)
+
+
+def load_verify_result_schema() -> dict[str, Any]:
+    """Load the dedicated, closed JSON contract for function verification records."""
+    resource = resources.files("geometric_function_atlas").joinpath(
+        "schema/verify-result.schema.json"
+    )
+    return json.loads(resource.read_text(encoding="utf-8"))
