@@ -2,8 +2,8 @@
 
 The website stores a large radius snapshot with deliberately different evidence
 levels.  This module exposes that snapshot without flattening the levels and
-replays only the eight exact certificate lanes reviewed in the public source
-crosswalk.  The replay implementation is package-owned: it does not import the
+replays eight reviewed certificate lanes and two symbolic paper lanes. The
+paper lanes leave global-containment reasoning unmechanized. Replay does not import the
 research repository or execute a serialized Python expression.
 """
 
@@ -293,7 +293,9 @@ class RadiusRecord:
 class RadiusReplayResult:
     """Fail-closed result of an exact radius certificate replay.
 
-    ``status`` is ``proven`` for a fully replayed chain, ``not_replayable``
+    ``status`` is ``proven`` for a reviewed certificate chain, and
+    ``symbolic_replay_only`` for a paper lane whose global reasoning is written
+    but not mechanized (``certified=False``). ``not_replayable`` applies
     when the unchanged trusted snapshot row has no bundled certificate
     (``unsupported``), ``candidate_mismatch`` for a wrong candidate,
     ``unresolved`` for a failed chain, ``invalid_input`` for malformed input,
@@ -312,6 +314,7 @@ class RadiusReplayResult:
     failure_state: FailureState | None = None
     error: str | None = None
     method: str = "bounded_exact_radius_certificate_replay"
+    global_containment_check: str = "not_mechanized"
 
     @property
     def direction(self) -> str:
@@ -329,6 +332,7 @@ class RadiusReplayResult:
             "method": self.method,
             "status": self.status,
             "certified": self.certified,
+            "global_containment_check": self.global_containment_check,
             "candidate": self.candidate,
             "expected_candidate": self.expected_candidate,
             "direction": self.direction,
@@ -1011,6 +1015,70 @@ _REVIEWED_DIRECTIONS = frozenset(
 )
 
 
+# Symbolic replay of paper Theorem 4.4; not part of the historical fixture.
+_PAPER_ANALYTIC_RADII = {
+    ("crescent", "exponential"): "sin(1)",
+    ("exponential", "crescent"): "asinh(1)",
+}
+
+
+def _replay_paper_analytic(source: str, target: str, steps: list[ReplayStep]) -> bool:
+    u = sp.Symbol("u")
+    if (source, target) == ("crescent", "exponential"):
+        # Infinite coefficient and branch arguments remain written mathematics.
+        ok = _step(steps, "asinh derivative identity (binomial series not mechanized)",
+                   sp.simplify(sp.diff(sp.asinh(u), u) - 1/sp.sqrt(1+u*u)) == 0)
+        ok &= _step(steps, "asin derivative identity (absolute majorant not mechanized)",
+                    sp.simplify(1/sp.sqrt(1-u*u) - sp.diff(sp.asin(u), u)) == 0)
+        ok &= _step(steps, "imaginary-axis asinh/asin identity",
+                    sp.simplify(sp.asinh(sp.I*u) - sp.I*sp.asin(u)) == 0)
+        ok &= _step(steps, "threshold asin(sin(1))=1", sp.asin(sp.sin(1)) == 1)
+        ok &= _step(steps, "contact crescent(i*sin(1))=exp(i)",
+                    sp.simplify(sp.I*sp.sin(1) + sp.cos(1) - sp.exp(sp.I)) == 0)
+        return bool(ok)
+    if (source, target) == ("exponential", "crescent"):
+        ok = _step(steps, "crescent inverse composed with exp is sinh",
+                   sp.simplify((sp.exp(2*u)-1)/(2*sp.exp(u))-sp.sinh(u)) == 0)
+        ok &= _step(steps, "sinh is odd part of exp (positivity not mechanized)",
+                    sp.simplify((sp.exp(u)-sp.exp(-u))/2-sp.sinh(u)) == 0)
+        ok &= _step(steps, "sinh(asinh(1))=1",
+                    sp.simplify(((1+sp.sqrt(2))-1/(1+sp.sqrt(2)))/2-1) == 0)
+        ok &= _step(steps, "contact exp(asinh(1))=1+sqrt(2)",
+                    sp.simplify(sp.exp(sp.asinh(1))-(1+sp.sqrt(2))) == 0)
+        return bool(ok)
+    return False
+
+
+def _recheck_quarantined_axis_touch(record: RadiusRecord) -> str:
+    """Exact axis equation diagnostic; never certifies disk inclusion."""
+    from .catalog import Z, get_generator
+
+    if record.status is not RadiusStatus.AUDIT_REQUIRED or record != radius(record.source_class, record.target_class):
+        return "unsupported"
+    if record.value_exact is None or record.touch_angle is None:
+        return "unsupported"
+    if math.isclose(record.touch_angle, 0, abs_tol=1e-12):
+        sign = 1
+    elif math.isclose(record.touch_angle, math.pi, abs_tol=1e-12):
+        sign = -1
+    else:
+        return "unsupported"
+    if record.target_class not in {"janowski_A0.75_B-0.25", "janowski_A1_B0", "order_0.75"}:
+        return "unsupported"
+    try:
+        candidate = _parse_exact_expression(record.value_exact)
+        w = get_generator(record.source_class).expression.subs(Z, sign * candidate)
+        if record.target_class == "janowski_A0.75_B-0.25":
+            inverse = (w - 1) / (sp.Rational(3, 4) + w / 4)
+        elif record.target_class == "janowski_A1_B0":
+            inverse = w - 1
+        else:
+            inverse = (w - 1) / (w - sp.Rational(1, 2))
+        return "touch_equation_only" if sp.simplify(inverse - sign) == 0 else "touch_mismatch"
+    except (InvalidInputError, ResourceLimitError, TypeError, ValueError):
+        return "unsupported"
+
+
 def _coerce_record(value: RadiusRecord | Mapping[str, Any]) -> RadiusRecord:
     if isinstance(value, RadiusRecord):
         return value
@@ -1134,6 +1202,34 @@ def replay_radius_certificate(
         "expected_candidate": expected,
     }
     blocker = _validate_record_for_replay(resolved)
+    paper_exact = _PAPER_ANALYTIC_RADII.get((resolved.source_class, resolved.target_class))
+    if paper_exact is not None and blocker is not None and blocker.failure_state is FailureState.UNSUPPORTED:
+        base["expected_candidate"] = paper_exact
+        base["candidate"] = candidate if candidate is not None else paper_exact
+        method = "paper_symbolic_radius_replay"
+        try:
+            _parse_exact_expression(base["candidate"])
+        except ResourceLimitError:
+            raise
+        except InvalidInputError as exc:
+            return RadiusReplayResult(**base, status="invalid_input", certified=False,
+                                      failure_state=FailureState.INVALID_INPUT, error=str(exc), method=method)
+        if not _expression_equal(base["candidate"], paper_exact):
+            return RadiusReplayResult(**base, status="candidate_mismatch", certified=False,
+                                      error="candidate differs from the paper exact radius", method=method)
+        paper_steps: list[ReplayStep] = []
+        expected_value = _parse_exact_expression(paper_exact)
+        stored = resolved.value_decimal
+        matches_snapshot = stored is not None and abs(sp.N(expected_value, 70) - sp.Float(stored, 70)) < sp.Rational(1, 10**58)
+        paper_steps.append(ReplayStep("exact paper value agrees with historical decimal", bool(matches_snapshot),
+                                scope="numeric identity guard; not containment proof"))
+        passed = _replay_paper_analytic(resolved.source_class, resolved.target_class, paper_steps)
+        if len(paper_steps) > max_steps:
+            raise ResourceLimitError("paper replay exceeds the replay step limit")
+        status = "symbolic_replay_only" if passed and all(step.verified for step in paper_steps) else "unresolved"
+        return RadiusReplayResult(**base, status=status, certified=False, steps=tuple(paper_steps),
+                                  method=method, error=("global containment and sharpness remain written reasoning, not machine-checked"
+                                                        if status == "symbolic_replay_only" else "symbolic replay failed"))
     if blocker is not None:
         return RadiusReplayResult(
             **base,
