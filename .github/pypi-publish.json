@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
   "project": "geometric-function-atlas",
-  "tag": "v0.5.0",
-  "commit": "87deef9d0acb05b24600a38e76f84ca030c16d94",
+  "tag": "v0.6.0",
+  "commit": "e3154d35cb49140a4ca45c5f5afaf5edc3e0bbd7",
   "assets": {
     "wheel": {
-      "name": "geometric_function_atlas-0.5.0-py3-none-any.whl",
-      "sha256": "67da23b7ce84ffa96168cdc9a0dbbbfa06dbe506d68b62b1248e0a98162e5ec7"
+      "name": "geometric_function_atlas-0.6.0-py3-none-any.whl",
+      "sha256": "ef52bb424ab4b796841786999136f1923048d0198a700379685111dac5e45bea"
     },
     "sdist": {
-      "name": "geometric_function_atlas-0.5.0.tar.gz",
-      "sha256": "41232f893a85f69efbef82e3c20a0efc3cd8aa3b1e749c87985d58ef03c8c03b"
+      "name": "geometric_function_atlas-0.6.0.tar.gz",
+      "sha256": "2467c17b2609dcd82046acc9b42589de9b085a2e1ee7314be51e1e23277b091c"
     },
     "checksums": {
       "name": "SHA256SUMS",
-      "sha256": "b4223930b5be84ac84a14d259930199e98a19fed54cae9cda2cbd718ef222e3e"
+      "sha256": "a19038d63399d9c9f5f9f5f999e8532ec109ef33b621fd278d84a756cb5bc3a0"
     }
   }
 }

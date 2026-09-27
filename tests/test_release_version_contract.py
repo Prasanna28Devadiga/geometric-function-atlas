@@ -1,4 +1,4 @@
-"""Release candidate identity and pre-publication installer boundary."""
+"""Release identity, frozen publication, and installer holdback."""
 
 import json
 from pathlib import Path
@@ -25,10 +25,13 @@ def test_release_procedure_selects_single_current_wheel() -> None:
     assert 'dist/geometric_function_atlas-0.5.0-py3-none-any.whl' not in procedure
 
 
-def test_prepublication_installers_and_pypi_manifest_remain_at_050() -> None:
+def test_installers_remain_at_published_050_until_pypi_060_is_live() -> None:
     wheel = "releases/download/v0.5.0/geometric_function_atlas-0.5.0-py3-none-any.whl"
     for name in ("install.sh", "install.ps1"):
         assert wheel in (ROOT / "scripts" / name).read_text(encoding="utf-8")
+
+
+def test_frozen_pypi_manifest_targets_the_verified_060_release() -> None:
     manifest = json.loads((ROOT / ".github/pypi-publish.json").read_text(encoding="utf-8"))
-    assert manifest["tag"] == "v0.5.0"
-    assert manifest["assets"]["wheel"]["name"] == "geometric_function_atlas-0.5.0-py3-none-any.whl"
+    assert manifest["tag"] == "v0.6.0"
+    assert manifest["assets"]["wheel"]["name"] == "geometric_function_atlas-0.6.0-py3-none-any.whl"
