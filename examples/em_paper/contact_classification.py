@@ -1,8 +1,8 @@
-"""Classify the unfinished directed radius questions in the Atlas by where the
-source image first meets the target boundary.
+"""Group unfinished directed-radius questions by stored contact mode.
 
 Reproduces the counts used in Section 6 (Table 4) of the Experimental
-Mathematics paper. Input comes from the installed package's radius snapshot.
+Mathematics paper; it does not independently certify first contact or global
+containment. Input comes from the installed package's radius snapshot.
 With no arguments the script runs `gfa radii --json` and
 `gfa artifact-classes --json` itself; saved copies can be passed instead:
 
@@ -10,13 +10,12 @@ With no arguments the script runs `gfa radii --json` and
 
 Checks, for every nontrivial record:
   1. contact mode (real axis vs interior/off-axis), from the stored touch data;
-  2. for real-axis records, whether the stored radius equals
-        R = min{ r in (0,1): phi1(r) = phi2(1) } U { r: phi1(-r) = phi2(-1) }
-     (tolerance 1e-6);
+  2. for real-axis records, compare the stored radius with a bisection of the
+     axis equations phi1(r) = phi2(1) or phi1(-r) = phi2(-1) (tolerance 1e-6);
+     this does not prove a globally first contact;
   3. for real-axis records, the sign pattern of the first N Taylor coefficients
-     of psi = phi2^{-1} o phi1, adjusted to the contact side: a single sign means
-     the majorant bound of Lemma 4.1 is exact at the contact point (evidence
-     only; it is not a proof for all orders);
+     of psi = phi2^{-1} o phi1, adjusted to the contact side: a single sign is
+     finite-order evidence for Lemma 4.1, not a proof for all orders;
   4. for off-axis records, whether the axis formula happens to give the value.
 
 The alias class janowski_A0_B-1 (= order_0.5) is merged: rows that involve it
@@ -33,6 +32,9 @@ import sympy as sp
 from _gfa import gfa_json
 from mpmath import mp, mpf, taylor
 
+from geometric_function_atlas import list_generators
+from geometric_function_atlas.artifacts import list_classes
+
 mp.dps = 40
 N = 22  # Taylor order tested
 TOL_RADIUS = 1e-6
@@ -41,13 +43,21 @@ ALIASES = {"janowski_A0_B-1"}
 
 def load(radii_path=None, classes_path=None):
     radii = gfa_json(radii_path, "radii")
-    classes = {r["key"]: r for r in gfa_json(classes_path, "artifact-classes")["record"]["rows"]}
-    z = sp.symbols("z")
-    funcs = {
-        k: sp.lambdify(z, sp.sympify(r["phi_formula"].replace("^", "**"),
-                                     locals={"z": z, "E": sp.E}), "mpmath")
-        for k, r in classes.items()
-    }
+    saved_rows = gfa_json(classes_path, "artifact-classes")["record"]["rows"]
+    authoritative = {row["key"]: row["phi_formula"] for row in list_classes()}
+    if (len(saved_rows) != len(authoritative)
+            or any(not isinstance(row, dict) or row.get("key") not in authoritative
+                   or row.get("phi_formula") != authoritative[row["key"]]
+                   for row in saved_rows)
+            or len({row["key"] for row in saved_rows}) != len(authoritative)):
+        raise ValueError("untrusted class key or untrusted class formula in saved JSON")
+    generators = {generator.key: generator for generator in list_generators()}
+    if generators.keys() != authoritative.keys():
+        raise ValueError("installed generator and artifact catalogs disagree")
+    funcs = {key: sp.lambdify(generator.variable, generator.expression, "mpmath")
+             for key, generator in generators.items()}
+    if any(rec["inner"] not in funcs or rec["target"] not in funcs for rec in radii):
+        raise ValueError("untrusted class key in saved radii JSON")
     return radii, funcs
 
 

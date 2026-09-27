@@ -12,12 +12,21 @@ The scripts live in the source repository; set up a checkout as described in
 [Before you run an example](README.md#before-you-run-an-example) and run the
 commands below from its root directory.
 
-The radius values and contact points used in the paper come directly from the
-package. `gfa radius <source> <target>` shows a single directed radius, and
-`gfa radii --json` lists all of them. The two counting scripts read that list
-by calling `gfa` themselves. Eight radii, such as `sine -> sigmoid`, also ship
-with a certificate that `gfa verify-radius-certificate <source> <target>`
-checks again on your machine. The other radii do not ship with one.
+The radius values and contact points used in the paper come from the package's
+stored snapshot. `gfa radius <source> <target>` shows a single directed radius,
+and `gfa radii --json` lists all of them. The two counting scripts read that
+list by calling `gfa` themselves; contact classification also uses the installed
+class catalog. Saved `radii.json` and `classes.json` can be supplied, but saved
+class keys/formulas must exactly match the installed catalog and are never
+parsed as executable expressions.
+
+Of the 19 manuscript written-proof lanes, **eight** have bounded certificate
+replay via `gfa verify-radius-certificate <source> <target>` (for example,
+`sine -> sigmoid`); **two** reciprocal lanes have symbolic-identity-only replay
+(`certified: false`, global containment not mechanized); the remaining **nine**
+have no local replay. A written paper proof, a stored radius, and a successful
+bounded replay are different kinds of evidence; none makes the whole manuscript
+proof automatically machine-checked.
 
 Two conventions are used in the counts:
 
@@ -30,11 +39,18 @@ Two conventions are used in the counts:
 
 ## Theorem 4.8: interval bounds
 
-This script checks the two radii of Theorem 4.8 with outward-rounded interval
-arithmetic (`mpmath.iv`):
+This script checks specific interval inequalities used in the two Theorem 4.8
+arguments with outward-rounded arithmetic (`mpmath.iv`):
 (a) $\arcsin(3-2\sqrt2)$ for the sine source and (b) $\tfrac12\log 2$ for the
 sigmoid source. In both cases the target is the rational class `rational_kr`.
-It needs only `sympy` and `mpmath`, not the radius list.
+It needs only `sympy` and `mpmath`, not the radius list. Its interval boxes
+bound the paper's implicit boundary polynomial along the source circle and
+its endpoint second derivative; the script also checks selected algebraic
+identities and a radius enclosure. It does **not** mechanize the full theorem:
+the correspondence between the polynomial sign and the target's correct
+interior component, global containment, and sharpness rely on the written
+geometric argument. The displayed boundary-extremum sample is numerical,
+not an interval certificate.
 
 ```bash
 uv run python examples/em_paper/thm48_interval_check.py
@@ -48,8 +64,8 @@ bounds, for (a) and (b) in turn:
   sigmoid  bulk lower bound 8.306e-8 | H'' single-box 0.01332 | H'' 50-box 0.01332
 ```
 
-Every bound is positive, which is the inequality the proof needs. The script
-stops with an error if a bound fails.
+Every reported interval lower bound is positive. These checks support the
+specific polynomial inequalities, not the unmechanized geometric steps above.
 
 ## Section 2 and Figure 1: reciprocal pairs
 
@@ -78,14 +94,17 @@ prints the counts and skips the figure.
 ## Section 6 and Table 4: contact classification
 
 The remaining directed questions are those not proved in the paper, with a
-radius below 1, and passing the package's consistency check. For each one,
-this script records where the source image first meets the target boundary:
-on the real axis or off it. For real-axis contacts, it also checks the signs of
+radius below 1, and passing the package's consistency check. This script
+groups them by the snapshot's stored contact mode (real axis or off axis); it
+does **not** independently search for the first boundary contact or establish
+that the stored contact realizes the global inclusion radius. It compares an
+axis-root heuristic against stored values, without proving smallest-root or
+global containment claims. For real-axis contacts, it also checks the signs of
 the first 22 Taylor coefficients of $\psi=\phi_2^{-1}\circ\phi_1$, where
 $\phi_1$ is the source generator and $\phi_2$ the target generator. When all
-signs agree (after adjusting for the side of the contact), the majorant bound
-of Lemma 4.1 is exact at the contact point. This is evidence from 22
-coefficients, not a proof for all orders.
+signs agree (after adjusting for the side of the contact), this is finite-order
+evidence compatible with the majorant bound of Lemma 4.1 being exact at the
+contact point; it does not prove the sign condition at all orders.
 
 ```bash
 uv run python examples/em_paper/contact_classification.py
