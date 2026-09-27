@@ -52,7 +52,7 @@ def test_symbolic_tier_convex_uses_alexander_sum() -> None:
     # z + 0.3z^2: C01 sum 0.6 <= 1 but sum(n^2|a_n|) = 1.2 > 1, and
     # 1 + z f''/f' < 0 for real z < -1/1.2, so it is not convex.
     result = verify_function(coefficients=[0.3], property="convex", max_cost="symbolic")
-    assert result.outcome == "c01_fails_sufficient_condition"
+    assert result.outcome == "convex_fails_sufficient_condition"
     assert result.evidence_kind == "inconclusive"
     checks = {check.name: check for check in result.verification_report.checks}
     assert checks["alexander_convexity_sum"].status.value == "fail"
@@ -68,6 +68,72 @@ def test_rigorous_tier_certified_violation_beats_c01_for_convex() -> None:
     assert verify_function(
         coefficients=[0.2], property="convex", max_cost="rigorous"
     ).outcome == "proven"
+
+
+@pytest.mark.parametrize("property_name", ["starlike", "convex", "becker_univalent", "nehari_univalent"])
+def test_rigorous_truncation_never_certifies_the_unknown_tail(property_name: str) -> None:
+    result = verify_function(coefficients=[0.3], property=property_name,
+                             max_cost="rigorous", truncation=True)
+    assert result.outcome not in {"proven", "certified_violation"}
+    assert not result.certified
+    assert result.evidence_kind != "certified_enclosure"
+    assert result.details["polynomial"] is False
+    assert not result.verification_report.success
+
+
+def test_closed_form_exact_coefficient_controls_boundary_proof() -> None:
+    z = sp.Symbol("z")
+    coefficient = sp.Rational(1, 4) + sp.Rational(1, 10**20)
+    result = verify_function(closed_form=z + coefficient * z**2,
+                             property="convex", max_cost="symbolic")
+    assert result.outcome != "proven"
+    assert result.exact_coefficients == (sp.sstr(coefficient),)
+    assert result.details["convex_sum"] == sp.sstr(4 * coefficient)
+    assert not result.verification_report.success
+
+
+def test_closed_form_rounded_interval_cannot_certify_original() -> None:
+    z = sp.Symbol("z")
+    result = verify_function(closed_form=z + (sp.Rational(3, 10) + sp.Rational(1, 10**20)) * z**2,
+                             property="convex", max_cost="rigorous")
+    assert not result.certified
+    assert result.outcome != "certified_violation"
+
+
+def test_declared_truncation_on_closed_form_never_proves_full_function() -> None:
+    z = sp.Symbol("z")
+    result = verify_function(closed_form=z + z**2 / 8, property="convex",
+                             max_cost="rigorous", truncation=True)
+    assert result.outcome != "proven"
+    assert not result.certified
+
+
+def test_convex_report_requires_alexander_not_c01() -> None:
+    result = verify_function([0.3], property="convex", max_cost="symbolic")
+    checks = {check.name: check for check in result.verification_report.checks}
+    assert checks["alexander_convexity_sum"].required
+    assert not checks["c01_exact_sum"].required
+    assert not result.verification_report.success
+    assert "convex" in result.outcome
+
+
+@pytest.mark.parametrize("property_name", ["becker_univalent", "nehari_univalent"])
+def test_criterion_violation_does_not_disprove_univalence(property_name: str) -> None:
+    result = verify_function([1.0], property=property_name, max_cost="rigorous")
+    assert result.outcome == "certified_violation"
+    assert result.details["violation_scope"] == "sufficient criterion only; not univalence"
+    assert result.verification_report.success
+
+
+def test_nonpolynomial_closed_form_interval_cannot_certify_truncation() -> None:
+    z = sp.Symbol("z")
+    result = verify_function(closed_form=z / (1 + 2*z), property="starlike",
+                             max_cost="rigorous")
+    assert result.outcome == "no_certified_violation_on_grid"
+    assert not result.certified
+    assert not result.verification_report.success
+    checks = {check.name: check for check in result.verification_report.checks}
+    assert checks["interval_certification"].status.value == "skip"
 
 
 def test_becker_symbolic_proof_states_it_comes_from_c01() -> None:

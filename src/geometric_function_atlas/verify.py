@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import builtins
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 import sympy as sp
@@ -106,25 +106,18 @@ def _exact_float(value: float) -> sp.Expr:
 
 
 def _decide_le_one(total: sp.Expr) -> bool | None:
-    """Exactly decide ``total <= 1``, with a certified numeric fallback."""
+    """Decide ``total <= 1`` only when SymPy establishes the exact sign."""
 
     diff = sp.simplify(total - 1)
-    if diff.is_number:
-        sign = diff.is_nonpositive
-        if sign is not None:
-            return bool(sign)
-        value = sp.N(diff, 50)
-        if value.is_real:
-            numeric = float(value)
-            if abs(numeric) > 1e-40:
-                return numeric <= 0
+    if diff.is_number and diff.is_nonpositive is not None:
+        return bool(diff.is_nonpositive)
     return None
 
 
 def _criterion_sums(
-    coefficients: tuple[float, ...],
+    coefficients: tuple[sp.Expr, ...],
 ) -> tuple[sp.Expr, sp.Expr]:
-    exact = tuple(_exact_float(value) for value in coefficients)
+    exact = coefficients
     c01 = sp.Add(
         *[sp.Integer(degree) * sp.Abs(value) for degree, value in enumerate(exact, start=2)]
     ) if exact else sp.Integer(0)
@@ -283,7 +276,7 @@ def _evaluate_convex_interval(
 
 def _closed_form_coefficients(
     expression: sp.Expr,
-) -> tuple[tuple[float, ...], bool, sp.Basic]:
+) -> tuple[tuple[float, ...], tuple[sp.Expr, ...], bool]:
     if not isinstance(expression, sp.Expr):
         raise TypeError("closed_form must be a preconstructed SymPy expression")
     symbols = expression.free_symbols
@@ -302,22 +295,31 @@ def _closed_form_coefficients(
     if polynomial:
         degree = sp.degree(sp.Poly(sp.expand(expression), variable))
         order = max(int(degree), 2)
+        if order - 1 > MAX_VERIFY_COEFFICIENTS:
+            raise ResourceLimitError("closed_form polynomial exceeds coefficient limit")
     else:
         order = MAX_CLOSED_FORM_ORDER
     series = sp.series(expression, variable, 0, order + 1).removeO().expand()
     coefficients: list[float] = []
+    exact: list[sp.Expr] = []
     for degree in range(2, order + 1):
-        coefficient = series.coeff(variable, degree)
+        coefficient = sp.simplify(series.coeff(variable, degree))
+        if coefficient.free_symbols or coefficient.is_real is not True or coefficient.is_finite is not True:
+            raise InvalidInputError("closed_form Taylor coefficients must be finite real numbers")
+        exact.append(coefficient)
         if coefficient == 0:
             coefficients.append(0.0)
             continue
         try:
-            coefficients.append(float(sp.N(coefficient, 30)))
-        except (TypeError, ValueError) as exc:
+            approximate = float(sp.N(coefficient, 30))
+            if not math.isfinite(approximate):
+                raise ValueError("non-finite approximation")
+            coefficients.append(approximate)
+        except (TypeError, ValueError, OverflowError) as exc:
             raise InvalidInputError(
                 "closed_form Taylor coefficients must be numeric"
             ) from exc
-    return tuple(coefficients), polynomial, variable
+    return tuple(coefficients), tuple(exact), polynomial
 
 
 @dataclass(frozen=True, slots=True)
@@ -353,7 +355,7 @@ class FunctionVerificationResult:
             tier=self.tier,
             assumptions=(
                 "f(z) is the supplied normalized function",
-                "coefficients are interpreted as exact binary64 rational values",
+                "sequence coefficients are exact binary64 rationals; closed_form retains SymPy exact coefficients for symbolic comparisons",
                 "a finite polynomial is the whole function unless truncation is declared",
             ),
             source_references=(_SCREEN_REFERENCE, _REFERENCE, _INTERVAL_REFERENCE),
@@ -407,21 +409,28 @@ def verify_function(
         )
 
     if closed_form is not None:
-        values, polynomial, _ = _closed_form_coefficients(closed_form)
+        values, exact_values, polynomial = _closed_form_coefficients(closed_form)
+        polynomial = polynomial and not truncation
     else:
         values = _validated_coefficients(coefficients)
+        exact_values = tuple(_exact_float(value) for value in values)
         polynomial = not truncation
 
-    exact_coefficients = tuple(
-        sp.sstr(_exact_float(value)) for value in values
+    exact_coefficients = tuple(sp.sstr(value) for value in exact_values)
+    # A point interval on the binary64 polynomial cannot certify an unknown
+    # tail or a different closed-form polynomial rounded to binary64.
+    interval_transfer = polynomial and all(
+        value == _exact_float(approximate)
+        for value, approximate in zip(exact_values, values)
     )
 
     if max_cost == "screen":
         return _screen_verdict(property, values, exact_coefficients, grid_r, grid_theta, rmax)
     if max_cost == "symbolic":
-        return _symbolic_verdict(property, values, exact_coefficients, polynomial)
+        return _symbolic_verdict(property, values, exact_values, exact_coefficients, polynomial)
     return _rigorous_verdict(
-        property, values, exact_coefficients, polynomial, grid_r, grid_theta, rmax
+        property, values, exact_values, exact_coefficients, polynomial,
+        interval_transfer, grid_r, grid_theta, rmax
     )
 
 
@@ -485,16 +494,18 @@ def _screen_verdict(
 def _symbolic_verdict(
     property_name: str,
     values: tuple[float, ...],
+    exact_values: tuple[sp.Expr, ...],
     exact_coefficients: tuple[str, ...],
     polynomial: bool,
 ) -> FunctionVerificationResult:
-    c01, convex = _criterion_sums(values)
+    c01, convex = _criterion_sums(exact_values)
     c01_str = sp.sstr(c01)
     convex_str = sp.sstr(convex)
     c01_decided = _decide_le_one(c01)
     convex_decided = _decide_le_one(convex)
+    governing = convex_decided if property_name == "convex" else c01_decided
 
-    if c01_decided is None:
+    if governing is None:
         c01_check = VerificationCheck(
             name="c01_exact_sum",
             checked="C01: sum(n*|a_n|) <= 1 in exact arithmetic",
@@ -507,7 +518,7 @@ def _symbolic_verdict(
         )
         outcome = "undecidable"
         evidence_kind = "inconclusive"
-    elif polynomial and c01_decided and (property_name != "convex" or convex_decided):
+    elif polynomial and governing:
         outcome = "proven"
         evidence_kind = "exact_proof"
         c01_check = VerificationCheck(
@@ -518,7 +529,7 @@ def _symbolic_verdict(
             status=CheckStatus.PASS,
             scope="exact symbolic arithmetic",
         )
-    elif not polynomial and c01_decided:
+    elif not polynomial and governing:
         outcome = "inconclusive_truncation"
         evidence_kind = "inconclusive"
         c01_check = VerificationCheck(
@@ -530,16 +541,18 @@ def _symbolic_verdict(
             scope="exact symbolic arithmetic on the truncation",
         )
     else:
-        outcome = "c01_fails_sufficient_condition"
+        outcome = ("convex_fails_sufficient_condition" if property_name == "convex"
+                   else "c01_fails_sufficient_condition")
         evidence_kind = "inconclusive"
         c01_check = VerificationCheck(
             name="c01_exact_sum",
             checked="C01: sum(n*|a_n|) <= 1 in exact arithmetic",
             expected="sum <= 1",
             observed=c01_str,
-            status=CheckStatus.PASS,
+            status=CheckStatus.PASS if c01_decided else CheckStatus.FAIL,
+            required=property_name != "convex",
             scope="exact symbolic arithmetic",
-            failure_reason=None,
+            failure_reason=None if c01_decided else "sum > 1",
         )
 
     convex_check = VerificationCheck(
@@ -552,7 +565,7 @@ def _symbolic_verdict(
             if convex_decided is None
             else CheckStatus.PASS if convex_decided else CheckStatus.FAIL
         ),
-        required=polynomial and bool(convex_decided),
+        required=property_name == "convex",
         scope="exact symbolic arithmetic",
         failure_reason=(
             None
@@ -576,13 +589,23 @@ def _symbolic_verdict(
             details["univalent_proven"] = True
         if property_name in ("becker_univalent", "nehari_univalent"):
             details["proven_via"] = _VIA_C01
+    c01_check = replace(c01_check, required=property_name != "convex")
+    scope_check = VerificationCheck(
+        name="full_function_proof_scope",
+        checked="coefficient proof covers the full function",
+        expected="whole polynomial and governing sum <= 1",
+        observed="whole polynomial" if polynomial else "unknown tail",
+        status=CheckStatus.PASS if outcome == "proven" else CheckStatus.SKIP,
+        required=outcome == "inconclusive_truncation",
+        scope="proof transfer",
+    )
     return FunctionVerificationResult(
         property=property_name,
         coefficients=values,
         tier="symbolic",
         outcome=outcome,
         evidence_kind=evidence_kind,
-        verification_report=VerificationReport(checks=(_finite_check(), c01_check, convex_check)),
+        verification_report=VerificationReport(checks=(_finite_check(), c01_check, convex_check, scope_check)),
         details=details,
         min_margin=None,
         exact_coefficients=exact_coefficients,
@@ -592,13 +615,15 @@ def _symbolic_verdict(
 def _rigorous_verdict(
     property_name: str,
     values: tuple[float, ...],
+    exact_values: tuple[sp.Expr, ...],
     exact_coefficients: tuple[str, ...],
     polynomial: bool,
+    interval_transfer: bool,
     grid_r: int,
     grid_theta: int,
     rmax: float,
 ) -> FunctionVerificationResult:
-    c01, convex = _criterion_sums(values)
+    c01, convex = _criterion_sums(exact_values)
     c01_str = sp.sstr(c01)
     c01_decided = _decide_le_one(c01)
     proof_decided = _decide_le_one(convex) if property_name == "convex" else c01_decided
@@ -607,12 +632,25 @@ def _rigorous_verdict(
         checked="C01: sum(n*|a_n|) <= 1 in exact arithmetic",
         expected="decided exact comparison",
         observed=c01_str,
-        status=CheckStatus.PASS if c01_decided is not None else CheckStatus.SKIP,
-        required=c01_decided is not None,
+        status=(CheckStatus.SKIP if c01_decided is None else
+                CheckStatus.PASS if c01_decided else CheckStatus.FAIL),
+        required=property_name != "convex",
         scope="exact symbolic arithmetic",
         failure_reason=(
-            None if c01_decided is not None else "comparison undecidable in exact arithmetic"
+            "sum > 1" if c01_decided is False else None
         ),
+    )
+    convex_decided = _decide_le_one(convex)
+    convex_check = VerificationCheck(
+        name="alexander_convexity_sum",
+        checked="Alexander condition: sum(n^2*|a_n|) <= 1",
+        expected="sum <= 1",
+        observed=sp.sstr(convex),
+        status=(CheckStatus.SKIP if convex_decided is None else
+                CheckStatus.PASS if convex_decided else CheckStatus.FAIL),
+        required=property_name == "convex",
+        scope="exact symbolic arithmetic" if polynomial else "partial sum; tail unknown",
+        failure_reason="sum > 1" if convex_decided is False else None,
     )
 
     margin, point, evaluated = _grid_scan(
@@ -630,7 +668,17 @@ def _rigorous_verdict(
     interval_check: VerificationCheck
     certified = False
     interval_details: dict[str, Any] = {}
-    if point is None:
+    if not interval_transfer:
+        interval_check = VerificationCheck(
+            name="interval_certification",
+            checked="certified interval for the supplied full function",
+            expected="exact binary64 polynomial with no unknown tail",
+            observed="point screen uses a rounded polynomial or unknown tail; no transfer to full function",
+            status=CheckStatus.SKIP,
+            required=False,
+            scope="point interval unavailable for full function",
+        )
+    elif point is None:
         interval_check = VerificationCheck(
             name="interval_certification",
             checked="certified interval at the worst screened point",
@@ -685,6 +733,19 @@ def _rigorous_verdict(
         outcome = "no_certified_violation_on_grid"
         evidence_kind = "numerical_screen"
 
+    c01_check = replace(c01_check, required=outcome == "proven" and property_name != "convex")
+    convex_check = replace(convex_check, required=outcome == "proven" and property_name == "convex")
+    interval_check = replace(interval_check, required=certified)
+    scope_check = VerificationCheck(
+        name="full_function_proof_scope",
+        checked="evidence transfers to the full function",
+        expected="whole polynomial and discharged criterion",
+        observed="full polynomial" if polynomial else "unknown tail",
+        status=CheckStatus.PASS if outcome in ("proven", "certified_violation") else CheckStatus.SKIP,
+        required=outcome == "no_certified_violation_on_grid",
+        scope="proof transfer",
+    )
+
     return FunctionVerificationResult(
         property=property_name,
         coefficients=values,
@@ -692,12 +753,18 @@ def _rigorous_verdict(
         outcome=outcome,
         evidence_kind=evidence_kind,
         verification_report=VerificationReport(
-            checks=(_finite_check(), grid_check, c01_check, interval_check)
+            checks=(_finite_check(), grid_check, c01_check, convex_check, interval_check, scope_check)
         ),
         details={
             "c01_sum": c01_str,
             "convex_sum": sp.sstr(convex),
             "polynomial": polynomial,
+            "violation_scope": (
+                "sufficient criterion only; not univalence"
+                if certified and property_name in ("becker_univalent", "nehari_univalent")
+                else "pointwise criterion for the full polynomial"
+                if certified else None
+            ),
             "grid_points": evaluated,
             "worst_point": None if point is None else list(point),
             **interval_details,

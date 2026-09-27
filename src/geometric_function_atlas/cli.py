@@ -884,6 +884,7 @@ def _verify(args: argparse.Namespace) -> None:
         "no_certified_violation_on_grid": "NO CERTIFIED VIOLATION ON GRID (rigorous)",
         "inconclusive_truncation": "INCONCLUSIVE (truncation; tail unknown)",
         "c01_fails_sufficient_condition": "SUFFICIENT CONDITION FAILS (not a disproof)",
+        "convex_fails_sufficient_condition": "ALEXANDER CONDITION FAILS (not a disproof)",
         "undecidable": "UNDECIDABLE IN EXACT ARITHMETIC",
     }
     lines = [
@@ -894,6 +895,10 @@ def _verify(args: argparse.Namespace) -> None:
     if result.witness_point is not None:
         real, imaginary = result.witness_point
         lines.append(f"Worst screened point: z = {real:g} {imaginary:g}i")
+    if "proven_via" in result.details:
+        lines.append(f"Proof route: {result.details['proven_via']}")
+    if result.details.get("violation_scope"):
+        lines.append(f"Violation scope: {result.details['violation_scope']}")
     lines.append("Numerical screens are never proofs; enclosures are not sharpness.")
     _write_utf8("\n".join(lines))
 

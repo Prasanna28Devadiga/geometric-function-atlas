@@ -189,7 +189,16 @@ assert rigorous.outcome == "certified_violation"
 `f(z) = z + a2*z**2 + ...`) or a preconstructed SymPy `closed_form` expression.
 Supported properties: `starlike`, `convex`, `univalent`, `becker_univalent`,
 `nehari_univalent`. Univalence has no pointwise screen; use the symbolic tier
-or the Becker/Nehari criteria.
+or the Becker/Nehari criteria. Convexity proofs require the Alexander sum
+`sum(n²|a_n|) <= 1`, not merely the C01 starlikeness sum `sum(n|a_n|) <= 1`.
+For `becker_univalent` and `nehari_univalent`, a symbolic `proven` result is
+**univalence via C01**, not a proof of the named Becker/Nehari criterion;
+an interval-certified `certified_violation` disproves only that sufficient
+criterion, **not univalence**. A screen is never a proof. An unknown Taylor
+tail (`truncation=True` or a nonpolynomial `closed_form`) cannot transfer a
+point interval or partial-sum proof to the full function. Closed-form symbolic
+proofs use the original SymPy coefficients, not their binary64 grid approximations;
+point intervals on rounded coefficients remain non-certifying.
 
 ### Counterexample witness replay and search
 
