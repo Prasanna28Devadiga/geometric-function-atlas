@@ -1098,7 +1098,7 @@ def _replay_paper_majorant(source: str, target: str, rstar: sp.Expr, steps: list
     ok &= _step(steps, "B(r*) = 1", _zero(bound(rstar) - 1) or _numeric_ok(bound(rstar) - 1, dps=dps, tolerance_exponent=tol))
     ok &= _step(steps, "|psi(u0)| = 1 at the contact point u0 with |u0| = r*",
                 _numeric_ok(sp.Abs(psi(contact(rstar))) - 1, dps=dps, tolerance_exponent=tol))
-    ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 3.1 (sharpness)")
+    ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 2.1 (sharpness)")
     return bool(ok)
 
 
@@ -1211,7 +1211,7 @@ def _replay_paper_interval(source: str, steps: list[ReplayStep]) -> bool:
         ok &= _step(steps, name, verified, "interval certificate step failed")
     ok &= _cited(steps, "{F_rho > 0} is the Jordan domain phi_R(D) - 1 and the image boundary lies on |u| = r*",
                  "Theorem 4.8 proof (univalence of phi_R)")
-    ok &= _cited(steps, "contact at u = -r* gives sharpness", "Lemma 3.1 (sharpness)")
+    ok &= _cited(steps, "contact at u = -r* gives sharpness", "Lemma 2.1 (sharpness)")
     return bool(ok)
 
 
@@ -1238,7 +1238,7 @@ def _replay_paper_analytic(source: str, target: str, steps: list[ReplayStep], *,
                     _zero(sp.exp(sp.asinh(x)) - x - sp.sqrt(x**2 + 1)))
         ok &= _step(steps, "r* < 1, the radius of convergence of asinh", bool(sp.N(1 - rstar, dps) > 0))
         ok &= _cited(steps, "max_{|u|<=r} |asinh(u)| = asin(r), attained at u = ir", _LEMMA_MAJORANT)
-        ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 3.1 (sharpness)")
+        ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 2.1 (sharpness)")
         return bool(ok)
     if (source, target) == ("exponential", "crescent"):
         ok = _step(steps, "crescent inverse composed with exp is sinh",
@@ -1251,7 +1251,7 @@ def _replay_paper_analytic(source: str, target: str, steps: list[ReplayStep], *,
                     sp.simplify(sp.exp(sp.asinh(1))-(1+sp.sqrt(2))) == 0)
         ok &= _step(steps, "r* < pi/2, so Re cosh(u) > 0 fixes the crescent branch", bool(sp.N(sp.pi / 2 - rstar, dps) > 0))
         ok &= _cited(steps, "sinh has nonnegative coefficients: max_{|u|<=r} |sinh u| = sinh r", _LEMMA_MAJORANT)
-        ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 3.1 (sharpness)")
+        ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 2.1 (sharpness)")
         return bool(ok)
     return False
 

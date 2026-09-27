@@ -3,7 +3,7 @@
 **Update:** all eleven lanes below now replay as `proven` (`certified: true`,
 `bounded_chain_replayed`), following the paper proofs step by step. Identities,
 branch normalisation, thresholds, domain margins and contacts are checked;
-Lemma 4.1, Lemma 4.2 and Lemma 3.1 are recorded as cited steps (as the eight
+Lemma 4.1, Lemma 4.2 and Lemma 2.1 are recorded as cited steps (as the eight
 fixture lanes record their majorant premises). The Theorem 4.8 lanes re-run
 `analysis/thm48_interval_check.py` (resultant, cusp, exact endpoint, radius
 enclosure, 2,000 bulk boxes and 50 endpoint boxes at `iv.dps=30`); the Jordan
