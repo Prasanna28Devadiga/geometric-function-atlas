@@ -211,6 +211,23 @@ def test_closed_form_polynomial_is_proven() -> None:
     assert result.evidence_kind == "exact_proof"
 
 
+@pytest.mark.parametrize("tier", TIERS)
+def test_closed_form_distinct_tail_has_distinct_canonical_identity(tier: str) -> None:
+    z = sp.Symbol("z")
+    base = verify_function(closed_form=z / (1 - z), max_cost=tier,
+                           grid_r=2, grid_theta=4).to_dict()
+    tail = verify_function(closed_form=z / (1 - z) + z**41, max_cost=tier,
+                           grid_r=2, grid_theta=4).to_dict()
+    assert base["canonical_inputs"]["coefficients"] == tail["canonical_inputs"]["coefficients"]
+    assert base["canonical_inputs"]["closed_form_srepr"] == sp.srepr(z / (1 - z))
+    assert tail["canonical_inputs"]["closed_form_srepr"] == sp.srepr(z / (1 - z) + z**41)
+    assert base["canonical_inputs"] != tail["canonical_inputs"]
+    assert base != tail
+    for record in (base, tail):
+        jsonschema.validate(record, load_verify_result_schema())
+        validate_screen_record(record)
+
+
 def test_closed_form_rational_is_not_silently_a_proof() -> None:
     zz = sp.symbols("z")
     result = verify_function(closed_form=zz / (1 - zz), max_cost="symbolic")
@@ -280,6 +297,37 @@ def test_truncation_changes_canonical_inputs() -> None:
     assert whole["canonical_inputs"] != partial["canonical_inputs"]
 
 
+def test_coefficient_input_has_explicit_null_closed_form_identity() -> None:
+    record = verify_function([0.2], max_cost="symbolic").to_dict()
+    assert record["canonical_inputs"]["closed_form_srepr"] is None
+    jsonschema.validate(record, load_verify_result_schema())
+    validate_screen_record(record)
+
+
+def test_closed_form_identity_is_bounded_before_series_expansion() -> None:
+    z = sp.Symbol("z")
+    huge_symbol = sp.Symbol("x" * 65536)
+    with pytest.raises(ResourceLimitError, match="representation exceeds limit"):
+        verify_function(closed_form=z + huge_symbol, max_cost="symbolic")
+
+
+def test_shared_dag_is_rejected_before_srepr_expansion(monkeypatch: pytest.MonkeyPatch) -> None:
+    z = sp.Symbol("z")
+    expression = z
+    expanded_length = len(sp.srepr(z))
+    for _ in range(17):
+        expression = sp.Add(expression, expression, evaluate=False)
+        expanded_length = len("Add(, )") + 2 * expanded_length
+    assert expanded_length > 65536
+
+    def forbidden_srepr(*args: object, **kwargs: object) -> str:
+        raise AssertionError("srepr must not expand the shared DAG")
+
+    monkeypatch.setattr(sp, "srepr", forbidden_srepr)
+    with pytest.raises(ResourceLimitError, match="representation exceeds limit"):
+        verify_function(closed_form=expression, max_cost="symbolic")
+
+
 def test_shipped_verification_schema_accepts_all_tiers_and_cli_shape() -> None:
     schema = load_verify_result_schema()
     jsonschema.Draft202012Validator.check_schema(schema)
@@ -299,6 +347,9 @@ def test_shipped_verification_schema_accepts_all_tiers_and_cli_shape() -> None:
     lambda r: r["canonical_inputs"].update(extra=True),
     lambda r: r["canonical_inputs"].update(truncation="false"),
     lambda r: r["canonical_inputs"].pop("truncation"),
+    lambda r: r["canonical_inputs"].pop("closed_form_srepr"),
+    lambda r: r["canonical_inputs"].update(closed_form_srepr=""),
+    lambda r: r["canonical_inputs"].update(closed_form_srepr="x" * 65537),
     lambda r: r["details"].update(outcome="invented"),
     lambda r: r["details"].update(certified="true"),
     lambda r: r["details"].update(witness_point=[10, 0]),

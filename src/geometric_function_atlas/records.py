@@ -66,7 +66,7 @@ _INPUT_SCHEMAS: dict[str, frozenset[str]] = {
     "class_admissibility": frozenset({"class_key"}),
     "class_membership": frozenset({"class_key", "coefficients"}),
     "class_containment": frozenset({"inner", "outer"}),
-    "function_verification": frozenset({"property", "coefficients", "tier", "truncation"}),
+    "function_verification": frozenset({"property", "coefficients", "tier", "truncation", "closed_form_srepr"}),
     "witness_search": frozenset({"property", "coefficients"}),
     "lab_metrics": frozenset({"metric_family"}),
 }
@@ -199,6 +199,10 @@ def validate_screen_record(record: Mapping[str, Any]) -> None:
         inputs = record["canonical_inputs"]
         if not isinstance(inputs["truncation"], bool):
             raise RecordError("canonical_inputs.truncation must be a bool")
+        identity = inputs["closed_form_srepr"]
+        if identity is not None and (not isinstance(identity, str) or
+                                     not 1 <= len(identity) <= 65536):
+            raise RecordError("canonical_inputs.closed_form_srepr must be null or a bounded non-empty string")
         for field in ("witness_point", "worst_point"):
             point = record["details"].get(field) if isinstance(record["details"], Mapping) else None
             if point is not None and (not isinstance(point, list) or len(point) != 2 or

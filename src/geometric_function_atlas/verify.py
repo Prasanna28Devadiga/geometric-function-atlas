@@ -69,6 +69,7 @@ _VIA_C01 = (
 )
 MAX_VERIFY_COEFFICIENTS = 128
 MAX_CLOSED_FORM_ORDER = 40
+MAX_CLOSED_FORM_SREPR_LENGTH = 65536
 _REFERENCE = (
     "gft.symbolic C01 (Schild/Goodman) and Alexander-convexity sufficient "
     f"conditions at source commit {SOURCE_ARTIFACT_COMMIT}"
@@ -340,6 +341,7 @@ class FunctionVerificationResult:
     min_margin: float | None = None
     exact_coefficients: tuple[str, ...] = ()
     truncation: bool = False
+    closed_form_srepr: str | None = None
 
     @builtins.property
     def passes(self) -> bool:
@@ -353,6 +355,7 @@ class FunctionVerificationResult:
                 "coefficients": list(self.exact_coefficients),
                 "tier": self.tier,
                 "truncation": self.truncation,
+                "closed_form_srepr": self.closed_form_srepr,
             },
             method="tiered_function_verification",
             evidence_kind=self.evidence_kind,
@@ -374,6 +377,58 @@ class FunctionVerificationResult:
                 **self.details,
             },
         )
+
+
+def _preflight_closed_form_srepr(expression: sp.Expr) -> None:
+    """Bound expanded srepr size over a shared DAG without expanding that DAG.
+
+    Charge a deliberately generous upper bound per supported printer node.
+    Unknown/custom printers are rejected rather than allowed to emit unbounded
+    text. The final srepr length check remains the exact acceptance criterion.
+    """
+    limit = MAX_CLOSED_FORM_SREPR_LENGTH
+    lengths: dict[int, int] = {}
+    pending: list[tuple[sp.Expr, bool, int]] = [(expression, False, 0)]
+    while pending:
+        node, visited, depth = pending.pop()
+        key = id(node)
+        if key in lengths:
+            continue
+        if depth > 128:
+            raise ResourceLimitError("closed_form expression representation exceeds limit")
+        if type(node) in (sp.Add, sp.Mul, sp.Pow):
+            base = 128
+        elif type(node) is sp.Symbol:
+            # repr(name) can escape each Unicode code point as up to ten
+            # characters. Assumption flags add only a small fixed allowance.
+            base = 256 + 12 * len(node.name)
+            if len(node._assumptions_orig) > 16:
+                raise ResourceLimitError("closed_form expression representation exceeds limit")
+        elif type(node) in (sp.Integer, sp.Rational, type(sp.S.Half),
+                            type(sp.S.Zero), type(sp.S.One), type(sp.S.NegativeOne)):
+            base = 128 + 2 * (node.p.bit_length() + node.q.bit_length())
+        elif type(node) is sp.Float:
+            base = 128 + 2 * (node._prec + abs(node._mpf_[2]).bit_length())
+        elif type(node) in (sp.exp, sp.log, sp.sin, sp.cos, sp.tan, sp.sinh, sp.cosh):
+            base = 256 + 12 * len(type(node).__name__)
+        else:
+            raise ResourceLimitError("closed_form expression representation exceeds limit (unsupported printer)")
+        if base > limit:
+            raise ResourceLimitError("closed_form expression representation exceeds limit")
+        if not visited and node.args:
+            pending.append((node, True, depth))
+            for child in node.args:
+                if not isinstance(child, sp.Expr):
+                    raise ResourceLimitError("closed_form expression representation exceeds limit (unsupported printer)")
+                if id(child) not in lengths:
+                    pending.append((child, False, depth + 1))
+            continue
+        length = base
+        for child in node.args:
+            length += lengths[id(child)]
+            if length > limit:
+                raise ResourceLimitError("closed_form expression representation exceeds limit")
+        lengths[key] = length
 
 
 def verify_function(
@@ -420,9 +475,16 @@ def verify_function(
         )
 
     if closed_form is not None:
+        if not isinstance(closed_form, sp.Expr):
+            raise TypeError("closed_form must be a preconstructed SymPy expression")
+        _preflight_closed_form_srepr(closed_form)
+        expression_identity = sp.srepr(closed_form)
+        if len(expression_identity) > MAX_CLOSED_FORM_SREPR_LENGTH:
+            raise ResourceLimitError("closed_form expression representation exceeds limit")
         values, exact_values, polynomial = _closed_form_coefficients(closed_form)
         polynomial = polynomial and not truncation
     else:
+        expression_identity = None
         values = _validated_coefficients(coefficients)
         exact_values = tuple(_exact_float(value) for value in values)
         polynomial = not truncation
@@ -436,13 +498,13 @@ def verify_function(
     )
 
     if max_cost == "screen":
-        return replace(_screen_verdict(property, values, exact_coefficients, grid_r, grid_theta, rmax), truncation=not polynomial)
+        return replace(_screen_verdict(property, values, exact_coefficients, grid_r, grid_theta, rmax), truncation=not polynomial, closed_form_srepr=expression_identity)
     if max_cost == "symbolic":
-        return replace(_symbolic_verdict(property, values, exact_values, exact_coefficients, polynomial), truncation=not polynomial)
+        return replace(_symbolic_verdict(property, values, exact_values, exact_coefficients, polynomial), truncation=not polynomial, closed_form_srepr=expression_identity)
     return replace(_rigorous_verdict(
         property, values, exact_values, exact_coefficients, polynomial,
         interval_transfer, grid_r, grid_theta, rmax
-    ), truncation=not polynomial)
+    ), truncation=not polynomial, closed_form_srepr=expression_identity)
 
 
 def _finite_check() -> VerificationCheck:

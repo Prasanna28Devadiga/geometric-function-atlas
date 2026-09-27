@@ -1,15 +1,16 @@
 {
  "$schema":"https://json-schema.org/draft/2020-12/schema",
  "$id":"https://geometric-function-atlas.org/schema/verify-result-1.json",
- "$comment":"Point bounds constrain each coordinate only; JSON Schema draft 2020-12 does not prove x*x + y*y < 1. Consumers requiring open-unit-disk containment must additionally call geometric_function_atlas.records.validate_screen_record.",
+ "$comment":"Point bounds constrain each coordinate only; JSON Schema draft 2020-12 does not prove x*x + y*y < 1. Consumers requiring open-unit-disk containment must additionally call geometric_function_atlas.records.validate_screen_record. closed_form_srepr is inert structural identity data, never a formula to parse or evaluate; null denotes coefficient input. Compare textual identity with a pinned SymPy version.",
  "type":"object", "additionalProperties":false,
  "required":["schema_version","record_type","canonical_inputs","method","evidence_kind","tier","assumptions","source_references","package_version","failure_state","novelty_claim","verification","details"],
  "properties":{
   "schema_version":{"const":1}, "record_type":{"const":"function_verification"},
-  "canonical_inputs":{"type":"object","additionalProperties":false,"required":["property","coefficients","tier","truncation"],"properties":{
+  "canonical_inputs":{"type":"object","additionalProperties":false,"required":["property","coefficients","tier","truncation","closed_form_srepr"],"properties":{
    "property":{"enum":["starlike","convex","univalent","becker_univalent","nehari_univalent"]},
    "coefficients":{"type":"array","maxItems":128,"items":{"type":"string","minLength":1}},
-   "tier":{"enum":["screen","symbolic","rigorous"]},"truncation":{"type":"boolean"}
+   "tier":{"enum":["screen","symbolic","rigorous"]},"truncation":{"type":"boolean"},
+   "closed_form_srepr":{"anyOf":[{"type":"null"},{"type":"string","minLength":1,"maxLength":65536}]}
   }},
   "method":{"const":"tiered_function_verification"},
   "evidence_kind":{"enum":["numerical_screen","certified_enclosure","exact_proof","inconclusive"]},
