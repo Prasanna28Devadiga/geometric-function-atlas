@@ -1278,7 +1278,27 @@ def _artifact_proofs(args: argparse.Namespace) -> None:
         status=args.status,
         search=args.search,
     )
-    _artifact_emit(args, result_type="proofs", record=record, record_count=record["count"])
+    origins = {row["artifact_source"] for row in record["rows"]}
+    supplemented = "coefficient_supplement" in origins
+    assumptions = (
+        (("records are transcribed from the versioned website snapshot",) if "website_snapshot" in origins else ())
+        + (("supplement certificates use the single-harmonic formula under Ma–Minda admissibility",) if supplemented else ())
+        + ("sharpness, enclosure, and novelty semantics remain those of each source record",)
+    )
+    references = (
+        (("Geometric Function Atlas versioned package snapshot",) if "website_snapshot" in origins else ())
+        + (("Versioned coefficient supplement; single-harmonic formula",) if supplemented else ())
+        or ("Geometric Function Atlas versioned package snapshot",)
+    )
+    _artifact_emit(
+        args, result_type="proofs", record=record, record_count=record["count"],
+        canonical_inputs={key: value for key, value in {
+            "class_key": args.class_key, "functional_key": args.functional_key,
+            "status": args.status, "search": args.search,
+        }.items() if value is not None},
+        supplement_version=_artifact_data.coefficient_supplement_version() if supplemented else None,
+        assumptions=assumptions, source_references=references,
+    )
 
 
 def _artifact_proof(args: argparse.Namespace) -> None:

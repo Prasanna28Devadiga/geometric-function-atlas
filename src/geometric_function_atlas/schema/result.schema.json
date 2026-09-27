@@ -307,6 +307,19 @@
       }
     },
     {
+      "if": {"properties": {"result_type": {"const": "proofs"}}, "required": ["result_type"]},
+      "then": {"properties": {"record": {
+        "type": "object", "required": ["count", "rows"],
+        "properties": {"rows": {"type": "array", "items": {
+          "type": "object", "required": ["artifact_source", "artifact_version"],
+          "properties": {
+            "artifact_source": {"enum": ["website_snapshot", "coefficient_supplement"]},
+            "artifact_version": {"type": "string", "pattern": "^gfa_(?:artifacts|coefficients):.+$"}
+          }
+        }}}
+      }}}
+    },
+    {
       "if": {"properties": {"result_type": {"const": "radius"}}, "required": ["result_type"]},
       "then": {
         "required": ["inner", "target", "direction", "value_exact", "value_decimal", "status", "status_label", "reconcilable", "inverse_branch_and_domain", "global_containment_route", "contact_and_attainment", "sharpness_status", "claim_label", "provenance_detail", "certificate"],

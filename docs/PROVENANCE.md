@@ -134,7 +134,14 @@ The original registry repository is treated as a research artifact and source of
 `scripts/bake_coefficient_supplement.py` from the checked-in `classes.json`
 Taylor coefficients and checked against `data/manifest.json`. Its independent
 `supplement_version` distinguishes it from the frozen 2026.08.11 website
-corpus. It adds 12 booth Fekete–Szegő certificates to the existing certificate
+corpus. The `proofs` gallery combines the two sources without rewriting either:
+rows carry `artifact_source` (`website_snapshot` or `coefficient_supplement`)
+and `artifact_version` matching the corresponding envelope version. Filtered
+results list the supplement version only when supplement rows are returned;
+mixed results cite both sources, while supplement-only results do not claim to
+be transcriptions of the website snapshot. The query filters are preserved in
+`canonical_inputs`. An empty match does not claim supplement provenance.
+It adds 12 booth Fekete–Szegő certificates to the existing certificate
 lookup/replay path; the analytic upper bound is the Ma–Minda single-harmonic
 formula, not the replay alone. It supplies one row for each of 38 distinct
 generators (the Janowski A=0, B=-1 alias of order-0.5 is excluded).

@@ -2,6 +2,7 @@
 import json
 from importlib.resources import files
 
+import pytest
 import sympy as sp
 from jsonschema import Draft202012Validator
 
@@ -80,3 +81,40 @@ def test_cli_supplement_proof_and_replay_provenance(capsys):
     assert main(["proof", "starlike__fekete_szego_mu1", "--json"]) == 0
     legacy = json.loads(capsys.readouterr().out)
     assert "coefficient_supplement" not in legacy["artifact_versions"]
+
+
+@pytest.mark.parametrize("filters,origins,count", [
+    (["--class", "booth_0.3"], {"website_snapshot", "coefficient_supplement"}, 8),
+    (["--class", "booth_0.3", "--functional", "fekete_szego_mu0.25"], {"coefficient_supplement"}, 1),
+    (["--class", "booth_0.3", "--functional", "inv_a3"], {"website_snapshot"}, 1),
+    (["--class", "booth_0.3", "--search", "not-present"], set(), 0),
+])
+def test_filtered_proof_gallery_identifies_each_source(capsys, filters, origins, count):
+    assert main(["proofs", *filters, "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    schema = json.loads(files("geometric_function_atlas").joinpath("schema/result.schema.json").read_text())
+    Draft202012Validator(schema).validate(payload)
+    rows = payload["record"]["rows"]
+    assert payload["record"]["count"] == count == len(rows)
+    assert {row["artifact_source"] for row in rows} == origins
+    assert payload["canonical_inputs"]["class_key"] == "booth_0.3"
+    assert ("coefficient_supplement" in payload["artifact_versions"]) == ("coefficient_supplement" in origins)
+    if "coefficient_supplement" in origins:
+        version = payload["artifact_versions"]["coefficient_supplement"]
+        assert all(row["artifact_version"] == version for row in rows if row["artifact_source"] == "coefficient_supplement")
+        assert any("supplement" in reference.lower() for reference in payload["source_references"])
+    if "website_snapshot" in origins:
+        version = payload["artifact_versions"]["fixture_or_proof"]
+        assert all(row["artifact_version"] == version for row in rows if row["artifact_source"] == "website_snapshot")
+    if origins == {"coefficient_supplement"}:
+        assert not any("transcribed" in assumption for assumption in payload["assumptions"])
+    if len(origins) == 2:
+        assert any("supplement" in assumption.lower() for assumption in payload["assumptions"])
+
+
+def test_gallery_schema_rejects_missing_row_origin(capsys):
+    assert main(["proofs", "--class", "booth_0.3", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    schema = json.loads(files("geometric_function_atlas").joinpath("schema/result.schema.json").read_text())
+    del payload["record"]["rows"][0]["artifact_version"]
+    assert not Draft202012Validator(schema).is_valid(payload)

@@ -446,13 +446,17 @@ def coefficient_table(functional_key: str) -> dict[str, Any]:
     }
 
 
-def _proof_summary(name: str, record: Mapping[str, Any]) -> dict[str, Any]:
+def _proof_summary(
+    name: str, record: Mapping[str, Any], *, artifact_source: str, artifact_version: str
+) -> dict[str, Any]:
     sharp = record.get("sharp") or {}
     # ``sharp`` means proven sharpness. The certificate's ``exact`` flag only
     # says the candidate is an exact constant; without ``proven`` it remains a
     # certified upper enclosure. The two must stay distinct.
     return {
         "name": name,
+        "artifact_source": artifact_source,
+        "artifact_version": artifact_version,
         "class_key": record["class"],
         "functional_key": record["functional"],
         "status": record["status"],
@@ -474,6 +478,11 @@ def list_proofs(
     match set is a valid result (the corpus simply has no such row).
     """
     certificates = _certificates()
+    supplement = _load_json("coefficient_supplement.json")
+    _check_schema(supplement, "coefficient_supplement.json")
+    supplement_names = supplement["certificates"]
+    snapshot_version = f"gfa_artifacts:{_manifest()['artifact_version']}"
+    supplement_version = f"gfa_coefficients:{supplement['supplement_version']}"
     if class_key is not None:
         _require_class(class_key)
     if functional_key is not None:
@@ -497,7 +506,12 @@ def list_proofs(
             haystack = f"{name} {record.get('statement', '')}".lower()
             if needle not in haystack:
                 continue
-        rows.append(_proof_summary(name, record))
+        supplemented = name in supplement_names
+        rows.append(_proof_summary(
+            name, record,
+            artifact_source="coefficient_supplement" if supplemented else "website_snapshot",
+            artifact_version=supplement_version if supplemented else snapshot_version,
+        ))
     return {"count": len(rows), "rows": rows}
 
 

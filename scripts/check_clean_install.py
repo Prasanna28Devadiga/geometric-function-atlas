@@ -68,6 +68,11 @@ assert bound["value_exact"] == "1"
 
 gallery = gfa.list_proofs()
 assert gallery["count"] == 318
+booth = gfa.list_proofs(class_key="booth_0.3")
+assert {row["artifact_source"] for row in booth["rows"]} == {
+    "website_snapshot", "coefficient_supplement"
+}
+assert all(row["artifact_version"] for row in booth["rows"])
 proof = gfa.get_proof("starlike__fekete_szego_mu1")
 assert proof["status"] == "PROVED"
 replay = gfa.verify_certificate("starlike__fekete_szego_mu1")
