@@ -275,16 +275,16 @@ def test_verify_radius_certificate_command_uses_fail_closed_exit_codes() -> None
 
 
 def test_radius_recompute_reports_unavailable_replay_in_human_and_json_modes() -> None:
-    human = run_cli("radius-recompute", "exponential", "sine")
+    human = run_cli("radius-recompute", "bell", "exponential")
 
     assert human.returncode == 3
     assert human.stdout == ""
     assert "NOT REPLAYABLE" in human.stderr
-    assert "exponential->sine" in human.stderr
+    assert "bell->exponential" in human.stderr
     assert "certificate" in human.stderr
     assert "--json" in human.stderr
 
-    machine = run_cli("radius-recompute", "exponential", "sine", "--json")
+    machine = run_cli("radius-recompute", "bell", "exponential", "--json")
 
     assert machine.returncode == 3
     assert machine.stderr == ""
@@ -297,9 +297,9 @@ def test_radius_recompute_reports_unavailable_replay_in_human_and_json_modes() -
 
 def test_sibling_radius_replay_commands_match_the_unavailable_semantics() -> None:
     for command in (
-        ("radius-audit", "exponential", "sine"),
-        ("radius-attainment", "exponential", "sine"),
-        ("verify-radius-certificate", "exponential", "sine"),
+        ("radius-audit", "bell", "exponential"),
+        ("radius-attainment", "bell", "exponential"),
+        ("verify-radius-certificate", "bell", "exponential"),
     ):
         human = run_cli(*command)
 
@@ -314,7 +314,7 @@ def test_sibling_radius_replay_commands_match_the_unavailable_semantics() -> Non
         payload = json.loads(machine.stdout)
         assert payload["status"] == "not_replayable", command
         if command[0] == "radius-audit":
-            assert payload["evidence_status"] == "paper_proved_exact", command
+            assert payload["evidence_status"] == "touch_proven_exact", command
             assert payload["certificate_replay"]["failure_state"] == "unsupported", command
         else:
             assert payload["failure_state"] == "unsupported", command

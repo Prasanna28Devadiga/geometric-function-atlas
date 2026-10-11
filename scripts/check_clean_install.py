@@ -94,7 +94,7 @@ for row in paper_rows:
     assert result["global_containment_check"] == (
         "bounded_chain_replayed" if result["certified"] else "not_mechanized"
     )
-assert outcomes == {"proven": 8, "symbolic_replay_only": 2, "not_replayable": 9}
+assert outcomes == {"proven": 19, "symbolic_replay_only": 0, "not_replayable": 0}
 
 plot = gfa.write_domain_plot("sine.svg", generator="sine", order=3)
 assert plot.output.name == "sine.svg"

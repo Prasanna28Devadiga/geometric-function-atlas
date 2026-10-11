@@ -75,12 +75,11 @@ separate route; `unidentified` is an open closed-form question; and
 assumptions, the global-containment route, contact/attainment wording, and
 reconciliation status without collapsing them into one boolean.
 
-Eight reviewed certificate lanes have local replay; two reciprocal lanes have
-only bounded symbolic identity checks (`symbolic_replay_only`, `certified: false`,
-`global_containment_check: not_mechanized`). Their branch, coefficient-majorant,
-global-containment and extremal reasoning remains written, not mechanized. See
-`docs/PAPER_RADIUS_REPLAY_AUDIT.md`. The other nine of the 19 written-proof
-lanes have no local replay route.
+Eight reviewed certificate lanes have local replay from the fixture; the other
+eleven of the 19 written-proof lanes replay package-owned chains following the
+paper proofs. Their coefficient-majorant, sine-ray and sharpness lemmas are
+cited steps, not mechanized; the Theorem 4.8 lanes re-run the interval
+certificate. See `docs/PAPER_RADIUS_REPLAY_AUDIT.md`.
 Six real-axis contacts were numerically recognized, which does not establish
 global containment or sharpness. The bounded raw 28-source × 26-target grid
 holds 702 rows, of which 12 remain `audit_required` consistency failures.
@@ -91,12 +90,10 @@ Replay uses a package-owned, bounded SymPy implementation of the recorded invers
 positive-majorant, boundary-contact, and monotonicity identities. It does not
 import the research repository and never evaluates a candidate as Python code.
 Malformed expressions, wrong direction, missing evidence, source/hash
-mismatch, and resource exhaustion fail closed; only the eight reviewed
-certificate lanes may yield `certified: true`. Passing finite symbolic steps
-in the two paper lanes does not certify global containment. A candidate that parses but differs from the
+mismatch, and resource exhaustion fail closed; only the 19 paper lanes may
+yield `certified: true`. A candidate that parses but differs from the
 reviewed exact expression is reported as `candidate_mismatch`, not as a new
-radius. An unchanged snapshot row outside the eight reviewed and two symbolic
-lanes has no replay route and is reported as `not_replayable` with the `unsupported`
+radius. An unchanged snapshot row outside the 19 paper lanes has no replay route and is reported as `not_replayable` with the `unsupported`
 failure state while keeping its own evidence status; `corrupt_artifact` is
 reserved for malformed records and for any record that is not its unchanged
 trusted snapshot row, including a reviewed lane whose bundled certificate was

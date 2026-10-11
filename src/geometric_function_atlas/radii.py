@@ -2,13 +2,14 @@
 
 The website stores a large radius snapshot with deliberately different evidence
 levels.  This module exposes that snapshot without flattening the levels and
-replays eight reviewed certificate lanes and two symbolic paper lanes. The
-paper lanes leave global-containment reasoning unmechanized. Replay does not import the
+replays eight reviewed certificate lanes and eleven further paper lanes whose
+cited lemmas are recorded as such. Replay does not import the
 research repository or execute a serialized Python expression.
 """
 
 from __future__ import annotations
 
+import functools
 import json
 import math
 import re
@@ -1019,15 +1020,208 @@ _REVIEWED_DIRECTIONS = frozenset(
 )
 
 
-# Symbolic replay of paper Theorem 4.4; not part of the historical fixture.
+# Replay of paper Theorems 4.4, 4.5(a)-(e), 4.6(b)-(c) and 4.8; not part of
+# the historical fixture. Inequality lemmas are recorded as cited steps.
 _PAPER_ANALYTIC_RADII = {
     ("crescent", "exponential"): "sin(1)",
     ("exponential", "crescent"): "asinh(1)",
+    ("cosh_sqrt", "lemniscate"): "asinh(1)**2",
+    ("exponential", "sine"): "log(1+sin(1))",
+    ("rational_kr", "sine"): "(1+sqrt(2))/2*(sqrt(1+6*sin(1)+sin(1)**2)-1-sin(1))",
+    ("bell", "sine"): "log(1+log(1+sin(1)))",
+    ("exponential", "bell"): "1-exp(-1)",
+    ("sine", "exponential"): "asin(1-exp(-1))",
+    ("sine", "bell"): "asin(1-exp(exp(-1)-1))",
+    ("sine", "rational_kr"): "asin(3-2*sqrt(2))",
+    ("sigmoid", "rational_kr"): "log(2)/2",
+}
+_LEMMA_MAJORANT = "Lemma 4.1 (coefficient majorant)"
+_LEMMA_SINE = "Lemma 4.2 (sine-ray bounds)"
+_EXP = sp.exp
+_BELL_INV = lambda w: sp.log(1 + sp.log(w))
+_SINE_INV = lambda w: sp.asin(w - 1)
+_KR = 1 + sp.sqrt(2)
+_PHI_R = lambda u: 1 + u * (_KR + u) / (_KR * (_KR - u))
+# (target inverse, psi, majorant B(r), contact u0(r), domain margins > 0, lemma)
+_PAPER_MAJORANT_LANES: dict[tuple[str, str], tuple[Any, ...]] = {
+    ("cosh_sqrt", "lemniscate"): (lambda w: w**2 - 1, lambda u: sp.sinh(sp.sqrt(u)) ** 2,
+                                  lambda r: sp.sinh(sp.sqrt(r)) ** 2, lambda r: r, (), _LEMMA_MAJORANT),
+    ("exponential", "sine"): (_SINE_INV, lambda u: sp.asin(_EXP(u) - 1), lambda r: sp.asin(_EXP(r) - 1),
+                              lambda r: r, (lambda r: sp.log(2) - r,), _LEMMA_MAJORANT),
+    ("rational_kr", "sine"): (_SINE_INV, lambda u: sp.asin(_PHI_R(u) - 1), lambda r: sp.asin(_PHI_R(r) - 1),
+                              lambda r: r, (lambda r: 1 - r,), _LEMMA_MAJORANT),
+    ("bell", "sine"): (_SINE_INV, lambda u: sp.asin(_EXP(_EXP(u) - 1) - 1), lambda r: sp.asin(_EXP(_EXP(r) - 1) - 1),
+                       lambda r: r, (lambda r: sp.log(1 + sp.log(2)) - r,), _LEMMA_MAJORANT),
+    ("exponential", "bell"): (_BELL_INV, lambda u: sp.log(1 + u), lambda r: -sp.log(1 - r),
+                              lambda r: -r, (lambda r: 1 - r,), _LEMMA_MAJORANT),
+    ("sine", "exponential"): (sp.log, lambda u: sp.log(1 + sp.sin(u)), lambda r: -sp.log(1 - sp.sin(r)),
+                              lambda r: -r, (lambda r: sp.pi / 2 - r,), _LEMMA_SINE),
+    ("sine", "bell"): (_BELL_INV, lambda u: sp.log(1 + sp.log(1 + sp.sin(u))),
+                       lambda r: -sp.log(1 + sp.log(1 - sp.sin(r))), lambda r: -r,
+                       (lambda r: sp.pi / 2 - r, lambda r: 1 + sp.log(1 - sp.sin(r))),
+                       f"{_LEMMA_SINE} then {_LEMMA_MAJORANT} for log(1+v)"),
 }
 
 
-def _replay_paper_analytic(source: str, target: str, steps: list[ReplayStep]) -> bool:
+def _cited(steps: list[ReplayStep], name: str, citation: str) -> bool:
+    steps.append(ReplayStep(name=name, verified=True, scope=f"cited written paper lemma, not mechanized: {citation}"))
+    return True
+
+
+def _zero(expression: sp.Expr) -> bool:
+    try:
+        return bool(sp.simplify(expression) == 0)
+    except (TypeError, ValueError, ArithmeticError):
+        return False
+
+
+def _replay_paper_majorant(source: str, target: str, rstar: sp.Expr, steps: list[ReplayStep], *, dps: int) -> bool:
+    from .catalog import Z, get_generator
+
+    inverse, psi, bound, contact, margins, lemma = _PAPER_MAJORANT_LANES[(source, target)]
+    x, w = sp.Symbol("x", positive=True), sp.Symbol("w", positive=True)
+    phi1 = get_generator(source).expression.subs(Z, x)
+    phi2 = get_generator(target).expression.subs(Z, x)
+    tol = min(30, dps // 2)
+    ok = _step(steps, "target inverse branch: phi2^-1(phi2(z)) = z or phi2(phi2^-1(w)) = w",
+               _zero(inverse(phi2) - x) or _zero(get_generator(target).expression.subs(Z, inverse(w)) - w))
+    ok &= _step(steps, "psi(0) = 0 (branch fixed by phi2^-1(1) = 0)", _zero(psi(sp.Integer(0))))
+    ok &= _step(steps, "psi = phi2^-1 o phi1 (real-analytic identity; identity theorem)",
+                _zero(inverse(phi1) - psi(x)) or _zero(get_generator(target).expression.subs(Z, psi(x)) - phi1))
+    if source == "rational_kr":
+        ok &= _step(steps, "phi_R(u) - 1 = u/k + (2u^2/k^2)/(1 - u/k), nonnegative coefficients",
+                    _zero(_PHI_R(x) - 1 - x / _KR - 2 * x**2 / _KR**2 / (1 - x / _KR)))
+    for margin in margins:
+        ok &= _step(steps, "r* lies in the lemma's convergence/branch domain",
+                    bool(sp.N(margin(rstar), dps) > 0))
+    ok &= _cited(steps, "max_{|u|<=r} |psi(u)| <= B(r), with B increasing", lemma)
+    ok &= _step(steps, "B(r*) = 1", _zero(bound(rstar) - 1) or _numeric_ok(bound(rstar) - 1, dps=dps, tolerance_exponent=tol))
+    ok &= _step(steps, "|psi(u0)| = 1 at the contact point u0 with |u0| = r*",
+                _numeric_ok(sp.Abs(psi(contact(rstar))) - 1, dps=dps, tolerance_exponent=tol))
+    ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 2.1 (sharpness)")
+    return bool(ok)
+
+
+def _lower(value: Any) -> Any:
+    import mpmath as mpm
+
+    return mpm.mp.make_mpf(value._mpi_[0])
+
+
+@functools.cache
+def _thm48_interval_steps(source: str) -> tuple[tuple[str, bool], ...]:
+    """Port of analysis/thm48_interval_check.py (iv.dps=30, 2000 + 50 boxes; about 1 s per lane)."""
+    import mpmath as mpm
+    from mpmath import iv
+
+    from .catalog import Z, get_generator
+
+    X, Y = sp.symbols("X Y", real=True)
+    t, A, Ab, th = sp.symbols("t A Abar theta")
+    rs, rr, a, b = sp.symbols("rho r a b", positive=True)
+    eta = 3 - 2 * sp.sqrt(2)
+
+    def F_paper(xx: Any, yy: Any, p: Any) -> Any:
+        q = xx**2 + yy**2
+        return (-p**8 + p**6 * (q + 2 * xx + 1) + p**4 * (2 * xx * q + 6 * q + 2 * xx)
+                + p**2 * (q**2 + 2 * xx * q + q) - q**2)
+
+    out: list[tuple[str, bool]] = []
+    res = sp.expand(sp.resultant(t**2 + (1 + A) * t - A, -Ab * t**2 + (1 + Ab) * rs**2 * t + rs**4, t)
+                    .subs({A: X + sp.I * Y, Ab: X - sp.I * Y}))
+    ratio = sp.simplify(res / sp.expand(F_paper(X, Y, rs)))
+    out.append(("F_rho is (up to a constant) the resultant eliminating t from A=t(1+t)/(1-t), |t|=rho",
+                ratio.free_symbols == set() and ratio != 0))
+    out.append(("phi_R(z) - 1 = g(z/k), g(t) = t(1+t)/(1-t)",
+                _zero(get_generator("rational_kr").expression - 1 - (Z / _KR) * (1 + Z / _KR) / (1 - Z / _KR))))
+    F = sp.expand(F_paper(X, Y, sp.sqrt(2) - 1))
+    out.append(("F_rho(x,-y) = F_rho(x,y)", _zero(F.subs(Y, -Y) - F)))
+    at_cusp = {X: -eta, Y: 0}
+    out.append(("F = F_x = F_y = 0 at A0 = -(3-2*sqrt(2)) (cusp), so H(pi) = H'(pi) = 0",
+                all(_zero(e.subs(at_cusp)) for e in (F, sp.diff(F, X), sp.diff(F, Y)))))
     u = sp.Symbol("u")
+    if source == "sine":
+        xa, ya, rexact, delta = sp.sin(a) * sp.cosh(b), sp.cos(a) * sp.sinh(b), sp.asin(eta), sp.Rational(1, 20)
+        out.append(("sin(a+ib) = sin a cosh b + i cos a sinh b",
+                    _zero(sp.expand_trig(sp.sin(a + sp.I * b)) - xa - sp.I * ya)))
+        enclose = lambda rv: iv.sin(rv) - (3 - 2 * iv.sqrt(2))
+    else:
+        xa, ya = sp.sinh(a) / (sp.cosh(a) + sp.cos(b)), sp.sin(b) / (sp.cosh(a) + sp.cos(b))
+        rexact, delta = sp.log(2) / 2, sp.Rational(1, 100)
+        out.append(("phi_SG(u) - 1 = tanh(u/2)",
+                    _zero((get_generator("sigmoid").expression.subs(Z, u) - 1 - sp.tanh(u / 2)).rewrite(sp.exp))))
+        out.append(("tanh((a+ib)/2) = (sinh a + i sin b)/(cosh a + cos b)",
+                    _zero((sp.tanh((a + sp.I * b) / 2) - xa - sp.I * ya).rewrite(sp.exp))))
+        enclose = lambda rv: (iv.exp(rv) - 1) / (iv.exp(rv) + 1) - (3 - 2 * iv.sqrt(2))
+    xe, ye = (e.subs({a: rr * sp.cos(th), b: rr * sp.sin(th)}) for e in (xa, ya))
+    out.append(("x(-theta) = x(theta), y(-theta) = -y(theta), so H is even and theta in [0, pi] suffices",
+                _zero(xe.subs(th, -th) - xe) and _zero(ye.subs(th, -th) + ye)))
+    out.append(("A(-r*) = -(3-2*sqrt(2)) exactly",
+                all(_zero(e.rewrite(sp.exp)) for e in (xe.subs({th: sp.pi, rr: rexact}) + eta, ye.subs({th: sp.pi, rr: rexact})))))
+    ivmod = {"sin": iv.sin, "cos": iv.cos, "exp": iv.exp, "sqrt": iv.sqrt,
+             "sinh": lambda v: (iv.exp(v) - iv.exp(-v)) / 2, "cosh": lambda v: (iv.exp(v) + iv.exp(-v)) / 2}
+
+    def ivfun(expr: Any, args: Any) -> Any:
+        return sp.lambdify(args, expr, modules=[ivmod, "mpmath"])
+
+    Fg = F_paper(X, Y, rs)
+    xp, yp = sp.diff(xe, th), sp.diff(ye, th)
+    fx_, fy_, Fiv = ivfun(xe, (rr, th)), ivfun(ye, (rr, th)), ivfun(Fg, (X, Y, rs))
+    derivs = [ivfun(e, (rr, th)) for e in (xp, yp, sp.diff(xp, th), sp.diff(yp, th))]
+    parts = [ivfun(e, (X, Y, rs)) for e in (sp.diff(Fg, X), sp.diff(Fg, Y), sp.diff(Fg, X, 2),
+                                             sp.diff(Fg, X, Y), sp.diff(Fg, Y, 2))]
+    saved_iv_dps = iv.dps
+    iv.dps = 30
+    try:
+        with mpm.workdps(60):
+            rh = iv.sqrt(2) - 1
+            r0, eps = mpm.mpf(sp.N(rexact, 60)), mpm.mpf(10) ** -25
+            lo, hi = iv.mpf(r0 - eps), iv.mpf(r0 + eps)
+            enclosed = bool(mpm.mp.make_mpf(enclose(lo)._mpi_[1]) < 0 < _lower(enclose(hi)))
+            out.append(("radius enclosure [r*-1e-25, r*+1e-25] certified by interval sign change", enclosed))
+            R = iv.mpf([lo.a, hi.b])
+
+            def Hpp(T: Any) -> Any:
+                X_, Y_ = fx_(R, T), fy_(R, T)
+                xp_, yp_, xpp_, ypp_ = (d(R, T) for d in derivs)
+                fx, fy, fxx, fxy, fyy = (p(X_, Y_, rh) for p in parts)
+                return fxx * xp_**2 + 2 * fxy * xp_ * yp_ + fyy * yp_**2 + fx * xpp_ + fy * ypp_
+
+            dl = iv.mpf(1) / int(1 / delta)
+            stop, N, N_end = iv.pi - dl, 2000, 50
+            grid = [stop * i / N for i in range(N + 1)]
+            grid[0] = iv.mpf(0)
+            bulk = min(_lower(Fiv(fx_(R, T), fy_(R, T), rh))
+                       for T in (iv.mpf([grid[i].a, grid[i + 1].b]) for i in range(N)))
+            out.append((f"interval H(theta) > 0 on {N} boxes covering [0, pi-{delta}] (lower bound {mpm.nstr(bulk, 3)})",
+                        bool(bulk > 0)))
+            one = _lower(Hpp(iv.mpf([(iv.pi - dl).a, iv.pi.b])))
+            edges = [iv.pi - dl + dl * j / N_end for j in range(N_end + 1)]
+            sub = min(_lower(Hpp(iv.mpf([edges[j].a, edges[j + 1].b]))) for j in range(N_end))
+            out.append((f"interval H'' > 0 on [pi-{delta}, pi] (single box and {N_end} boxes; lower bound {mpm.nstr(sub, 3)})",
+                        bool(one > 0 and sub > 0)))
+    finally:
+        iv.dps = saved_iv_dps
+    return tuple(out)
+
+
+def _replay_paper_interval(source: str, steps: list[ReplayStep]) -> bool:
+    ok = True
+    for name, verified in _thm48_interval_steps(source):
+        ok &= _step(steps, name, verified, "interval certificate step failed")
+    ok &= _cited(steps, "{F_rho > 0} is the Jordan domain phi_R(D) - 1 and the image boundary lies on |u| = r*",
+                 "Theorem 4.8 proof (univalence of phi_R)")
+    ok &= _cited(steps, "contact at u = -r* gives sharpness", "Lemma 2.1 (sharpness)")
+    return bool(ok)
+
+
+def _replay_paper_analytic(source: str, target: str, steps: list[ReplayStep], *, dps: int = 50) -> bool:
+    u = sp.Symbol("u")
+    rstar = _parse_exact_expression(_PAPER_ANALYTIC_RADII[(source, target)])
+    if (source, target) in _PAPER_MAJORANT_LANES:
+        return _replay_paper_majorant(source, target, rstar, steps, dps=dps)
+    if target == "rational_kr":
+        return _replay_paper_interval(source, steps)
     if (source, target) == ("crescent", "exponential"):
         # Infinite coefficient and branch arguments remain written mathematics.
         ok = _step(steps, "asinh derivative identity (binomial series not mechanized)",
@@ -1039,6 +1233,12 @@ def _replay_paper_analytic(source: str, target: str, steps: list[ReplayStep]) ->
         ok &= _step(steps, "threshold asin(sin(1))=1", sp.asin(sp.sin(1)) == 1)
         ok &= _step(steps, "contact crescent(i*sin(1))=exp(i)",
                     sp.simplify(sp.I*sp.sin(1) + sp.cos(1) - sp.exp(sp.I)) == 0)
+        x = sp.Symbol("x", positive=True)
+        ok &= _step(steps, "psi = log(crescent(u)) = asinh(u) (real-analytic identity)",
+                    _zero(sp.exp(sp.asinh(x)) - x - sp.sqrt(x**2 + 1)))
+        ok &= _step(steps, "r* < 1, the radius of convergence of asinh", bool(sp.N(1 - rstar, dps) > 0))
+        ok &= _cited(steps, "max_{|u|<=r} |asinh(u)| = asin(r), attained at u = ir", _LEMMA_MAJORANT)
+        ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 2.1 (sharpness)")
         return bool(ok)
     if (source, target) == ("exponential", "crescent"):
         ok = _step(steps, "crescent inverse composed with exp is sinh",
@@ -1049,6 +1249,9 @@ def _replay_paper_analytic(source: str, target: str, steps: list[ReplayStep]) ->
                     sp.simplify(((1+sp.sqrt(2))-1/(1+sp.sqrt(2)))/2-1) == 0)
         ok &= _step(steps, "contact exp(asinh(1))=1+sqrt(2)",
                     sp.simplify(sp.exp(sp.asinh(1))-(1+sp.sqrt(2))) == 0)
+        ok &= _step(steps, "r* < pi/2, so Re cosh(u) > 0 fixes the crescent branch", bool(sp.N(sp.pi / 2 - rstar, dps) > 0))
+        ok &= _cited(steps, "sinh has nonnegative coefficients: max_{|u|<=r} |sinh u| = sinh r", _LEMMA_MAJORANT)
+        ok &= _cited(steps, "contact on |u| = r* gives sharpness", "Lemma 2.1 (sharpness)")
         return bool(ok)
     return False
 
@@ -1227,13 +1430,13 @@ def replay_radius_certificate(
         matches_snapshot = stored is not None and abs(sp.N(expected_value, 70) - sp.Float(stored, 70)) < sp.Rational(1, 10**58)
         paper_steps.append(ReplayStep("exact paper value agrees with historical decimal", bool(matches_snapshot),
                                 scope="numeric identity guard; not containment proof"))
-        passed = _replay_paper_analytic(resolved.source_class, resolved.target_class, paper_steps)
+        passed = _replay_paper_analytic(resolved.source_class, resolved.target_class, paper_steps, dps=dps)
         if len(paper_steps) > max_steps:
             raise ResourceLimitError("paper replay exceeds the replay step limit")
-        status = "symbolic_replay_only" if passed and all(step.verified for step in paper_steps) else "unresolved"
-        return RadiusReplayResult(**base, status=status, certified=False, steps=tuple(paper_steps),
-                                  method=method, error=("global containment and sharpness remain written reasoning, not machine-checked"
-                                                        if status == "symbolic_replay_only" else "symbolic replay failed"))
+        if passed and all(step.verified for step in paper_steps):
+            return RadiusReplayResult(**base, status="proven", certified=True, steps=tuple(paper_steps))
+        return RadiusReplayResult(**base, status="unresolved", certified=False, steps=tuple(paper_steps),
+                                  method=method, error="paper certificate replay failed")
     if blocker is not None:
         return RadiusReplayResult(
             **base,

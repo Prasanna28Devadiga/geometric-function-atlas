@@ -116,11 +116,10 @@ Draft202012Validator(schema).validate(payload)
 This schema is shipped in wheel/sdist and checks closed top-level, input,
 expression and step keys, status/method/failure combinations, and `certified`
 versus `global_containment_check`. `bounded_chain_replayed` means the eight
-fixture lanes passed their bounded package checks (some inequality steps are
-recorded analytic premises), **not** that every global theorem was formally
-proved by software. The two paper-symbolic routes have
-`symbolic_replay_only`, `certified: false`, `not_mechanized`; nine other written
-paper lanes are `not_replayable`, also `not_mechanized`. No written-paper label
+fixture lanes and eleven paper lanes passed their bounded package checks (some
+inequality steps are recorded analytic premises; paper-lane premises carry a
+`cited written paper lemma` scope), **not** that every global theorem was
+formally proved by software. No written-paper label
 is upgraded by schema validation.
 
 Radius certificate replay keeps "unavailable" separate from "damaged": an

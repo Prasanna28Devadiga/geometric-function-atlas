@@ -34,7 +34,7 @@ def test_all_nineteen_written_paper_lanes_have_closed_replay_envelopes():
         else:
             assert payload["global_containment_check"] == "not_mechanized"
             assert payload["certified"] is False
-    assert outcomes == {"proven": 8, "symbolic_replay_only": 2, "not_replayable": 9}
+    assert outcomes == {"proven": 19, "symbolic_replay_only": 0, "not_replayable": 0}
 
 
 def test_replay_failures_are_closed_and_never_inherit_containment_check():
@@ -66,7 +66,7 @@ def test_cli_json_is_same_packaged_contract_for_each_lane():
             [sys.executable, "-m", "geometric_function_atlas", "verify-radius-certificate", row.source_class, row.target_class, "--json"],
             capture_output=True, text=True, check=False,
         )
-        assert run.returncode == (0 if row.certificate else 4 if row.direction in {"crescent->exponential", "exponential->crescent"} else 3), (row.direction, run.stderr)
+        assert run.returncode == 0, (row.direction, run.stderr)
         payload = json.loads(run.stdout)
         assert not list(validator.iter_errors(payload)), row.direction
         assert payload["direction"] == row.direction
