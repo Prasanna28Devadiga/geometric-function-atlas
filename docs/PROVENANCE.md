@@ -430,3 +430,16 @@ Source: DOI10.34198/ejms.16626.75.11831199 Eq3/8, Theorems3.1/3.3/3.5.
 Source-specific sufficient radii and literal signed coanalytic bounds from
 arXiv:2602.13613v1 remain campaign evidence, not harmonic solver APIs,
 sharp-radius claims or whole-paper certifications.
+
+Batch27 anchors the existing convex solver against whole derivatives
+`f'=(1-z^m)^(-alpha/m)`, m1,2, and Schippers sigma3(0) against direct
+Schwarzian differentiation. Source: arXiv:2601.07842v2, Eq1.1 and Theorem4.2.
+At m2, alpha7/4, S_f(0)=7/4; comparing that with the literal source norm
+bound7/8 remains source-specific campaign evidence. No general norm optimizer
+or replacement sharp theorem is added. Existing generator-series and linear
+subordination alpha1 also recover jets with
+`H_k'=1/[(1-z)^2*(1-k*z)]`, independently anchored by clearing the rational
+ODE denominator and exact complex rotation. Source: arXiv:2505.17157v1 Eq2.4
+and Theorem2.1 (the reviewed cached version predates its indexing year).
+Whole harmonic convexity, endpoint-attainment comparisons and global growth
+inequalities remain separate claims; these anchors do not certify a whole paper.
