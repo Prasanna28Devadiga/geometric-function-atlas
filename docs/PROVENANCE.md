@@ -270,6 +270,19 @@ extend the real-Schur parameter domain or certify a nephroid source bound.
 Source locators: DOI10.11113/mjfas.v22n3.5097 Definition2.3 and
 DOI10.3389/fams.2026.1923663 Definition1.3, Theorem3.1.
 
+## Batch36: independent Bernardi/Jackson defining-equation anchors
+
+Existing `bernardi_coefficients` and `q_al_oboudi_coefficients` suffice for
+DOI10.24996/ijs.2026.67.5.28 Eq2/Theorem1.1 at s=k1,q0 and
+DOI10.29304/jqcsm.2026.18.12464 Eq4, Definitions2.1/2.2, Theorems3.1/3.2
+at beta0,k=z/(1-z). Independent normalized-integral, arbitrary-symbol ODE,
+exact Jackson-dilation and whole rational-function tests anchor the conventions
+through a9. The latter source's beta0/1 images are zD_q f and f; their linear
+combination needs no new generalized operator API. These are additional tests,
+not new production capabilities. Literal sufficient-condition failures and the
+source H_n notation conflict remain campaign evidence, not package theorem
+claims, class-preservation assertions or global coefficient certificates.
+
 ## Collaborator bundles
 
 A collaborator-bundle manifest is integrity provenance, not theorem evidence.
