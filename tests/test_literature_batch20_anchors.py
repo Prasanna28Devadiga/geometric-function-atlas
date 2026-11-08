@@ -162,3 +162,38 @@ def test_shifted_primitive_composition_preserves_nonnormalized_origin():
             assert s.diff(G, z).subs(z, 0) == 0
             independent = s.integrate(scale*z**degree*s.diff(h, z), z)
             assert s.expand(G-independent) == 0
+
+
+def test_entire_error_generator_independent_integral_coefficients():
+    """1F1(1/2;3/2;-z)=integral_0^1 exp(-z*t²)dt, not a class certificate."""
+    t = s.Symbol('t')
+    B = generator_series(Generator(key='error-integral-anchor', name='Error factor',
+        expression=s.hyper([s.Rational(1, 2)], [s.Rational(3, 2)], -z),
+        citation='DOI10.36753/mathenot.1838201 Eq1.2'), order=4).coefficients
+    independent = tuple(s.integrate((-t*t)**k/s.factorial(k), (t, 0, 1))
+                        for k in range(1, 5))
+    assert tuple(B) == independent
+    jet = product_subordination_coefficients([0]*4, B,
+        [s.Rational(1, 2), -1], order=4)
+    omega = z*(s.Rational(1, 2)-z)/(1-z/2)
+    direct = 1+sum(c*omega**k for k, c in enumerate(independent, 1))
+    expanded = s.series(direct, z, 0, 5).removeO().expand()
+    assert tuple(jet) == tuple(expanded.coeff(z, k) for k in range(1, 5))
+
+
+def test_pascal_generator_direct_rational_and_bernardi_ode():
+    """Closed rational Pascal factors; integration is not Hadamard inversion."""
+    for beta in [1, 2, 3]:
+        rho = s.Rational(1, 3)
+        phi = 1+(1-rho)**beta*((1-rho*z)**(-beta)-1)
+        B = generator_series(Generator(key='pascal-rational-anchor', name='Pascal',
+            expression=phi, citation='DOI10.28924/2291-8639-24-2026-333 Eq1.4'),
+            order=4).coefficients
+        direct = tuple(s.diff(phi, z, k).subs(z, 0)/s.factorial(k)
+                       for k in range(1, 5))
+        assert tuple(B) == direct
+        jet = product_subordination_coefficients([0]*4, B, [1], order=4)
+        F = z+sum(a*z**n for n, a in enumerate(jet, 2))
+        I = z+sum(a*z**n for n, a in enumerate(
+            bernardi_coefficients(jet, gamma=0), 2))
+        assert s.expand(z*s.diff(I, z)-F) == 0

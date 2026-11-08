@@ -408,3 +408,13 @@ bracket structure of Eq17 in DOI10.31926/but.mif.2026.6.68.1.8. No new API,
 arbitrary complex-Schur support, global optimization or paper certification is
 introduced. Beta-negative-binomial probability and source-radius comparisons
 remain source-specific campaign evidence rather than a new package engine.
+
+Batch25 adds independent anchors for the entire error factor
+`1F1(1/2;3/2;-z)=integral_0^1 exp(-z*t²)dt` and rational Pascal factors.
+Existing generator-series, product-subordination and Bernardi APIs suffice;
+no new operator or inverse-Hadamard API is introduced. Integral coefficients,
+a nonradial rational Schwarz composition, direct rational differentiation and
+the Bernardi ODE anchor the conventions. Sources: DOI10.36753/mathenot.1838201
+Eq1.2 and DOI10.28924/2291-8639-24-2026-333 Eq1.4. Error-image attainment,
+signed-weight coefficient claims and literal-versus-repaired Pascal notation
+remain source-specific campaign comparisons, not package theorem claims.
