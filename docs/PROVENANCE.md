@@ -376,3 +376,15 @@ also distinguish the literal inverse and operator-definition discrepancies in
 DOI10.24996/ijs.2026.67.2.30 from unreviewed later class bounds. Source-specific
 Borel arithmetic and rejected advertised witnesses remain campaign evidence,
 not new package APIs or endorsements of source sharpness claims.
+
+Batch21 independently anchors the existing member solver against the nonradial
+whole primitive `F=z*exp(2z)*(1-z/2)^3`, whose logarithmic derivative is
+`1+z*(1/2-z)/(1-z/2)`. This supplies a genuine endpoint of the exponential
+characterization in DOI10.3389/fams.2026.1777576, Definition1.1, sigma1,
+K=exp(z). It does not solve the interior-sigma nonlinear class. A separate
+literal Jackson subtraction for Mobius members gives
+`z^2*D_q F/F=z/(1-q*t*z)` and checks the defining expression and the native
+bracket structure of Eq17 in DOI10.31926/but.mif.2026.6.68.1.8. No new API,
+arbitrary complex-Schur support, global optimization or paper certification is
+introduced. Beta-negative-binomial probability and source-radius comparisons
+remain source-specific campaign evidence rather than a new package engine.
