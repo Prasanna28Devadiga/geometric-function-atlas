@@ -27,6 +27,10 @@ Status: shipped.
   bounded turning, and ordinary logarithms through gamma4 use the same engine.
   Formal inverse jets through A5 and Schippers sigma3/sigma4 at the origin
   have independent composition/differential anchors; disk norms remain out of scope.
+  - `mixed_derivative_coefficients`: nonlinear derivative/convex interpolation,
+    distinct from the linear class; `product_subordination_coefficients`:
+    exact normalized base times phi(omega). Both reuse real Schur composition,
+    return bounded jets only, and have direct equation/product anchors.
   These API-only transforms return bare SymPy tuples; no new theorem/evidence
   envelope or automatic sharp-bound claim is introduced.
 - Classical starlike anchors and JSON-capable CLI.

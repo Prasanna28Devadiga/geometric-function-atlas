@@ -44,6 +44,8 @@ from .coefficient_transforms import (
     inverse_logarithmic_coefficients,
     linear_subordination_coefficients,
     logarithmic_coefficients,
+    mixed_derivative_coefficients,
+    product_subordination_coefficients,
     schippers_origin,
 )
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
@@ -232,9 +234,11 @@ __all__ = [
     "list_radii",
     "list_screen_classes",
     "logarithmic_coefficients",
+    "mixed_derivative_coefficients",
     "open_problems",
     "parse_exact_expression",
     "plot_object_coefficients",
+    "product_subordination_coefficients",
     "radius",
     "recompute_radius",
     "reconciliation",

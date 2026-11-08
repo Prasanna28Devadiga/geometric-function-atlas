@@ -136,6 +136,55 @@ def linear_subordination_coefficients(
     return tuple(sp.cancel(q[n]/(1+n*alpha)) for n in range(1, order+1))
 
 
+def product_subordination_coefficients(
+    base_coefficients: Sequence[Any], phi_coefficients: Sequence[Any],
+    gammas: Sequence[Any], *, order: int,
+) -> tuple[sp.Expr, ...]:
+    """Jet of f=g*phi(omega) from a normalized base jet g=z+b2*z²+... .
+
+    Supply exactly order base coefficients b2..b_(order+1); missing base terms
+    are unknown, not zero. Composition reuses the existing real Schur engine.
+    No starlikeness/univalence of g or f is inferred from finite jets, and no
+    unknown tail or global analytic class membership is certified.
+    """
+    composed = [sp.Integer(1)] + list(linear_subordination_coefficients(
+        phi_coefficients, gammas, alpha=0, order=order,
+    ))
+    if len(base_coefficients) != order:
+        raise ValueError('supply exactly order base coefficients')
+    base = [sp.Integer(1)] + _exact_jet(base_coefficients, maximum=8)
+    return tuple(sp.cancel(sum(base[k]*composed[n-k] for k in range(n+1)))
+                 for n in range(1, order+1))
+
+
+def mixed_derivative_coefficients(
+    phi_coefficients: Sequence[Any], gammas: Sequence[Any], *, alpha: Any, order: int,
+) -> tuple[sp.Expr, ...]:
+    """Jet for (1-alpha)f' + alpha*(1+zf''/f') = phi(omega).
+
+    Exact rational alpha in [0,1]. This nonlinear derivative interpolation is
+    NOT linear_subordination_coefficients. Reuses its composed generator and
+    solves the triangular formal equation for F=f'. Endpoint alpha=0 is bounded
+    turning; alpha=1 is convex. Local formal jets do not establish continuation,
+    nonvanishing of f' in the disk, admissibility or global class membership.
+    Order/depth and polynomial-generator conventions inherit the Schur engine.
+    """
+    if isinstance(alpha, bool) or not isinstance(alpha, (int, sp.Rational)):
+        raise TypeError('alpha must be a preconstructed exact rational')
+    alpha = sp.Rational(alpha)
+    if not 0 <= alpha <= 1:
+        raise ValueError('alpha must lie in [0,1]')
+    q = [sp.Integer(1)] + list(linear_subordination_coefficients(
+        phi_coefficients, gammas, alpha=0, order=order,
+    ))
+    derivative = [sp.Integer(1)]
+    for n in range(1, order+1):
+        rhs = q[n] + sum(q[k]*derivative[n-k] for k in range(1, n))
+        rhs -= (1-alpha)*sum(derivative[k]*derivative[n-k] for k in range(1, n))
+        derivative.append(sp.cancel(rhs/(1+alpha*(n-1))))
+    return tuple(sp.cancel(derivative[n]/(n+1)) for n in range(1, order+1))
+
+
 def convex_member_coefficients(
     phi_coefficients: Sequence[Any], gammas: Sequence[Any], *, order: int,
 ) -> tuple[sp.Expr, ...]:

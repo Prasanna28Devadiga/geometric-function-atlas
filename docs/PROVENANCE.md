@@ -46,6 +46,17 @@ composition tests through degree five, plus Koebe and Möbius anchors. Source
 applications include DOI 10.24193/subbmath.2026.1.06 (1.6), (2.5) and
 10.64721/240cr737 (11). Source formula discrepancies remain caller-owned evidence;
 these algebraic transforms do not endorse a paper's global upper bounds.
+`mixed_derivative_coefficients` solves the distinct nonlinear interpolation
+(1-alpha)f' + alpha*(1+zf''/f')=phi(omega), with rational alpha in [0,1],
+by a triangular recurrence for f'. `product_subordination_coefficients` returns
+f=g*phi(omega) from a complete exact base jet. Both reuse the existing bounded
+real Schur composition route rather than a campaign-specific engine. Direct
+symbolic ODE/product tests and endpoint identities are independent anchors.
+Applications include DOI 10.47000/tjmcs.1786554 Definition1.1 and
+10.47372/ejua-ba.2026.2.545 Definition1.1; these are not starlike subordinations.
+Interior mixed jets do not certify analytic continuation or nonvanishing of f'
+in the disk. Product jets do not establish the base's starlikeness or f's
+univalence. No theorem, global bound, unknown tail or source sharpness is endorsed.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

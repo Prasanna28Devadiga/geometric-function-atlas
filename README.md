@@ -184,6 +184,21 @@ assert logarithmic_coefficients([2,3,4]) == (1,sp.Rational(1,2),sp.Rational(1,3)
 Both return exact tuples only, not theorem certification, global extremization,
 whole-function tail declarations, or newly released CLI commands.
 
+### Mixed derivative and product subordinations (low-level API)
+
+`mixed_derivative_coefficients(B, gammas, alpha=alpha, order=N)` solves the
+**different, nonlinear** equation `(1-alpha)f' + alpha*(1+zf''/f')=phi(omega)`.
+Alpha is an exact rational in [0,1]; endpoints are bounded turning and convexity.
+The triangular formal solution at interior alpha does not certify analytic
+continuation or nonvanishing of f' on the whole disk.
+
+`product_subordination_coefficients(base, B, gammas, order=N)` returns the jet of
+`f=g*phi(omega)`, with exactly N exact base coefficients `[b2,...,b_(N+1)]`.
+For example, a Koebe base `[2,3,4]`, sine B=`[1,0,-Rational(1,6)]` and `[1]`
+(omega=z) returns `(3,5,Rational(41,6))`; this is **not** sine starlikeness.
+Both reuse real Schur composition, with depth five/order eight, return exact
+bare tuples and certify no global bound, univalence, unknown tail or theorem.
+
 ### Exact convex jets and inverse logarithms (low-level API)
 
 ```python
