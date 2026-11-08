@@ -122,6 +122,13 @@ Jackson equation for `f=z/(1-t*z)`, `z*D_q(f)/f=1/(1-q*t*z)`.
 These source-linked controls (arXiv:2609.26154v1; DOI10.24996/ijs.2026.67.9.22)
 add no new API or global class-optimization claim. No positive-real
 admissibility or arbitrary complex-Schur support follows.
+Batch16 independently checks scaled-exponential starlike jets against the
+integrated defining equation at a nonradial rational Schwarz function, and
+inverse composition through degree4. A generic two-point Mobius kernel and its
+diagonal limit independently anchor the convex solver used for completely
+convex members (arXiv:2610.36737v2 Eq3/4 and arXiv:2607.09925v1 Example2.2).
+No new API is needed; these tests do not certify all-Schwarz optimization,
+source sharpness, arbitrary complex-Schur support, or whole papers.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 
