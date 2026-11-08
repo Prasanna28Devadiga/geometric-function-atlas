@@ -323,3 +323,17 @@ prefilter and discards a trailing odd row or column, so its package parity
 includes accepted odd-sized inputs. Image metrics and transforms are empirical
 statistics and convolutions, not analytic image-domain or conformal-warp
 results.
+
+## Strongly starlike scalar source anchors
+
+Existing Schur member and ordinary logarithm helpers suffice for scalar controls
+of arXiv:2610.20849v1, Theorems5.1,5.3-5.5,7.1 and witnesses6.1/6.2.
+The generator is `((1+z)/(1-z))**alpha`, with the disk-analytic principal branch
+for real0<alpha<=1. Independent tests compose a nonradial rational Schwarz
+function directly, integrate the defining logarithmic derivative and exponentiate;
+they also check the source symmetric/asymmetric jets through a5. The symmetric
+logarithmic Hankel is **-alpha²/4**; its absolute value attains alpha²/4.
+No generic complex-Schur capability or Banach-space lifting proof is inferred.
+The source's two conditional a5 bounds have a genuine applicability gap; finite
+replays must retain an unavailable bound there rather than interpolate one.
+These are additional anchors, not a new production API or whole-paper proof.
