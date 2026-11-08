@@ -45,3 +45,21 @@ its exact B coefficients to existing starlike/convex APIs. Do not call
 `q_starlike_member_coefficients` merely because the title says q-derivative.
 Finite exact jets, sampled comparisons, and attained witnesses are not a
 whole-paper, sharp global upper-bound, or analytic-continuation certificate.
+
+## Jackson convex endpoint: rescale before inverting
+
+For `1+z*D_q(D_q h)/(D_q h)=phi(omega)`, set `F=z*D_q h`.
+The Jackson product rule gives `D_q(zG)=G+q*z*D_q G`, so
+`z*D_q F/F=1+q*(phi(omega)-1)`, **not** `phi(omega)`.
+Multiply every nonconstant generator coefficient by q, obtain F with
+`q_starlike_member_coefficients`, then undo `[n]_q` with
+`q_al_oboudi_coefficients(..., q=q, lam=1, degree=1, inverse=True)`.
+The ordinary Alexander recipe without this generator rescaling is wrong at
+q<1. Generic product-rule and nonradial direct-equation anchors are in
+`tests/test_q_alexander_composition.py`; no new operator API is needed.
+
+Source application: Bayan J. Mohammed and Nafya H. Mohammed, *A New Subclass
+of Univalent Functions Using Chebyshev Polynomials*, JUBPAS34(1),2026,
+Definition1.1 Eq3, delta1 endpoint. Finite jets alone do not prove disk
+analyticity or ordinary univalence. In particular the literal definition asks
+for h in A, not an independently assumed h in S; retain that distinction.
