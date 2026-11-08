@@ -360,3 +360,19 @@ refute that upper theorem. Exact i-rotations and independent differentiation
 anchor the existing APIs. No generalized-FS theorem API, global optimization,
 arbitrary complex-Schur capability, Banach lifting or whole-paper certificate
 is added.
+
+## Elastic and biunivalent whole-function anchors
+
+DOI10.1007/s13324-026-01235-1 Eq17/18 supplies a custom normalized
+square-root generator w_alpha solving
+`alpha*w+(1-alpha)/w=(1+z)/(1-z)`. The branch has w_alpha(0)=1;
+alpha<=0 uses the reciprocal of w_(1-alpha). Existing generator-series and
+starlike-member APIs suffice. Independent substitution anchors these jets at
+alpha0,1,3/2,2,-1, without a new solver or general Banach-space assertion.
+
+The genuine biunivalent functions z/(1-t*z), |t|<=1, have inverse
+w/(1+t*w); exact compositions anchor inverse jets through a5. These controls
+also distinguish the literal inverse and operator-definition discrepancies in
+DOI10.24996/ijs.2026.67.2.30 from unreviewed later class bounds. Source-specific
+Borel arithmetic and rejected advertised witnesses remain campaign evidence,
+not new package APIs or endorsements of source sharpness claims.
