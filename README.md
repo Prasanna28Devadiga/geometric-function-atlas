@@ -83,6 +83,13 @@ Short aliases save typing: `gfa coeffs`, `gfa fs`, `gfa disprove`, and
 generator key earns a `did you mean ...?` suggestion, and witness points may
 use fraction syntax with `--at` (`gfa disprove --coefficients 1 --at=-3/4`).
 
+Low-level exact research helpers also include `inverse_coefficients([a2,...,a5])`
+for formal inverse jets and `schippers_origin([a2,a3,a4])` for the classical
+Schwarzian and next Schippers invariant **at the origin**. They return exact
+SymPy tuples, not global bounds, inverse-domain certificates or disk norms.
+For example, the Koebe jet `[2,3,4,5]` gives inverse `(-2,5,-14,42)`;
+its initial Schippers invariants are `(-6,48)`.
+
 ## Registry snapshot boundary
 
 The package does not bundle the mutable registry database, and no canonical snapshot URL is bundled.

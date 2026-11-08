@@ -52,9 +52,48 @@ def logarithmic_coefficients(coefficients: Sequence[Any]) -> tuple[sp.Expr, ...]
     return tuple(result)
 
 
-def _exact_jet(coefficients: Sequence[Any]) -> list[sp.Expr]:
-    if not 1 <= len(coefficients) <= 3:
-        raise ValueError('supply 1..3 coefficients a2..a4')
+def inverse_coefficients(coefficients: Sequence[Any]) -> tuple[sp.Expr, ...]:
+    """Formal inverse jet [A2,...,A5] from [a2,...,a5], length 1..4.
+
+    Normalization f(0)=0, f'(0)=1 is assumed. The local inverse's unknown tail
+    and domain are not certified; global univalence is not tested. These bounded
+    reversion identities are independently checked by composition in both orders.
+    """
+    values = _exact_jet(coefficients, maximum=4)
+    a = values[0]
+    result = [-a]
+    if len(values) >= 2:
+        b = values[1]
+        result.append(2*a**2-b)
+    if len(values) >= 3:
+        b, c = values[1:3]
+        result.append(-5*a**3+5*a*b-c)
+    if len(values) >= 4:
+        b, c, d = values[1:4]
+        result.append(14*a**4-21*a**2*b+6*a*c+3*b**2-d)
+    return tuple(result)
+
+
+def schippers_origin(coefficients: Sequence[Any]) -> tuple[sp.Expr, ...]:
+    """Return sigma3(0), optionally sigma4(0), from a normalized initial jet.
+
+    Supply exactly [a2,a3] or [a2,a3,a4]. Convention: sigma3 is the classical
+    Schwarzian, sigma_(n+1)=sigma_n'-(n-1)*(f''/f')*sigma_n. Only origin
+    values are returned, not a disk norm, higher operators or a univalence test.
+    """
+    values = _exact_jet(coefficients)
+    if len(values) < 2:
+        raise ValueError('supply 2..3 coefficients a2..a4')
+    a, b = values[:2]
+    result = [6*b-6*a**2]
+    if len(values) == 3:
+        result.append(24*values[2]-72*a*b+48*a**3)
+    return tuple(result)
+
+
+def _exact_jet(coefficients: Sequence[Any], *, maximum: int = 3) -> list[sp.Expr]:
+    if not 1 <= len(coefficients) <= maximum:
+        raise ValueError(f'supply 1..{maximum} coefficients a2..a{maximum+1}')
     values = []
     for value in coefficients:
         if isinstance(value, bool) or not isinstance(value, (int, sp.Expr)):

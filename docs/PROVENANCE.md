@@ -34,6 +34,13 @@ Independent tests directly substitute a rational Schwarz function in the linear
 ODE and compare the ordinary log with a symbolic series (including Koebe).
 Literature applications include DOI 10.5269/bspm.81468 and
 10.63673/SJS.1882993, but the package does not endorse their sharpness claims.
+`inverse_coefficients` returns formal A2..A5 from an exact normalized jet,
+independently checked by composition in both directions and Koebe/Catalan anchors.
+`schippers_origin` returns sigma3(0) and sigma4(0) under Schippers' recurrence,
+independently checked from f''/f' and its derivatives and a Möbius zero anchor.
+Source applications are DOI 10.5644/SJM.22.01.04 (1.12), (2.4) and
+arXiv:2607.26268v1 (1.2)-(1.3). These API-only bounded transforms do not certify
+an inverse domain, global univalence, disk norm or source sharpness claim.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

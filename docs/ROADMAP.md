@@ -25,6 +25,8 @@ Status: shipped.
   Schur recurrence, and signed inverse logarithmic coefficients through Gamma3.
   Exact linear subordinations (1-alpha)f/z+alpha*f'=phi(omega), including
   bounded turning, and ordinary logarithms through gamma3 use the same engine.
+  Formal inverse jets through A5 and Schippers sigma3/sigma4 at the origin
+  have independent composition/differential anchors; disk norms remain out of scope.
   These API-only transforms return bare SymPy tuples; no new theorem/evidence
   envelope or automatic sharp-bound claim is introduced.
 - Classical starlike anchors and JSON-capable CLI.

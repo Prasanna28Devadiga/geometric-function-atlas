@@ -40,9 +40,11 @@ from .classes import (
 )
 from .coefficient_transforms import (
     convex_member_coefficients,
+    inverse_coefficients,
     inverse_logarithmic_coefficients,
     linear_subordination_coefficients,
     logarithmic_coefficients,
+    schippers_origin,
 )
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
 from .contracts import (  # noqa: F401
@@ -220,6 +222,7 @@ __all__ = [
     "get_proof",
     "identify_radius",
     "install_snapshot",
+    "inverse_coefficients",
     "inverse_logarithmic_coefficients",
     "linear_subordination_coefficients",
     "list_artifact_classes",
@@ -239,6 +242,7 @@ __all__ = [
     "registry_snapshot_info",
     "replay_radius_certificate",
     "resolve_plot_object",
+    "schippers_origin",
     "snapshot_info",
     "snapshot_payload",
     "snapshot_verify",
