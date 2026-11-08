@@ -68,6 +68,16 @@ Independent derivative-definition and geometric-function anchors verify the
 convention, including degree0 identity and degree1 Alexander scaling. Source
 application: DOI10.5269/bspm.83160 Definition1.1. Inverse multipliers are not
 functional inverses; no global membership, univalence, tail or bound is certified.
+`q_starlike_member_coefficients` solves the distinct Jackson equation
+z*D_q f/f=phi(omega) for exact rational0<q<=1 (q=1 classical limit),
+reusing real Schur composition and dividing by [n+1]_q-1. The formal solution
+may have disk poles; no global member is inferred from a finite jet.
+`q_ruscheweyh_coefficients` applies/undoes integer-degree q-binomial multipliers
+(degree0..64, jet length1..8); no noninteger q-gamma convention is selected.
+Direct defining-difference substitution, independent finite products, classical
+limit and roundtrip controls anchor both. Source application:
+DOI10.5269/bspm.81781 Definition1.1/1.2. No paper formula, global bound,
+analytic continuation, univalence, tail or theorem certification is endorsed.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

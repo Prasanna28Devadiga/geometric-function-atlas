@@ -214,6 +214,28 @@ Independent differentiation of `z/m! * (z^(m-1)*f)^(m)` anchors the convention.
 This API returns exact tuples only, not global membership, univalence, unknown
 tail, or theorem certification. Source application: DOI10.5269/bspm.83160 (1.4).
 
+### Jackson q-difference jets (low-level API)
+
+`q_starlike_member_coefficients(B, gammas, q=q, order=N)` solves the formal
+coefficient equation `z*D_q f/f=phi(omega)`, where
+`D_q f=(f(z)-f(q*z))/((1-q)*z)`. Exact rational `0<q<=1` is required;
+`q=1` is the ordinary derivative limit. It reuses real Schur composition
+(depth five, order eight, omitted B entries mean a polynomial generator).
+The coefficient divisor is `[n+1]_q-1`, not `n` or `[n]_q`.
+
+`q_ruscheweyh_coefficients(jet, q=q, degree=m, inverse=False)` applies
+`[m+n-1]_q!/([m]_q!*[n-1]_q!)` to a2..a9. Integer degree0..64 only;
+noninteger q-gamma conventions are not implemented. `inverse=True` divides
+multipliers, not functional inversion. At q=1 this equals the ordinary API.
+For example, q=1/2, degree1 maps `[1,1,1]` to `(3/2,7/4,15/8)`.
+Existing exact-expression resource bounds still apply to input jets.
+
+These return bare exact tuples, not global q-starlikeness, analyticity,
+nonvanishing, univalence, bounds, or unknown-tail certificates. In particular,
+the triangular q-difference solution can have poles in the disk; a finite jet
+alone does not establish class membership. Source application:
+DOI10.5269/bspm.81781 Definition1.1/1.2; this does not endorse its formulas.
+
 ### Exact convex jets and inverse logarithms (low-level API)
 
 ```python

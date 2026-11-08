@@ -133,6 +133,62 @@ def ruscheweyh_coefficients(
                  for n, a in enumerate(values, 2))
 
 
+def _exact_q(q: Any) -> sp.Rational:
+    if isinstance(q, bool) or not isinstance(q, (int, sp.Rational)):
+        raise TypeError('q must be a preconstructed exact rational')
+    q = sp.Rational(q)
+    if not 0 < q <= 1:
+        raise ValueError('q must lie in (0,1]; q=1 is the classical limit')
+    return q
+
+
+def q_starlike_member_coefficients(
+    phi_coefficients: Sequence[Any], gammas: Sequence[Any], *, q: Any, order: int,
+) -> tuple[sp.Expr, ...]:
+    """Formal normalized jet solving z*D_q f/f=phi(omega).
+
+    D_q f=(f(z)-f(q*z))/((1-q)*z), with q=1 the ordinary derivative.
+    Exact rational 0<q<=1; composition reuses the bounded real Schur engine
+    (order<=8, depth<=5, missing B entries polynomial). This triangular formal
+    solution does not prove disk analyticity, nonvanishing or global membership:
+    its q-difference equation may introduce poles. No complex-Schur extension,
+    arbitrary q-operator convention, global bound or tail certification.
+    """
+    q = _exact_q(q)
+    composed = [sp.Integer(0)] + list(linear_subordination_coefficients(
+        phi_coefficients, gammas, alpha=0, order=order,
+    ))
+    jet = [sp.Integer(1)]
+    for n in range(1, order+1):
+        denominator = sum(q**k for k in range(1, n+1))  # [n+1]_q - 1
+        jet.append(sp.cancel(sum(composed[k]*jet[n-k] for k in range(1, n+1))
+                             / denominator))
+    return tuple(jet[1:])
+
+
+def q_ruscheweyh_coefficients(
+    coefficients: Sequence[Any], *, q: Any, degree: int, inverse: bool = False,
+) -> tuple[sp.Expr, ...]:
+    """Apply/undo integer q-Ruscheweyh multipliers [m+n-1]_q!/([m]_q![n-1]_q!).
+
+    Exact rational 0<q<=1, integer degree 0..64 and exact a2..a9 jet (length
+    1..8). q=1 is the classical limit. inverse=True undoes multipliers, NOT
+    functional inversion. Noninteger q-gamma conventions are intentionally
+    unsupported. No analytic continuation, univalence or unknown-tail claim.
+    """
+    q = _exact_q(q)
+    # Reuse the ordinary transform's exact jet/degree/inverse validation.
+    ruscheweyh_coefficients(coefficients, degree=degree, inverse=inverse)
+    values = _exact_jet(coefficients, maximum=8)
+    multiplier = sp.Integer(1)
+    result = []
+    for j, value in enumerate(values, 1):
+        multiplier *= (sum(q**k for k in range(degree+j))
+                       / sum(q**k for k in range(j)))
+        result.append(sp.cancel(value/multiplier if inverse else value*multiplier))
+    return tuple(result)
+
+
 def _exact_jet(coefficients: Sequence[Any], *, maximum: int = 3) -> list[sp.Expr]:
     if not 1 <= len(coefficients) <= maximum:
         raise ValueError(f'supply 1..{maximum} coefficients a2..a{maximum+1}')
