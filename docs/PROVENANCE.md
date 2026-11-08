@@ -129,6 +129,12 @@ diagonal limit independently anchor the convex solver used for completely
 convex members (arXiv:2610.36737v2 Eq3/4 and arXiv:2607.09925v1 Example2.2).
 No new API is needed; these tests do not certify all-Schwarz optimization,
 source sharpness, arbitrary complex-Schur support, or whole papers.
+Batch17 anchors scalar specializations of arXiv:2610.13869v1 Theorems1.1/1.2,
+arXiv:2610.15497v1 Theorems2.1/2.3, and arXiv:2610.33031v1 Theorem3.1:
+independent binomial differentiation through a9, genuinely complex rotations of
+symmetric (not Hermitian) Toeplitz determinants, and the nonradial convex
+primitive f'=1/(1-z+z²). Existing APIs suffice. These controls do not extend the
+real-Schur parameter engine or certify higher-dimensional/global bounds.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 
