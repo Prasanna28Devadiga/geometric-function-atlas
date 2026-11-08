@@ -337,3 +337,26 @@ No generic complex-Schur capability or Banach-space lifting proof is inferred.
 The source's two conditional a5 bounds have a genuine applicability gap; finite
 replays must retain an unavailable bound there rather than interpolate one.
 These are additional anchors, not a new production API or whole-paper proof.
+
+## Generalized Fekete–Szegő and scalar Bavrin anchors
+
+Existing starlike/convex jet solvers suffice for selected planar comparisons of
+arXiv:2607.17584v1 (Lemma2.3, Theorems3.1/3.3/4.1),
+DOI10.1007/s11785-026-02039-8 (Theorems7/10) and
+DOI10.1007/s40840-026-02137-y (Theorems2.1/2.2, scalar3.1).
+For the latter, the scalar factor f=F/z is distinct from normalized F;
+L(f)=f+zf' identifies M with starlike F and N with convex F.
+The independent primitive F'=1/(1-z+z²), Schwarz function
+z*(1/2-z)/(1-z/2), has (a2,a3,a4)=(1/2,0,-1/4) and H22=-1/8.
+It anchors the nonradial N extremal through a6 without a new operator API.
+
+For the generalized functional |a3-lambda*a2²|-mu*|a2|, the penalty is signed,
+not clipped to zero. Direct differentiation gives the convex identity
+`a3-lambda*a2²=(b2-(3*lambda/2-1)*b1²)/6`.
+The second source's native p28 proof instead prints `2*lambda/3-1`, which
+fails at the genuine convex F=z/(1-z), lambda1,mu0: 0 versus5/9.
+Its p27 Theorem10(38) uses the correct factor; the local proof error does not
+refute that upper theorem. Exact i-rotations and independent differentiation
+anchor the existing APIs. No generalized-FS theorem API, global optimization,
+arbitrary complex-Schur capability, Banach lifting or whole-paper certificate
+is added.
