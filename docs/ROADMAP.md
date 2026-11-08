@@ -35,6 +35,11 @@ Status: shipped.
     return bounded jets only, and have direct equation/product anchors.
   - `ruscheweyh_coefficients`: apply/undo integer-degree0..64 binomial
     multipliers on exact a2..a9 jets; independent derivative-definition anchors.
+  - `bernardi_coefficients`: normalized integral multiplier (gamma+1)/(gamma+n),
+    gamma rational>=0; `q_al_oboudi_coefficients`: integer-lam1..64
+    [1+(n-1)*lam]_q**degree multipliers, degree0..64, exact rational0<q<=1.
+    Both apply/undo bounded exact jets a2..a9, not functional inversion or
+    a global preservation theorem; independent ODE/integral/Jackson anchors.
   These API-only transforms return bare SymPy tuples; no new theorem/evidence
   envelope or automatic sharp-bound claim is introduced.
 - Classical starlike anchors and JSON-capable CLI.

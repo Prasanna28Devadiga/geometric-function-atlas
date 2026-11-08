@@ -133,6 +133,30 @@ def ruscheweyh_coefficients(
                  for n, a in enumerate(values, 2))
 
 
+def bernardi_coefficients(
+    coefficients: Sequence[Any], *, gamma: Any, inverse: bool = False,
+) -> tuple[sp.Expr, ...]:
+    """Apply/undo I_gamma: a_n -> (gamma+1)*a_n/(gamma+n).
+
+    For exact rational gamma>=0, I_gamma f=(gamma+1)*z**(-gamma)
+    integral_0^z t**(gamma-1)*f(t) dt, defined equivalently by its normalized
+    power series. Accepts exact jets a2..a9, length1..8. inverse=True solves
+    z*F'+gamma*F=(gamma+1)*f coefficientwise; it is not functional inversion.
+    No univalence, preservation theorem, unknown tail or global bound claim.
+    """
+    if isinstance(gamma, bool) or not isinstance(gamma, (int, sp.Rational)):
+        raise TypeError('gamma must be an exact rational')
+    gamma = sp.Rational(gamma)
+    if gamma < 0:
+        raise ValueError('gamma must be nonnegative')
+    if not isinstance(inverse, bool):
+        raise TypeError('inverse must be boolean')
+    values = _exact_jet(coefficients, maximum=8)
+    return tuple(sp.cancel(a*(gamma+n)/(gamma+1) if inverse
+                           else a*(gamma+1)/(gamma+n))
+                 for n, a in enumerate(values, 2))
+
+
 def _exact_q(q: Any) -> sp.Rational:
     if isinstance(q, bool) or not isinstance(q, (int, sp.Rational)):
         raise TypeError('q must be a preconstructed exact rational')
@@ -140,6 +164,36 @@ def _exact_q(q: Any) -> sp.Rational:
     if not 0 < q <= 1:
         raise ValueError('q must lie in (0,1]; q=1 is the classical limit')
     return q
+
+
+def q_al_oboudi_coefficients(
+    coefficients: Sequence[Any], *, q: Any, lam: int, degree: int,
+    inverse: bool = False,
+) -> tuple[sp.Expr, ...]:
+    """Apply/undo [1+(n-1)*lam]_q**degree on an exact a2..a9 jet.
+
+    This is the multiplier definition of the q-Al-Oboudi operator, not
+    (1+lam*([n]_q-1))**degree and not [n*lam]_q**degree. Integer lam1..64
+    and degree0..64 only; exact rational0<q<=1 (q1 classical limit).
+    lam1 gives the iterated Jackson Euler operator (z*D_q)**degree.
+    inverse=True divides multipliers; no functional inverse, disk membership,
+    global bound, unknown-tail or noninteger-lam convention is inferred.
+    """
+    q = _exact_q(q)
+    if isinstance(lam, bool) or not isinstance(lam, (int, sp.Integer)):
+        raise TypeError('lam must be an exact integer')
+    if not 1 <= lam <= 64:
+        raise ValueError('lam must lie in 1..64')
+    # Share degree, inverse and exact-jet admission with the ordinary multiplier.
+    ruscheweyh_coefficients(coefficients, degree=degree, inverse=inverse)
+    values = _exact_jet(coefficients, maximum=8)
+    result = []
+    for n, value in enumerate(values, 2):
+        power = 1+(n-1)*lam
+        number = sp.Integer(power) if q == 1 else (1-q**power)/(1-q)
+        multiplier = number**degree
+        result.append(sp.cancel(value/multiplier if inverse else value*multiplier))
+    return tuple(result)
 
 
 def q_starlike_member_coefficients(

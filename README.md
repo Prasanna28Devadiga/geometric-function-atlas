@@ -163,6 +163,27 @@ symbols are rejected. Caller definitions receive a collision-safe canonical
 identity of the form `user:<key>:<SHA-256 of exact formula>` in exported
 records; reusing a catalog key cannot impersonate the built-in object.
 
+### Bernardi and integer-parameter q-Al-Oboudi multipliers (low-level API)
+
+`bernardi_coefficients(jet, gamma=g, inverse=False)` applies
+`a_n -> (g+1)*a_n/(g+n)` for exact rational `g>=0`, on one to eight exact
+coefficients `a2..a9`. This is the normalized Bernardi integral
+`I_g f=(g+1)*z**(-g)*integral_0^z t**(g-1)*f(t) dt`, equivalently defined
+by its series. The identity `z*F'+g*F=(g+1)*f` anchors the convention;
+`g=0` gives `integral_0^z f(t)/t dt`, not `f`.
+
+`q_al_oboudi_coefficients(jet, q=q, lam=L, degree=m, inverse=False)`
+applies `[1+(n-1)*L]_q**m`, **not** `[n*L]_q**m` or
+`(1+L*([n]_q-1))**m`. Parameters are exact rational `0<q<=1`, integer
+`L=1..64`, integer `m=0..64`, and one to eight exact coefficients. At `L=1`
+this is the iterated Jackson Euler operator; `q=1` is the classical limit.
+Noninteger lambda is deliberately unsupported. Both inverses divide the
+multipliers; neither means functional inversion. Both return bare exact tuples,
+not global membership, preservation, univalence, tail or bound certificates.
+Source applications: DOI10.36948/ijfmr.2026.v08i05.89311, Definition2.3 Eq(2)-(3),
+and DOI10.5269/bspm.79733
+Eq(1.3)-(1.5). Formula discrepancies in either paper are not endorsed.
+
 ### Linear subordinations and ordinary logarithms (low-level API)
 
 `linear_subordination_coefficients(B, gammas, alpha=alpha, order=N)` returns

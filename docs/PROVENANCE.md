@@ -78,6 +78,17 @@ Direct defining-difference substitution, independent finite products, classical
 limit and roundtrip controls anchor both. Source application:
 DOI10.5269/bspm.81781 Definition1.1/1.2. No paper formula, global bound,
 analytic continuation, univalence, tail or theorem certification is endorsed.
+`bernardi_coefficients` applies/undoes the normalized integral multipliers
+(gamma+1)/(gamma+n), exact rational gamma>=0, jets a2..a9. Independent direct
+integration and zF'+gamma*F=(gamma+1)*f anchor the convention.
+`q_al_oboudi_coefficients` applies/undoes [1+(n-1)*lam]_q**degree for integer
+lam1..64, degree0..64, exact rational0<q<=1. This is not [n*lam]_q**degree
+or a linear combination of q-integers. Independent Jackson monomial differences,
+lam1 operator iterations and classical-limit controls anchor the implementation.
+Both are bare bounded tuple APIs, not global preservation, analyticity,
+univalence, functional inversion, unknown-tail or source-bound certificates.
+Sources: DOI10.36948/ijfmr.2026.v08i05.89311 Definition2.3 Eq(2)-(3), and
+DOI10.5269/bspm.79733 Eq(1.3)-(1.5). Noninteger lambda is deliberately unsupported.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

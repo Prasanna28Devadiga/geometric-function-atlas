@@ -39,6 +39,7 @@ from .classes import (
     list_classes,
 )
 from .coefficient_transforms import (
+    bernardi_coefficients,
     convex_member_coefficients,
     inverse_coefficients,
     inverse_logarithmic_coefficients,
@@ -46,6 +47,7 @@ from .coefficient_transforms import (
     logarithmic_coefficients,
     mixed_derivative_coefficients,
     product_subordination_coefficients,
+    q_al_oboudi_coefficients,
     q_ruscheweyh_coefficients,
     q_starlike_member_coefficients,
     ruscheweyh_coefficients,
@@ -206,6 +208,7 @@ __all__ = [
     "WitnessSearchResult",
     "__version__",
     "audit_radius",
+    "bernardi_coefficients",
     "build_screen_record",
     "citation_export",
     "citation_formats",
@@ -243,6 +246,7 @@ __all__ = [
     "parse_exact_expression",
     "plot_object_coefficients",
     "product_subordination_coefficients",
+    "q_al_oboudi_coefficients",
     "q_ruscheweyh_coefficients",
     "q_starlike_member_coefficients",
     "radius",
