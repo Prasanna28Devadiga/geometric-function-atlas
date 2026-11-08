@@ -21,6 +21,10 @@ Status: shipped.
 - Exact Taylor coefficients `B_1, …, B_n` via `generator_series`.
 - Exact Ma–Minda Fekete–Szegő constants under declared assumptions via
   `fekete_szego`.
+- Bounded low-level exact convex member jets via Alexander + the existing real
+  Schur recurrence, and signed inverse logarithmic coefficients through Gamma3.
+  These API-only transforms return bare SymPy tuples; no new theorem/evidence
+  envelope or automatic sharp-bound claim is introduced.
 - Classical starlike anchors and JSON-capable CLI.
 
 ## Function verification, class screens, and witness replay

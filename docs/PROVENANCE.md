@@ -18,7 +18,15 @@ The versioned schema and fail-closed check semantics are specified in
 `src/geometric_function_atlas/schema/`.
 
 Low-level exact helpers may return bare SymPy expressions or tuples for use in
-other symbolic programs. Their structured counterparts (`generator_series`,
+other symbolic programs. `convex_member_coefficients` and
+`inverse_logarithmic_coefficients` are bounded jet transforms in that category:
+Alexander's identity reuses the existing Schur recurrence; inverse logarithms
+use formal reversion through degree four. Anchors include the classical convex
+function z/(1-z), the odd function atanh(z), and the source-linked apple-like
+extremal from arXiv:2606.15780v1 (3.1)-(3.3). Exact attained coefficients do not
+validate a sharp global bound, the paper's complete theorem, or an unknown
+tail. They do not modify frozen artifacts or emit evidence/CLI envelopes.
+Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 
 ## Evidence statuses

@@ -38,6 +38,10 @@ from .classes import (
     class_member_screen,
     list_classes,
 )
+from .coefficient_transforms import (
+    convex_member_coefficients,
+    inverse_logarithmic_coefficients,
+)
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
 from .contracts import (  # noqa: F401
     RESULT_SCHEMA_VERSION,
@@ -203,6 +207,7 @@ __all__ = [
     "coefficient_bound",
     "coefficient_table",
     "conformal_grid",
+    "convex_member_coefficients",
     "expansion",
     "fekete_szego",
     "find_counterexample",
@@ -213,6 +218,7 @@ __all__ = [
     "get_proof",
     "identify_radius",
     "install_snapshot",
+    "inverse_logarithmic_coefficients",
     "list_artifact_classes",
     "list_classes",
     "list_generators",

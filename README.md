@@ -152,6 +152,43 @@ symbols are rejected. Caller definitions receive a collision-safe canonical
 identity of the form `user:<key>:<SHA-256 of exact formula>` in exported
 records; reusing a catalog key cannot impersonate the built-in object.
 
+### Exact convex jets and inverse logarithms (low-level API)
+
+```python
+import sympy as sp
+from geometric_function_atlas import (
+    Generator, convex_member_coefficients, generator_series,
+    inverse_logarithmic_coefficients, z,
+)
+
+apple = Generator(key="apple", name="Apple-like", expression=sp.exp(z)*sp.sqrt(1+z),
+                  citation="arXiv:2606.15780v1, Theorem 3.1, equations (3.1)-(3.3)")
+B = generator_series(apple, order=3).coefficients
+jet = convex_member_coefficients(B, [1], order=3)  # omega(z)=z
+assert jet == (sp.Rational(3,4), sp.Rational(25,48), sp.Rational(385,1152))
+assert inverse_logarithmic_coefficients(jet) == (
+    -sp.Rational(3,8), sp.Rational(31,192), -sp.Rational(205,2304),
+)
+```
+
+`convex_member_coefficients` reuses the bounded Schur recurrence and Alexander's
+identity, returning `[a2,...,a_(order+1)]` for `1+zf''/f'=phi(omega)`.
+Schur parameters are exact **real rationals**, not arbitrary complex parameters;
+order is at most eight, depth at most five. Supply every `B1..B_order` for a
+nonpolynomial generator. Missing entries have the existing polynomial-generator
+meaning, not an unknown-tail guarantee. Admissibility of a custom generator is
+not certified by this transform.
+
+`inverse_logarithmic_coefficients([a2,...])` accepts one to three preconstructed
+exact coefficients and returns signed `Gamma1..Gamma3` under the convention
+`log(f^(-1)(w)/w)=2*sum(Gamma_n*w^n)`. It rejects strings, floats, infinities,
+and booleans. Symbolic coefficients are permitted. Formal local reversion does
+not prove global univalence or a disk of inversion. Both operations return bare
+SymPy tuples (no CLI envelope), as permitted for low-level exact helpers; they
+compute finite jets, not full Taylor polynomials, sharp bounds, or source-paper
+validation. Keep source/page/PDF hashes and theorem evidence in the caller's
+research manifest. Released snapshots and evidence schemas are unchanged.
+
 ### Exact Fekete–Szegő constants
 
 ```python

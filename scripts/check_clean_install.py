@@ -16,6 +16,12 @@ import json
 import geometric_function_atlas as gfa
 
 assert gfa.__version__
+import sympy as sp
+jet = gfa.convex_member_coefficients([sp.Integer(2)]*3, [1], order=3)
+assert jet == (1,1,1)
+assert gfa.inverse_logarithmic_coefficients(jet) == (
+    -sp.Rational(1,2), sp.Rational(1,4), -sp.Rational(1,6),
+)
 result = gfa.generator_series("sine", order=3).to_dict()
 assert result["schema_version"] == 1
 assert result["verification"]["success"] is True
