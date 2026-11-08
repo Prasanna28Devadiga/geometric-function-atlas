@@ -2,6 +2,15 @@
 
 ## Claim boundary
 
+Independent low-level anchors also cover the exact removable Gregory generator
+`z/log(1+z)` via its binomial-integral coefficients and a nonradial defining
+starlike equation, plus a fourfold half-plane target. Identical image ranges do
+not imply identical coefficient sequences: source comparisons must distinguish
+fixed-target range inclusion from auxiliary-function equality. These anchors
+exercise existing APIs only and do not endorse literature bounds or silently
+repair source definitions (DOI 10.19139/soic-2310-5070-3241 and
+10.31801/cfsuasmas.1637685).
+
 A returned number is not enough. Structured result objects and CLI records identify:
 
 1. the canonical mathematical problem;

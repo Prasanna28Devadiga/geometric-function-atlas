@@ -73,3 +73,48 @@ def test_q_multiplicative_mobius_defining_expression():
         eta1, eta2 = coeffs
         literal17 = -(eta2-eta1**2)-eta1*(q+1)+q+s.Rational(1, 2)
         assert literal17 == jet[1]
+
+
+def test_gregory_removable_generator_integral_anchor():
+    """G(z)=integral_0^1 (1+z)^x dx; no polynomial replacement."""
+    x = s.Symbol('x')
+    G = s.Piecewise((s.Integer(1), s.Eq(z, 0)),
+                    (z/s.log(1+z), True))
+    got = generator_series(Generator(key='gregory-anchor', name='Gregory',
+        expression=G, citation='DOI10.19139/soic-2310-5070-3241 Eq1.1'),
+        order=5).coefficients
+    independent = []
+    for n in range(1, 6):
+        polynomial = s.prod(x-j for j in range(n))/s.factorial(n)
+        independent.append(s.integrate(polynomial, (x, 0, 1)))
+    assert tuple(got) == tuple(independent)
+    # A nonradial Schwarz map guards against correlated coefficient slices.
+    omega = z*(s.Rational(1, 2)-z)/(1-z/2)
+    jet = member_coefficients(got, [s.Rational(1, 2), -1], order=4)
+    f = z + sum(a*z**n for n, a in enumerate(jet, 2))
+    wjet = s.series(omega, z, 0, 5).removeO()
+    rhs = 1 + sum(b*wjet**n for n, b in enumerate(got[:4], 1))
+    assert s.series(z*s.diff(f,z)/f-rhs, z, 0, 5).removeO().expand() == 0
+
+
+def test_fourfold_range_target_is_not_auxiliary_equality():
+    """Same half-plane image does not give equal coefficient sequences."""
+    target = (1+z**4)/(1-z**4)
+    coeffs = generator_series(Generator(key='fourfold-halfplane-anchor',
+        name='Fourfold half-plane', expression=target,
+        citation='Literal fixed-target control, DOI10.31801/cfsuasmas.1637685'),
+        order=4).coefficients
+    assert tuple(coeffs) == (0, 0, 0, 2)
+    for t in [s.Rational(1, 2), s.I/2]:
+        f = z/(1-t*z)
+        g = z/(1+t*z)
+        assert s.cancel(f.subs(z,g)-z) == 0
+        assert s.cancel(g.subs(z,f)-z) == 0
+        h = s.cancel(z*s.diff(f,z)/f)
+        p = s.cancel(z*s.diff(g,z)/g)
+        assert s.cancel(h-1/(1-t*z)) == 0
+        assert s.cancel(p-1/(1+t*z)) == 0
+        # Their Cayley maps have |omega| <= |t|/(2-|t|) < 1;
+        # composing target with a fourth root is not an analytic disk lift.
+        assert abs(t)/(2-abs(t)) < 1
+        assert s.series(h-target,z,0,2).removeO().expand().coeff(z,1) == t
