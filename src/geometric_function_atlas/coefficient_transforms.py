@@ -157,6 +157,28 @@ def bernardi_coefficients(
                  for n, a in enumerate(values, 2))
 
 
+def euler_differential_coefficients(
+    coefficients: Sequence[Any], *, second: Any, first: Any, inverse: bool = False,
+) -> tuple[sp.Expr, ...]:
+    """Apply/undo jets of second*z²*f''+first*z*f'+(1-first)*f.
+
+    Exact rational first and second; accepts a2..a9, length1..8. Normalization
+    is preserved. Inverse divides nonzero multipliers, not functional inversion.
+    Bare finite algebra, not analytic membership or preservation.
+    """
+    for parameter in (second, first):
+        if isinstance(parameter, bool) or not isinstance(parameter, (int, sp.Rational)):
+            raise TypeError('Euler parameters must be exact rationals')
+    if not isinstance(inverse, bool):
+        raise TypeError('inverse must be boolean')
+    values = _exact_jet(coefficients, maximum=8)
+    multipliers = [1+first*(n-1)+second*n*(n-1) for n in range(2, len(values)+2)]
+    if inverse and any(multiplier == 0 for multiplier in multipliers):
+        raise ValueError('cannot invert a zero Euler multiplier')
+    return tuple(sp.cancel(value/multiplier if inverse else value*multiplier)
+                 for value, multiplier in zip(values, multipliers, strict=True))
+
+
 def _exact_q(q: Any) -> sp.Rational:
     if isinstance(q, bool) or not isinstance(q, (int, sp.Rational)):
         raise TypeError('q must be a preconstructed exact rational')

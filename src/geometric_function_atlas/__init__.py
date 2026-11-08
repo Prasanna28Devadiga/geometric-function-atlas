@@ -41,6 +41,7 @@ from .classes import (
 from .coefficient_transforms import (
     bernardi_coefficients,
     convex_member_coefficients,
+    euler_differential_coefficients,
     inverse_coefficients,
     inverse_logarithmic_coefficients,
     linear_subordination_coefficients,
@@ -221,6 +222,7 @@ __all__ = [
     "coefficient_table",
     "conformal_grid",
     "convex_member_coefficients",
+    "euler_differential_coefficients",
     "expansion",
     "fekete_szego",
     "find_counterexample",

@@ -89,6 +89,15 @@ Both are bare bounded tuple APIs, not global preservation, analyticity,
 univalence, functional inversion, unknown-tail or source-bound certificates.
 Sources: DOI10.36948/ijfmr.2026.v08i05.89311 Definition2.3 Eq(2)-(3), and
 DOI10.5269/bspm.79733 Eq(1.3)-(1.5). Noninteger lambda is deliberately unsupported.
+`euler_differential_coefficients` applies/undoes the normalized expression
+`a*z²*f''+b*z*f'+(1-b)*f`, exact rational a,b, jets a2..a9. Inverse mode
+rejects zero multipliers and is not functional inversion. Generic symbolic
+polynomial differentiation and singular/roundtrip guards anchor the convention.
+Source: DOI10.47772/IJRISS.2026.100300432 Eq8/10; the ambiguous earlier generalized
+operator is not endorsed. This bounded API proves no global membership or bound.
+A separate q-Al-Oboudi audit checks nonunit integer lambda by the polynomial
+conjugacy `P_lambda T=(z*D_q) P_lambda`, where `P_lambda f=z^(1-lambda)*f(z^lambda)`.
+No mismatch was found; neither a real-lambda extension nor paper endorsement follows.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

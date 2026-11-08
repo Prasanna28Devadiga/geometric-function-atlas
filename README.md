@@ -172,6 +172,15 @@ coefficients `a2..a9`. This is the normalized Bernardi integral
 by its series. The identity `z*F'+g*F=(g+1)*f` anchors the convention;
 `g=0` gives `integral_0^z f(t)/t dt`, not `f`.
 
+`euler_differential_coefficients(jet, second=a, first=b, inverse=False)`
+applies the normalized Euler differential expression `a*z**2*f''+b*z*f'+(1-b)*f`
+with exact rational a,b to a2..a9 (length1..8). Inverse mode divides the
+multipliers `1+b*(n-1)+a*n*(n-1)` and rejects a zero multiplier, even for a zero
+input coefficient. This is coefficientwise inversion, not functional inversion,
+analytic continuation, univalence, preservation or a global bound. Generic
+polynomial differentiation independently anchors the convention; a literature
+application is DOI10.47772/IJRISS.2026.100300432 Eq8/10 at m0.
+
 `q_al_oboudi_coefficients(jet, q=q, lam=L, degree=m, inverse=False)`
 applies `[1+(n-1)*L]_q**m`, **not** `[n*L]_q**m` or
 `(1+L*([n]_q-1))**m`. Parameters are exact rational `0<q<=1`, integer

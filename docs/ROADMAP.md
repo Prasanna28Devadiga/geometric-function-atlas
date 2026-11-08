@@ -40,6 +40,10 @@ Status: shipped.
     [1+(n-1)*lam]_q**degree multipliers, degree0..64, exact rational0<q<=1.
     Both apply/undo bounded exact jets a2..a9, not functional inversion or
     a global preservation theorem; independent ODE/integral/Jackson anchors.
+  - `euler_differential_coefficients`: normalized quadratic Euler expression,
+    exact rational parameters, apply/undo a2..a9 jets with zero-divisor refusal.
+    Direct generic differentiation anchors Eq8/10 of DOI10.47772/IJRISS.2026.100300432;
+    no generalized-operator repair or global preservation inference.
   These API-only transforms return bare SymPy tuples; no new theorem/evidence
   envelope or automatic sharp-bound claim is introduced.
 - Classical starlike anchors and JSON-capable CLI.
