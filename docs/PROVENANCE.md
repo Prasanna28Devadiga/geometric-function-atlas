@@ -104,6 +104,12 @@ substitution anchor the composite without adding another mathematical engine;
 see [the bounded composition workflow](workflows/composed-operators.md).
 Interior-beta formal algebra does not certify disk membership. A q-exponential
 source generator does not by itself change ordinary derivatives to Jackson ones.
+The existing convex jet solver also accepts negative and exact complex generator
+coefficients: it solves an equation without asserting that the member is convex.
+A direct rational nonradial substitution and sign-mutation control anchor this
+reuse for arXiv:2603.16388v1; see the
+[rotated-halfplane workflow](workflows/rotated-halfplane-jets.md). No positive-real
+admissibility or arbitrary complex-Schur support follows.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 
