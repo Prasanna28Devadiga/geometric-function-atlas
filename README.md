@@ -169,7 +169,8 @@ the existing starlike recurrence rather than maintaining another Schur engine.
 Real rational Schur parameters, depth five, order eight, polynomial treatment
 of omitted B entries, and caller-owned analytic hypotheses are unchanged.
 
-`logarithmic_coefficients([a2,a3,a4])` returns signed gamma1..gamma3 with
+`logarithmic_coefficients([a2,...,a5])` accepts one to four exact coefficients
+and returns the corresponding signed gamma1..gamma4 with
 `log(f(z)/z)=2 sum gamma_n*z^n`. For example:
 
 ```python
@@ -210,8 +211,8 @@ nonpolynomial generator. Missing entries have the existing polynomial-generator
 meaning, not an unknown-tail guarantee. Admissibility of a custom generator is
 not certified by this transform.
 
-`inverse_logarithmic_coefficients([a2,...])` accepts one to three preconstructed
-exact coefficients and returns signed `Gamma1..Gamma3` under the convention
+`inverse_logarithmic_coefficients([a2,...])` accepts one to four preconstructed
+exact coefficients and returns signed `Gamma1..Gamma4` under the convention
 `log(f^(-1)(w)/w)=2*sum(Gamma_n*w^n)`. It rejects strings, floats, infinities,
 and booleans. Symbolic coefficients are permitted. Formal local reversion does
 not prove global univalence or a disk of inversion. Both operations return bare

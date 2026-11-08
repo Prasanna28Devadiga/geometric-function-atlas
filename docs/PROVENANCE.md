@@ -21,7 +21,7 @@ Low-level exact helpers may return bare SymPy expressions or tuples for use in
 other symbolic programs. `convex_member_coefficients` and
 `inverse_logarithmic_coefficients` are bounded jet transforms in that category:
 Alexander's identity reuses the existing Schur recurrence; inverse logarithms
-use formal reversion through degree four. Anchors include the classical convex
+use formal reversion through degree five. Anchors include the classical convex
 function z/(1-z), the odd function atanh(z), and the source-linked apple-like
 extremal from arXiv:2606.15780v1 (3.1)-(3.3). Exact attained coefficients do not
 validate a sharp global bound, the paper's complete theorem, or an unknown
@@ -29,7 +29,7 @@ tail. They do not modify frozen artifacts or emit evidence/CLI envelopes.
 `linear_subordination_coefficients` additionally recovers phi(omega)-1 from
 that same recurrence and divides coefficient n by 1+n*alpha for
 (1-alpha)f/z+alpha*f'=phi(omega), alpha rational in [0,1].
-`logarithmic_coefficients` expands the formal near-zero logarithm through gamma3.
+`logarithmic_coefficients` expands the formal near-zero logarithm through gamma4.
 Independent tests directly substitute a rational Schwarz function in the linear
 ODE and compare the ordinary log with a symbolic series (including Koebe).
 Literature applications include DOI 10.5269/bspm.81468 and
@@ -41,6 +41,11 @@ independently checked from f''/f' and its derivatives and a Möbius zero anchor.
 Source applications are DOI 10.5644/SJM.22.01.04 (1.12), (2.4) and
 arXiv:2607.26268v1 (1.2)-(1.3). These API-only bounded transforms do not certify
 an inverse domain, global univalence, disk norm or source sharpness claim.
+Their fourth-order entries have independent symbolic-log and recursive inverse
+composition tests through degree five, plus Koebe and Möbius anchors. Source
+applications include DOI 10.24193/subbmath.2026.1.06 (1.6), (2.5) and
+10.64721/240cr737 (11). Source formula discrepancies remain caller-owned evidence;
+these algebraic transforms do not endorse a paper's global upper bounds.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

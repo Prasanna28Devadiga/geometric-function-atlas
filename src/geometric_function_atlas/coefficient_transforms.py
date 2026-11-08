@@ -16,15 +16,15 @@ from .schur import member_coefficients
 
 
 def inverse_logarithmic_coefficients(coefficients: Sequence[Any]) -> tuple[sp.Expr, ...]:
-    """Return Gamma1..Gamma3 of log(f^{-1}(w)/w)=2*sum Gamma_n*w^n.
+    """Return Gamma1..Gamma4 of log(f^{-1}(w)/w)=2*sum Gamma_n*w^n.
 
-    Input is the complete initial jet [a2,...], of length 1..3. Returns exact
+    Input is the complete initial jet [a2,...], of length 1..4. Returns exact
     signed coefficients, not absolute values, global bounds or inverse-disk
     certification. Formal reversion only needs f'(0)=1; analytic inversion
     requires local analyticity, and the radius 1/4 additionally needs univalence
     in the unit disk. No formula strings or binary floats are evaluated.
     """
-    values = _exact_jet(coefficients)
+    values = _exact_jet(coefficients, maximum=4)
     a = values[0]
     result = [-a / 2]
     if len(values) >= 2:
@@ -33,22 +33,28 @@ def inverse_logarithmic_coefficients(coefficients: Sequence[Any]) -> tuple[sp.Ex
     if len(values) >= 3:
         b, c = values[1:3]
         result.append(-5*a**3/3+2*a*b-c/2)
+    if len(values) >= 4:
+        b, c, d = values[1:4]
+        result.append(35*a**4/8-15*a**2*b/2+5*a*c/2+5*b**2/4-d/2)
     return tuple(result)
 
 
 def logarithmic_coefficients(coefficients: Sequence[Any]) -> tuple[sp.Expr, ...]:
-    """Signed gamma1..gamma3 for log(f(z)/z)=2*sum gamma_n*z^n.
+    """Signed gamma1..gamma4 for log(f(z)/z)=2*sum gamma_n*z^n.
 
-    Exact initial jet [a2,...] of length 1..3. Formal near-zero logarithm only;
+    Exact initial jet [a2,...] of length 1..4. Formal near-zero logarithm only;
     no global nonvanishing, bound, univalence or unknown-tail guarantee.
     """
-    values = _exact_jet(coefficients)
+    values = _exact_jet(coefficients, maximum=4)
     a = values[0]
     result = [a/2]
     if len(values) >= 2:
         result.append(values[1]/2-a**2/4)
     if len(values) >= 3:
         result.append(values[2]/2-a*values[1]/2+a**3/6)
+    if len(values) >= 4:
+        b, c, d = values[1:4]
+        result.append(d/2-a*c/2+a**2*b/2-b**2/4-a**4/8)
     return tuple(result)
 
 

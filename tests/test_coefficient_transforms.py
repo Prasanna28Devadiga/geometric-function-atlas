@@ -11,7 +11,7 @@ def test_logarithms_independent_series():
     expected = sp.series(sp.log(1+a*z+b*z**2+c*z**3)/2,z,0,4).removeO().expand()
     assert gfa.logarithmic_coefficients([a,b,c]) == tuple(expected.coeff(z,n) for n in range(1,4))
     assert gfa.logarithmic_coefficients([2,3,4]) == (1,sp.Rational(1,2),sp.Rational(1,3))
-    for bad in ([], [1]*4, [True], [sp.Float('0.1')], ['1/2'], [sp.oo]):
+    for bad in ([], [1]*5, [True], [sp.Float('0.1')], ['1/2'], [sp.oo]):
         with pytest.raises((TypeError,ValueError)):
             gfa.logarithmic_coefficients(bad)
 
@@ -80,4 +80,4 @@ def test_inverse_logarithms_composition_and_rejections():
         with pytest.raises((TypeError,ValueError)):
             gfa.inverse_logarithmic_coefficients(invalid)
     with pytest.raises(ValueError):
-        gfa.inverse_logarithmic_coefficients([1]*4)
+        gfa.inverse_logarithmic_coefficients([1]*5)
