@@ -46,6 +46,7 @@ from .coefficient_transforms import (
     logarithmic_coefficients,
     mixed_derivative_coefficients,
     product_subordination_coefficients,
+    ruscheweyh_coefficients,
     schippers_origin,
     schwarzian_derivative_origin,
 )
@@ -247,6 +248,7 @@ __all__ = [
     "registry_snapshot_info",
     "replay_radius_certificate",
     "resolve_plot_object",
+    "ruscheweyh_coefficients",
     "schippers_origin",
     "schwarzian_derivative_origin",
     "snapshot_info",

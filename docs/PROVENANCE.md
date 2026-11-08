@@ -62,6 +62,12 @@ univalence. No theorem, global bound, unknown tail or source sharpness is endors
 anchored by differentiating (f''/f')'-(f''/f')²/2 and by Koebe/Mobius tests.
 Source application: arXiv:2606.03433v1 (2), Theorems1-3. This is local algebra,
 not a disk norm, global bound, or source-paper certification.
+`ruscheweyh_coefficients` applies or undoes the exact integer-degree coefficient
+multiplier binomial(m+n-1,n-1), bounded to degree0..64 and jets a2..a9.
+Independent derivative-definition and geometric-function anchors verify the
+convention, including degree0 identity and degree1 Alexander scaling. Source
+application: DOI10.5269/bspm.83160 Definition1.1. Inverse multipliers are not
+functional inverses; no global membership, univalence, tail or bound is certified.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

@@ -203,6 +203,17 @@ For example, a Koebe base `[2,3,4]`, sine B=`[1,0,-Rational(1,6)]` and `[1]`
 Both reuse real Schur composition, with depth five/order eight, return exact
 bare tuples and certify no global bound, univalence, unknown tail or theorem.
 
+### Ruscheweyh coefficient multipliers (low-level API)
+
+`ruscheweyh_coefficients([a2,...,a9], degree=m, inverse=False)` applies
+`D^m f = z + sum binomial(m+n-1,n-1)*a_n*z^n` to a nonempty exact jet
+of length at most eight, for integer `0 <= m <= 64`. `inverse=True` divides
+by those multipliers; it is **not functional inversion**. For example,
+`ruscheweyh_coefficients([1,1,1], degree=2)` returns `(3,6,10)`.
+Independent differentiation of `z/m! * (z^(m-1)*f)^(m)` anchors the convention.
+This API returns exact tuples only, not global membership, univalence, unknown
+tail, or theorem certification. Source application: DOI10.5269/bspm.83160 (1.4).
+
 ### Exact convex jets and inverse logarithms (low-level API)
 
 ```python

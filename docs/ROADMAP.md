@@ -33,6 +33,8 @@ Status: shipped.
     distinct from the linear class; `product_subordination_coefficients`:
     exact normalized base times phi(omega). Both reuse real Schur composition,
     return bounded jets only, and have direct equation/product anchors.
+  - `ruscheweyh_coefficients`: apply/undo integer-degree0..64 binomial
+    multipliers on exact a2..a9 jets; independent derivative-definition anchors.
   These API-only transforms return bare SymPy tuples; no new theorem/evidence
   envelope or automatic sharp-bound claim is introduced.
 - Classical starlike anchors and JSON-capable CLI.

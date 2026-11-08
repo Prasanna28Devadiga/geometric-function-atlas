@@ -111,6 +111,28 @@ def schwarzian_derivative_origin(coefficients: Sequence[Any]) -> sp.Expr:
     return 24*(c-2*a*b+a**3)
 
 
+def ruscheweyh_coefficients(
+    coefficients: Sequence[Any], *, degree: int, inverse: bool = False,
+) -> tuple[sp.Expr, ...]:
+    """Apply or undo D^degree on an exact normalized initial jet a2..a9.
+
+    D^m multiplies a_n by binomial(m+n-1,n-1). Degree is an integer 0..64;
+    inverse=True divides by that multiplier, not functional inversion. Input
+    length is 1..8; no omitted tail is declared zero. Local coefficient algebra
+    only: no univalence, analytic continuation or global class certification.
+    """
+    if isinstance(degree, bool) or not isinstance(degree, (int, sp.Integer)):
+        raise TypeError('degree must be an exact integer')
+    if not 0 <= degree <= 64:
+        raise ValueError('degree must lie in 0..64')
+    if not isinstance(inverse, bool):
+        raise TypeError('inverse must be boolean')
+    values = _exact_jet(coefficients, maximum=8)
+    return tuple(sp.cancel(a/sp.binomial(degree+n-1, n-1) if inverse
+                           else a*sp.binomial(degree+n-1, n-1))
+                 for n, a in enumerate(values, 2))
+
+
 def _exact_jet(coefficients: Sequence[Any], *, maximum: int = 3) -> list[sp.Expr]:
     if not 1 <= len(coefficients) <= maximum:
         raise ValueError(f'supply 1..{maximum} coefficients a2..a{maximum+1}')
