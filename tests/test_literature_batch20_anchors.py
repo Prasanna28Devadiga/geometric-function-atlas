@@ -4,6 +4,8 @@ import sympy as s
 from geometric_function_atlas import (
     Generator,
     bernardi_coefficients,
+    convex_member_coefficients,
+    euler_differential_coefficients,
     generator_series,
     inverse_coefficients,
     product_subordination_coefficients,
@@ -141,3 +143,22 @@ def test_wright_hypergeometric_ode_and_integral_anchor():
         f = z+sum(a*z**k for k, a in enumerate(jet, 2))
         F = z+sum(a*z**k for k, a in enumerate(integral, 2))
         assert s.simplify(z*s.diff(F, z)-f) == 0
+
+
+def test_shifted_primitive_composition_preserves_nonnormalized_origin():
+    """Euler+Bernardi handles z^k*h' without inventing a harmonic solver."""
+    a2, a3, a4, a5 = s.symbols('a2 a3 a4 a5')
+    generic = (a2, a3, a4, a5)
+    nonradial = convex_member_coefficients([2]*4, [s.Rational(1, 2), -1], order=4)
+    for jet in [generic, nonradial]:
+        h = z + sum(c*z**n for n, c in enumerate(jet, 2))
+        E = euler_differential_coefficients(jet, second=0, first=1)
+        for degree, scale in [(1, s.Integer(1)), (2, s.Rational(1, 3))]:
+            transformed = bernardi_coefficients(E, gamma=degree)
+            G = scale*z**(degree+1)/(degree+1) * (
+                1 + sum(c*z**n for n, c in enumerate(transformed, 1)))
+            assert s.expand(s.diff(G, z)-scale*z**degree*s.diff(h, z)) == 0
+            assert G.subs(z, 0) == 0
+            assert s.diff(G, z).subs(z, 0) == 0
+            independent = s.integrate(scale*z**degree*s.diff(h, z), z)
+            assert s.expand(G-independent) == 0
