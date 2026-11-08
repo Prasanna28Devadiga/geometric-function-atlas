@@ -418,3 +418,15 @@ the Bernardi ODE anchor the conventions. Sources: DOI10.36753/mathenot.1838201
 Eq1.2 and DOI10.28924/2291-8639-24-2026-333 Eq1.4. Error-image attainment,
 signed-weight coefficient claims and literal-versus-repaired Pascal notation
 remain source-specific campaign comparisons, not package theorem claims.
+
+Batch26 independently anchors normalized Cesàro composition without a new API:
+apply the existing product-subordination operation with `1/(1-z)`, then
+Bernardi at gamma1. The result satisfies `(z*F)'=2*h/(1-z)` for arbitrary
+independent symbolic coefficients. Subtract the normalized baseline for a
+coanalytic component whose first derivative is zero. Existing quadratic Euler
+multipliers followed by ordinary differentiation recover
+`F'+lambda*z*F''+delta*z²*F'''` with `second=delta,first=lambda-2*delta`.
+Source: DOI10.34198/ejms.16626.75.11831199 Eq3/8, Theorems3.1/3.3/3.5.
+Source-specific sufficient radii and literal signed coanalytic bounds from
+arXiv:2602.13613v1 remain campaign evidence, not harmonic solver APIs,
+sharp-radius claims or whole-paper certifications.

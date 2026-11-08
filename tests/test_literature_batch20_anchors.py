@@ -197,3 +197,25 @@ def test_pascal_generator_direct_rational_and_bernardi_ode():
         I = z+sum(a*z**n for n, a in enumerate(
             bernardi_coefficients(jet, gamma=0), 2))
         assert s.expand(z*s.diff(I, z)-F) == 0
+
+
+def test_normalized_cesaro_composition_independent_generic_ode():
+    """Product+Bernardi gamma1 is 2C, not C or an unnormalized coanalytic map."""
+    a2, a3, a4, a5 = s.symbols('a2 a3 a4 a5')
+    jet = (a2, a3, a4, a5)
+    h = z+sum(c*z**n for n, c in enumerate(jet, 2))
+    composed = product_subordination_coefficients(jet, [1]*4, [1], order=4)
+    output = bernardi_coefficients(composed, gamma=1)
+    F = z+sum(c*z**n for n, c in enumerate(output, 2))
+    assert s.series(s.diff(z*F, z)-2*h/(1-z), z, 0, 6).removeO().expand() == 0
+    baseline = bernardi_coefficients(product_subordination_coefficients(
+        [0]*4, [1]*4, [1], order=4), gamma=1)
+    G = sum((c-b)*z**n for n, (c, b) in enumerate(zip(output, baseline), 2))
+    assert s.series(s.diff(z*G, z)-2*(h-z)/(1-z), z, 0, 6).removeO().expand() == 0
+    assert s.diff(G, z).subs(z, 0) == 0
+    for lam, delta in [(s.Rational(3, 4), s.Rational(1, 4)), (2, 1)]:
+        weighted = euler_differential_coefficients(output,
+            second=delta, first=lam-2*delta)
+        direct = s.diff(F, z)+lam*z*s.diff(F, z, 2)+delta*z*z*s.diff(F, z, 3)
+        assert tuple(n*c for n, c in enumerate(weighted, 2)) == tuple(
+            direct.expand().coeff(z, n-1) for n in range(2, 6))
