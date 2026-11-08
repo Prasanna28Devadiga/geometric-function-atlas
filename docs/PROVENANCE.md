@@ -26,6 +26,14 @@ function z/(1-z), the odd function atanh(z), and the source-linked apple-like
 extremal from arXiv:2606.15780v1 (3.1)-(3.3). Exact attained coefficients do not
 validate a sharp global bound, the paper's complete theorem, or an unknown
 tail. They do not modify frozen artifacts or emit evidence/CLI envelopes.
+`linear_subordination_coefficients` additionally recovers phi(omega)-1 from
+that same recurrence and divides coefficient n by 1+n*alpha for
+(1-alpha)f/z+alpha*f'=phi(omega), alpha rational in [0,1].
+`logarithmic_coefficients` expands the formal near-zero logarithm through gamma3.
+Independent tests directly substitute a rational Schwarz function in the linear
+ODE and compare the ordinary log with a symbolic series (including Koebe).
+Literature applications include DOI 10.5269/bspm.81468 and
+10.63673/SJS.1882993, but the package does not endorse their sharpness claims.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 

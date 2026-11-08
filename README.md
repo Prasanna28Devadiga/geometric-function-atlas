@@ -152,6 +152,30 @@ symbols are rejected. Caller definitions receive a collision-safe canonical
 identity of the form `user:<key>:<SHA-256 of exact formula>` in exported
 records; reusing a catalog key cannot impersonate the built-in object.
 
+### Linear subordinations and ordinary logarithms (low-level API)
+
+`linear_subordination_coefficients(B, gammas, alpha=alpha, order=N)` returns
+`a2..a_(N+1)` for `(1-alpha)f/z + alpha*f' = phi(omega)` with exact rational
+`0 <= alpha <= 1`. At alpha=1 this is bounded turning, **not** convexity;
+at alpha=0 it is `f/z` subordination. It recovers the composed generator via
+the existing starlike recurrence rather than maintaining another Schur engine.
+Real rational Schur parameters, depth five, order eight, polynomial treatment
+of omitted B entries, and caller-owned analytic hypotheses are unchanged.
+
+`logarithmic_coefficients([a2,a3,a4])` returns signed gamma1..gamma3 with
+`log(f(z)/z)=2 sum gamma_n*z^n`. For example:
+
+```python
+import sympy as sp
+from geometric_function_atlas import linear_subordination_coefficients, logarithmic_coefficients
+jet = linear_subordination_coefficients([1,0,-sp.Rational(1,3)], [1], alpha=1, order=3)
+assert jet == (sp.Rational(1,2), 0, -sp.Rational(1,12))  # f'=1+tanh(z)
+assert logarithmic_coefficients([2,3,4]) == (1,sp.Rational(1,2),sp.Rational(1,3))
+```
+
+Both return exact tuples only, not theorem certification, global extremization,
+whole-function tail declarations, or newly released CLI commands.
+
 ### Exact convex jets and inverse logarithms (low-level API)
 
 ```python

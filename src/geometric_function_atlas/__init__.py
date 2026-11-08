@@ -41,6 +41,8 @@ from .classes import (
 from .coefficient_transforms import (
     convex_member_coefficients,
     inverse_logarithmic_coefficients,
+    linear_subordination_coefficients,
+    logarithmic_coefficients,
 )
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
 from .contracts import (  # noqa: F401
@@ -219,12 +221,14 @@ __all__ = [
     "identify_radius",
     "install_snapshot",
     "inverse_logarithmic_coefficients",
+    "linear_subordination_coefficients",
     "list_artifact_classes",
     "list_classes",
     "list_generators",
     "list_proofs",
     "list_radii",
     "list_screen_classes",
+    "logarithmic_coefficients",
     "open_problems",
     "parse_exact_expression",
     "plot_object_coefficients",

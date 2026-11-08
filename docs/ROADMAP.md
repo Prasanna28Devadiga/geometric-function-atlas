@@ -23,6 +23,8 @@ Status: shipped.
   `fekete_szego`.
 - Bounded low-level exact convex member jets via Alexander + the existing real
   Schur recurrence, and signed inverse logarithmic coefficients through Gamma3.
+  Exact linear subordinations (1-alpha)f/z+alpha*f'=phi(omega), including
+  bounded turning, and ordinary logarithms through gamma3 use the same engine.
   These API-only transforms return bare SymPy tuples; no new theorem/evidence
   envelope or automatic sharp-bound claim is introduced.
 - Classical starlike anchors and JSON-capable CLI.
