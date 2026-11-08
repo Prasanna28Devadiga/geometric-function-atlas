@@ -114,7 +114,13 @@ anchors the existing starlike recurrence against the direct binomial primitive
 solver against the whole quadratic `f=z+41*z²/100`. Positive-real f' establishes
 that quadratic's univalence but does not imply lemniscate membership; the exact
 complex-point defect is retained in an independent regression. These fixed
-controls neither extend real-Schur support nor endorse a source inequality. No positive-real
+controls neither extend real-Schur support nor endorse a source inequality.
+Batch15 independently anchors the existing exponential starlike/convex solvers
+against the entire primitive of `(exp(-z)-1)/z`. It also composes product
+subordination with inverse q-Al-Oboudi (lambda1,degree1) and checks the direct
+Jackson equation for `f=z/(1-t*z)`, `z*D_q(f)/f=1/(1-q*t*z)`.
+These source-linked controls (arXiv:2609.26154v1; DOI10.24996/ijs.2026.67.9.22)
+add no new API or global class-optimization claim. No positive-real
 admissibility or arbitrary complex-Schur support follows.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
