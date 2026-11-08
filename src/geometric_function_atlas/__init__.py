@@ -47,6 +47,7 @@ from .coefficient_transforms import (
     mixed_derivative_coefficients,
     product_subordination_coefficients,
     schippers_origin,
+    schwarzian_derivative_origin,
 )
 from .coefficients import GeneratorSeriesResult, generator_series, taylor_coefficients
 from .contracts import (  # noqa: F401
@@ -247,6 +248,7 @@ __all__ = [
     "replay_radius_certificate",
     "resolve_plot_object",
     "schippers_origin",
+    "schwarzian_derivative_origin",
     "snapshot_info",
     "snapshot_payload",
     "snapshot_verify",

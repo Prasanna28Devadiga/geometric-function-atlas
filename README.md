@@ -89,6 +89,10 @@ Schwarzian and next Schippers invariant **at the origin**. They return exact
 SymPy tuples, not global bounds, inverse-domain certificates or disk norms.
 For example, the Koebe jet `[2,3,4,5]` gives inverse `(-2,5,-14,42)`;
 its initial Schippers invariants are `(-6,48)`.
+`schwarzian_derivative_origin([a2,a3,a4])` instead returns the **ordinary**
+derivative `S_f'(0)=24*(a4-2*a2*a3+a2**3)`. For Koebe it is zero, not sigma4=48.
+Exactly three exact coefficients are required. This scalar low-level API proves
+no disk norm, global univalence, sharp bound, or whole-paper result.
 
 ## Registry snapshot boundary
 

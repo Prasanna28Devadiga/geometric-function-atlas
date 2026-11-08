@@ -97,6 +97,20 @@ def schippers_origin(coefficients: Sequence[Any]) -> tuple[sp.Expr, ...]:
     return tuple(result)
 
 
+def schwarzian_derivative_origin(coefficients: Sequence[Any]) -> sp.Expr:
+    """Return S_f'(0) from exactly [a2,a3,a4] for f=z+a2*z²+....
+
+    This is the ordinary derivative of the classical Schwarzian, not sigma4
+    in Schippers' recurrence. Exact local algebra only: no disk norm, global
+    univalence, tail declaration, or source-theorem certification.
+    """
+    values = _exact_jet(coefficients)
+    if len(values) != 3:
+        raise ValueError('supply exactly 3 coefficients a2..a4')
+    a, b, c = values
+    return 24*(c-2*a*b+a**3)
+
+
 def _exact_jet(coefficients: Sequence[Any], *, maximum: int = 3) -> list[sp.Expr]:
     if not 1 <= len(coefficients) <= maximum:
         raise ValueError(f'supply 1..{maximum} coefficients a2..a{maximum+1}')

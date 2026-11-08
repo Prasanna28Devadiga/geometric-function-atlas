@@ -27,6 +27,8 @@ Status: shipped.
   bounded turning, and ordinary logarithms through gamma4 use the same engine.
   Formal inverse jets through A5 and Schippers sigma3/sigma4 at the origin
   have independent composition/differential anchors; disk norms remain out of scope.
+  `schwarzian_derivative_origin` supplies the ordinary S_f'(0), distinct from
+  Schippers sigma4(0), with an independent generic differential identity test.
   - `mixed_derivative_coefficients`: nonlinear derivative/convex interpolation,
     distinct from the linear class; `product_subordination_coefficients`:
     exact normalized base times phi(omega). Both reuse real Schur composition,

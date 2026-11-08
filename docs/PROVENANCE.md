@@ -57,6 +57,11 @@ Applications include DOI 10.47000/tjmcs.1786554 Definition1.1 and
 Interior mixed jets do not certify analytic continuation or nonvanishing of f'
 in the disk. Product jets do not establish the base's starlikeness or f's
 univalence. No theorem, global bound, unknown tail or source sharpness is endorsed.
+`schwarzian_derivative_origin` returns the exact scalar S_f'(0) for exactly
+[a2,a3,a4], not the next Schippers invariant. The identity is independently
+anchored by differentiating (f''/f')'-(f''/f')²/2 and by Koebe/Mobius tests.
+Source application: arXiv:2606.03433v1 (2), Theorems1-3. This is local algebra,
+not a disk norm, global bound, or source-paper certification.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 
