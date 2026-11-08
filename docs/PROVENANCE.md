@@ -258,6 +258,18 @@ and complex coefficients, inverses and malformed inputs have separate tests.
 This is finite coefficient algebra; campaign-specific whole polynomial
 membership and strict-boundary findings are not package theorem claims.
 
+Batch35 adds an independent rho2/3 Abel-kernel anchor: t=z*(1-u³) removes
+its integrable singularity, giving the multiplier
+`(n+1/3)*integral_0^1 (1-u³)^n du`. Independent symbolic input coefficients
+check the existing Owa API through a9 without a new API or dependency.
+Existing starlike and linear-subordination solvers are independently anchored
+against `f=z*exp(t*z²/2-t³*z^6/18)` and
+`f=z+t*z³/3-t³*z^7/21`, including exact imaginary t. Their equations use
+`q(t*z²)=1+t*z²-t³*z^6/3`; these fixed whole-function controls do not
+extend the real-Schur parameter domain or certify a nephroid source bound.
+Source locators: DOI10.11113/mjfas.v22n3.5097 Definition2.3 and
+DOI10.3389/fams.2026.1923663 Definition1.3, Theorem3.1.
+
 ## Collaborator bundles
 
 A collaborator-bundle manifest is integrity provenance, not theorem evidence.
