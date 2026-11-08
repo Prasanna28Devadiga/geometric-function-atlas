@@ -3,8 +3,10 @@ import sympy as s
 
 from geometric_function_atlas import (
     Generator,
+    bernardi_coefficients,
     generator_series,
     inverse_coefficients,
+    product_subordination_coefficients,
     z,
 )
 from geometric_function_atlas.schur import member_coefficients
@@ -118,3 +120,24 @@ def test_fourfold_range_target_is_not_auxiliary_equality():
         # composing target with a fourth root is not an analytic disk lift.
         assert abs(t)/(2-abs(t)) < 1
         assert s.series(h-target,z,0,2).removeO().expand().coeff(z,1) == t
+
+
+def test_wright_hypergeometric_ode_and_integral_anchor():
+    """Whole 0F1 generator, independent ODE and integral coefficient controls."""
+    for L in [1, 2]:
+        n = s.Rational(1, 16)
+        K = s.hyper([], [L], n)
+        phi = 1+(s.hyper([], [L], n*z)-1)/K
+        B = generator_series(Generator(key='wright-anchor', name='Wright factor',
+            expression=phi, citation='DOI10.28924/2291-8639-24-2026-75 Eq1.5 tau1'),
+            order=4).coefficients
+        # 0F1 solves z*Y''+L*Y'=n*Y, independently of the source moment proof.
+        Y = 1+sum(K*b*z**k for k, b in enumerate(B, 1))
+        ode = s.expand(z*s.diff(Y, z, 2)+L*s.diff(Y, z)-n*Y)
+        assert all(s.simplify(ode.coeff(z, k)) == 0 for k in range(4))
+        jet = product_subordination_coefficients([0]*4, B, [1], order=4)
+        assert all(s.simplify(a-b) == 0 for a, b in zip(jet, B))
+        integral = bernardi_coefficients(jet, gamma=0)
+        f = z+sum(a*z**k for k, a in enumerate(jet, 2))
+        F = z+sum(a*z**k for k, a in enumerate(integral, 2))
+        assert s.simplify(z*s.diff(F, z)-f) == 0

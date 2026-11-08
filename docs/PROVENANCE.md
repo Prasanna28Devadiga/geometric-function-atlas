@@ -2,6 +2,17 @@
 
 ## Claim boundary
 
+The existing generator/product/Bernardi helpers also accept the exact entire
+Wright factor `1+(0F1(;L;n*z)-1)/0F1(;L;n)` at fixed positive rational n and
+L=1,2. Independent anchors use the hypergeometric ODE `z*Y''+L*Y'=n*Y`
+and normalized integral identity `z*F'=f`, not a second coefficient engine.
+Source: DOI10.28924/2291-8639-24-2026-75 Eq1.5/4.1. Literal malformed
+class definitions, shifted-moment discrepancies and whole-series membership
+arguments remain explicitly scoped campaign evidence, not package certifications.
+No factorial-growth all-disk operator is added for DOI10.31642/JoKMC/2018/120203:
+a normalized disk-analytic input need not have an analytic image under its
+printed integral/multiplier. Finite jets do not establish that missing domain.
+
 Independent low-level anchors also cover the exact removable Gregory generator
 `z/log(1+z)` via its binomial-integral coefficients and a nonradial defining
 starlike equation, plus a fourfold half-plane target. Identical image ranges do
