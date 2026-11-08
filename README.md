@@ -193,6 +193,18 @@ Source applications: DOI10.36948/ijfmr.2026.v08i05.89311, Definition2.3 Eq(2)-(3
 and DOI10.5269/bspm.79733
 Eq(1.3)-(1.5). Formula discrepancies in either paper are not endorsed.
 
+### Normalized Owa fractional multipliers (low-level API)
+
+`owa_fractional_coefficients(jet, rho=rho, inverse=False)` applies
+`Gamma(n+1)*Gamma(2-rho)/Gamma(n+1-rho)` to initial a2..a9, length1..8,
+for an exact rational `0<=rho<=1`. It is the normalized operator
+`Omega^rho f=Gamma(2-rho)*z^rho*D^rho f`; rho0 is identity and rho1 is the
+endpoint `z*f'`, not an iterated fractional derivative. A finite rational product
+avoids numerical gamma evaluation. `inverse=True` divides these multipliers,
+not functional reversion. The bare exact tuple certifies no global analyticity,
+univalence, preservation, omitted tail or source theorem. Source applications:
+DOI10.5269/bspm.79103 Eq1.7 and DOI10.5269/bspm.79357 Definition1.2.
+
 ### Linear subordinations and ordinary logarithms (low-level API)
 
 `linear_subordination_coefficients(B, gammas, alpha=alpha, order=N)` returns

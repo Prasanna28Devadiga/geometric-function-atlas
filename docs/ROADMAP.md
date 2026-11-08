@@ -35,6 +35,9 @@ Status: shipped.
     return bounded jets only, and have direct equation/product anchors.
   - `ruscheweyh_coefficients`: apply/undo integer-degree0..64 binomial
     multipliers on exact a2..a9 jets; independent derivative-definition anchors.
+  - `owa_fractional_coefficients`: normalized Owa gamma-ratio multipliers,
+    exact rational rho0..1, apply/undo exact a2..a9 jets; independent half-order
+    Abel-integral and identity/Euler endpoint anchors, no preservation claim.
   - `bernardi_coefficients`: normalized integral multiplier (gamma+1)/(gamma+n),
     gamma rational>=0; `q_al_oboudi_coefficients`: integer-lam1..64
     [1+(n-1)*lam]_q**degree multipliers, degree0..64, exact rational0<q<=1.

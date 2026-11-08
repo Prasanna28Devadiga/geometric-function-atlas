@@ -133,6 +133,34 @@ def ruscheweyh_coefficients(
                  for n, a in enumerate(values, 2))
 
 
+def owa_fractional_coefficients(
+    coefficients: Sequence[Any], *, rho: Any, inverse: bool = False,
+) -> tuple[sp.Expr, ...]:
+    """Apply/undo normalized Owa fractional multipliers to a2..a9.
+
+    Omega^rho f=Gamma(2-rho)*z^rho*D^rho f multiplies a_n by
+    Gamma(n+1)*Gamma(2-rho)/Gamma(n+1-rho). Exact rational 0<=rho<=1;
+    rho=0 is identity and rho=1 is z*f'. The latter is the endpoint extension.
+    A finite rational product avoids special-function numerical evaluation.
+    Accepts 1..8 exact coefficients. Inverse divides multipliers, not functional
+    reversion. No global analyticity, preservation, univalence or bound claim.
+    """
+    if isinstance(rho, bool) or not isinstance(rho, (int, sp.Rational)):
+        raise TypeError('rho must be an exact rational')
+    rho = sp.Rational(rho)
+    if not 0 <= rho <= 1:
+        raise ValueError('rho must lie in [0,1]')
+    if not isinstance(inverse, bool):
+        raise TypeError('inverse must be boolean')
+    values = _exact_jet(coefficients, maximum=8)
+    multiplier = sp.Integer(1)
+    result = []
+    for n, value in enumerate(values, 2):
+        multiplier *= sp.Rational(n)/(n-rho)
+        result.append(sp.cancel(value/multiplier if inverse else value*multiplier))
+    return tuple(result)
+
+
 def bernardi_coefficients(
     coefficients: Sequence[Any], *, gamma: Any, inverse: bool = False,
 ) -> tuple[sp.Expr, ...]:

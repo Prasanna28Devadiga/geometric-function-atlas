@@ -245,6 +245,19 @@ the diagonal, missing directed pairs, evidence status, and availability of a
 local replay certificate remain distinct. A colored cell therefore never
 turns a snapshot value into a proof or implies the reverse direction.
 
+## Normalized Owa fractional coefficient transform
+
+`owa_fractional_coefficients` supplies the missing bounded reusable multiplier
+for DOI10.5269/bspm.79103 Eq1.7 and DOI10.5269/bspm.79357 Definition1.2.
+The rational product `product(k/(k-rho),k=2..n)` equals the printed normalized
+gamma ratio. Exact rational rho in [0,1], jets a2..a9, and apply/undo only;
+rho1 is the endpoint extension, not a fractional-order iteration.
+An independent half-order Abel integral, after t=z-v² removes the square-root
+kernel, anchors all eight monomials. Identity/Euler endpoints, exact symbolic
+and complex coefficients, inverses and malformed inputs have separate tests.
+This is finite coefficient algebra; campaign-specific whole polynomial
+membership and strict-boundary findings are not package theorem claims.
+
 ## Collaborator bundles
 
 A collaborator-bundle manifest is integrity provenance, not theorem evidence.
