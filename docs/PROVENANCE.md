@@ -98,6 +98,12 @@ operator is not endorsed. This bounded API proves no global membership or bound.
 A separate q-Al-Oboudi audit checks nonunit integer lambda by the polynomial
 conjugacy `P_lambda T=(z*D_q) P_lambda`, where `P_lambda f=z^(1-lambda)*f(z^lambda)`.
 No mismatch was found; neither a real-lambda extension nor paper endorsement follows.
+Existing Euler and q-Al-Oboudi APIs also compose for H=(1-beta)*D^j f+beta*z*(D^j f)'
+at q=1,delta1. Generic polynomial differentiation and a nonradial Schwarz
+substitution anchor the composite without adding another mathematical engine;
+see [the bounded composition workflow](workflows/composed-operators.md).
+Interior-beta formal algebra does not certify disk membership. A q-exponential
+source generator does not by itself change ordinary derivatives to Jackson ones.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 
