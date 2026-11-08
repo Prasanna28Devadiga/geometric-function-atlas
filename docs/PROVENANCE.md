@@ -108,7 +108,13 @@ The existing convex jet solver also accepts negative and exact complex generator
 coefficients: it solves an equation without asserting that the member is convex.
 A direct rational nonradial substitution and sign-mutation control anchor this
 reuse for arXiv:2603.16388v1; see the
-[rotated-halfplane workflow](workflows/rotated-halfplane-jets.md). No positive-real
+[rotated-halfplane workflow](workflows/rotated-halfplane-jets.md). Batch14 also
+anchors the existing starlike recurrence against the direct binomial primitive
+`f=z*(1-z)^(-(1-i))` (spirallike angle pi/4), and the existing linear derivative
+solver against the whole quadratic `f=z+41*z²/100`. Positive-real f' establishes
+that quadratic's univalence but does not imply lemniscate membership; the exact
+complex-point defect is retained in an independent regression. These fixed
+controls neither extend real-Schur support nor endorse a source inequality. No positive-real
 admissibility or arbitrary complex-Schur support follows.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
