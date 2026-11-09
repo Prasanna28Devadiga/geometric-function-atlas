@@ -283,6 +283,19 @@ not new production capabilities. Literal sufficient-condition failures and the
 source H_n notation conflict remain campaign evidence, not package theorem
 claims, class-preservation assertions or global coefficient certificates.
 
+## Batch39: polynomial and meromorphic normalization anchors
+
+Existing derivative-endpoint and Jackson q-Al-Oboudi operations suffice for
+retained arXiv:2406.01709v2 Theorem2.1 at alpha2 and
+DOI10.30546/09090.2025.510.1013 Definition1.1/Theorem2.1 at degree0.
+Independent arbitrary-coefficient integration anchors the derivative solver;
+terminated Gauss polynomials anchor z*(1-(k-1)*z²/(k+1)). A generic Laurent
+product-rule test retains the z^-2 factor when normalizing H=z²*f; applying
+normalized Jackson jets directly to f is rejected by a separate negative control.
+These are regression anchors, not a new harmonic/meromorphic engine, a class
+preservation claim, an alpha-interior Landau-radius theorem or source-bound
+certification. Campaign-level B<A versus A<B ambiguity remains explicit.
+
 ## Collaborator bundles
 
 A collaborator-bundle manifest is integrity provenance, not theorem evidence.
