@@ -31,7 +31,8 @@ def test_installers_target_published_060_after_pypi_release() -> None:
         assert wheel in (ROOT / "scripts" / name).read_text(encoding="utf-8")
 
 
-def test_frozen_pypi_manifest_targets_the_verified_060_release() -> None:
+def test_frozen_pypi_manifest_targets_the_verified_070_release() -> None:
     manifest = json.loads((ROOT / ".github/pypi-publish.json").read_text(encoding="utf-8"))
-    assert manifest["tag"] == "v0.6.0"
-    assert manifest["assets"]["wheel"]["name"] == "geometric_function_atlas-0.6.0-py3-none-any.whl"
+    assert manifest["tag"] == "v0.7.0"
+    assert manifest["commit"] == "a1e7102a14d7684f37ccdb14c67eced54b9be541"
+    assert manifest["assets"]["wheel"]["name"] == "geometric_function_atlas-0.7.0-py3-none-any.whl"
