@@ -307,6 +307,23 @@ convex-spiral sufficient-condition failures, negative-versus-positive target
 classes and exact-radius overstatements remain source-specific campaign
 evidence, not global preservation, optimization or whole-paper certificates.
 
+## Batch41: Bessel-factor and iterated-product anchors
+
+Existing exact generator, product-subordination and quadratic Euler operations
+suffice for selected comparisons in DOI10.24193/subbmath.2026.3.3 Eq1.14,
+DOI10.12688/f1000research.172490.2 Eq5, and the Raducanu-Orhan operator in
+*Inequality Estimations of Subclass of Univalent Functions Involving
+Raducanu-Orhan Operator*. Independent circle-cosine integral moments anchor
+`0F1(;1;-z/4)` through a9; direct polynomial differentiation anchors three
+iterations of the RO expression, and whole rational functions anchor Mobius
+powers. No new API or dependency is justified. Native-source Bessel
+normalization/ODE defects, local binomial omissions, and a missing selfmap
+premise in an integral-mean argument remain campaign-level comparisons, not
+package theorem claims, unrestricted inverse-Bessel attainment or whole-paper
+certificates. The source's Bessel coefficient upper theorem retains modulus
+bars omitted by text extraction; these tests do not allege a missing-modulus
+bound counterexample.
+
 ## Collaborator bundles
 
 A collaborator-bundle manifest is integrity provenance, not theorem evidence.
