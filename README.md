@@ -94,6 +94,12 @@ derivative `S_f'(0)=24*(a4-2*a2*a3+a2**3)`. For Koebe it is zero, not sigma4=48.
 Exactly three exact coefficients are required. This scalar low-level API proves
 no disk norm, global univalence, sharp bound, or whole-paper result.
 
+`hadamard_coefficients(left, right)` computes exact coefficientwise products of
+normalized jets a2..a9 (equal nonempty lengths, at most eight terms). Unknown
+tails are never zero-padded. This API is not ordinary multiplication and proves
+no global convolution theorem or class membership; see
+[bounded Hadamard jets](docs/workflows/hadamard-jets.md).
+
 ## Registry snapshot boundary
 
 The package does not bundle the mutable registry database, and no canonical snapshot URL is bundled.

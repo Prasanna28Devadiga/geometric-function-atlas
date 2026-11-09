@@ -24,6 +24,13 @@ assert gfa.inverse_logarithmic_coefficients(jet) == (
 )
 assert gfa.logarithmic_coefficients([2,3,4]) == (1,sp.Rational(1,2),sp.Rational(1,3))
 assert gfa.linear_subordination_coefficients([1,0,-sp.Rational(1,3)],[1],alpha=1,order=3) == (sp.Rational(1,2),0,-sp.Rational(1,12))
+assert gfa.hadamard_coefficients([2,3,4], [2,3,4]) == (4,9,16)
+try:
+    gfa.hadamard_coefficients([1], [1,2])
+except ValueError:
+    pass
+else:
+    raise AssertionError("unknown Hadamard tail unexpectedly padded")
 assert gfa.inverse_coefficients([2,3,4,5]) == (-2,5,-14,42)
 assert gfa.schippers_origin([2,3,4]) == (-6,48)
 assert gfa.mixed_derivative_coefficients([2,2,2], [1], alpha=1, order=3) == (1,1,1)

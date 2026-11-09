@@ -158,6 +158,13 @@ real-Schur parameter engine or certify higher-dimensional/global bounds.
 Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
 
+`hadamard_coefficients` reuses the existing exact-jet validator for bounded
+normalized coefficientwise products. Independent symbolic and rational-function
+anchors check normalization, unequal/unknown tails, and unsafe string refusal.
+Source application: arXiv:2606.20861v1 p2. This unreleased API does not certify
+the universal convolution-duality theorem, continuum membership, a radius or
+a whole paper. Scalar quartic isolations and numerical rcc remain distinct.
+
 ## Evidence statuses
 
 The package will use explicit, non-overlapping statuses:

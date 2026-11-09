@@ -83,6 +83,7 @@ from .counterexamples import (
 )
 from .exact import ExactExpressionError, parse_exact_expression
 from .fekete_szego import FeketeSzegoResult, fekete_szego
+from .hadamard import hadamard_coefficients
 from .implementation_registry import (  # noqa: F401
     get_trusted_implementation,
     list_trusted_implementations,
@@ -232,6 +233,7 @@ __all__ = [
     "generator_series",
     "get_generator",
     "get_proof",
+    "hadamard_coefficients",
     "identify_radius",
     "install_snapshot",
     "inverse_coefficients",

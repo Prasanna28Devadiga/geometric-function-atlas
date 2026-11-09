@@ -49,6 +49,9 @@ Status: shipped.
     no generalized-operator repair or global preservation inference.
   These API-only transforms return bare SymPy tuples; no new theorem/evidence
   envelope or automatic sharp-bound claim is introduced.
+- `hadamard_coefficients`: bounded normalized exact coefficientwise products,
+  equal nonempty jets a2..a9, no zero-padding or convolution-duality certificate.
+  API-only, with independent symbolic/rational anchors and unsafe-input guards.
 - Classical starlike anchors and JSON-capable CLI.
 
 ## Function verification, class screens, and witness replay
