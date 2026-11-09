@@ -83,6 +83,23 @@ Short aliases save typing: `gfa coeffs`, `gfa fs`, `gfa disprove`, and
 generator key earns a `did you mean ...?` suggestion, and witness points may
 use fraction syntax with `--at` (`gfa disprove --coefficients 1 --at=-3/4`).
 
+Low-level exact research helpers also include `inverse_coefficients([a2,...,a5])`
+for formal inverse jets and `schippers_origin([a2,a3,a4])` for the classical
+Schwarzian and next Schippers invariant **at the origin**. They return exact
+SymPy tuples, not global bounds, inverse-domain certificates or disk norms.
+For example, the Koebe jet `[2,3,4,5]` gives inverse `(-2,5,-14,42)`;
+its initial Schippers invariants are `(-6,48)`.
+`schwarzian_derivative_origin([a2,a3,a4])` instead returns the **ordinary**
+derivative `S_f'(0)=24*(a4-2*a2*a3+a2**3)`. For Koebe it is zero, not sigma4=48.
+Exactly three exact coefficients are required. This scalar low-level API proves
+no disk norm, global univalence, sharp bound, or whole-paper result.
+
+`hadamard_coefficients(left, right)` computes exact coefficientwise products of
+normalized jets a2..a9 (equal nonempty lengths, at most eight terms). Unknown
+tails are never zero-padded. This API is not ordinary multiplication and proves
+no global convolution theorem or class membership; see
+[bounded Hadamard jets](docs/workflows/hadamard-jets.md).
+
 ## Registry snapshot boundary
 
 The package does not bundle the mutable registry database, and no canonical snapshot URL is bundled.
@@ -151,6 +168,158 @@ of custom input remains an explicit caller assumption, and undeclared free
 symbols are rejected. Caller definitions receive a collision-safe canonical
 identity of the form `user:<key>:<SHA-256 of exact formula>` in exported
 records; reusing a catalog key cannot impersonate the built-in object.
+
+### Bernardi and integer-parameter q-Al-Oboudi multipliers (low-level API)
+
+`bernardi_coefficients(jet, gamma=g, inverse=False)` applies
+`a_n -> (g+1)*a_n/(g+n)` for exact rational `g>=0`, on one to eight exact
+coefficients `a2..a9`. This is the normalized Bernardi integral
+`I_g f=(g+1)*z**(-g)*integral_0^z t**(g-1)*f(t) dt`, equivalently defined
+by its series. The identity `z*F'+g*F=(g+1)*f` anchors the convention;
+`g=0` gives `integral_0^z f(t)/t dt`, not `f`.
+
+`euler_differential_coefficients(jet, second=a, first=b, inverse=False)`
+applies the normalized Euler differential expression `a*z**2*f''+b*z*f'+(1-b)*f`
+with exact rational a,b to a2..a9 (length1..8). Inverse mode divides the
+multipliers `1+b*(n-1)+a*n*(n-1)` and rejects a zero multiplier, even for a zero
+input coefficient. This is coefficientwise inversion, not functional inversion,
+analytic continuation, univalence, preservation or a global bound. Generic
+polynomial differentiation independently anchors the convention; a literature
+application is DOI10.47772/IJRISS.2026.100300432 Eq8/10 at m0.
+
+`q_al_oboudi_coefficients(jet, q=q, lam=L, degree=m, inverse=False)`
+applies `[1+(n-1)*L]_q**m`, **not** `[n*L]_q**m` or
+`(1+L*([n]_q-1))**m`. Parameters are exact rational `0<q<=1`, integer
+`L=1..64`, integer `m=0..64`, and one to eight exact coefficients. At `L=1`
+this is the iterated Jackson Euler operator; `q=1` is the classical limit.
+Noninteger lambda is deliberately unsupported. Both inverses divide the
+multipliers; neither means functional inversion. Both return bare exact tuples,
+not global membership, preservation, univalence, tail or bound certificates.
+Source applications: DOI10.36948/ijfmr.2026.v08i05.89311, Definition2.3 Eq(2)-(3),
+and DOI10.5269/bspm.79733
+Eq(1.3)-(1.5). Formula discrepancies in either paper are not endorsed.
+
+### Normalized Owa fractional multipliers (low-level API)
+
+`owa_fractional_coefficients(jet, rho=rho, inverse=False)` applies
+`Gamma(n+1)*Gamma(2-rho)/Gamma(n+1-rho)` to initial a2..a9, length1..8,
+for an exact rational `0<=rho<=1`. It is the normalized operator
+`Omega^rho f=Gamma(2-rho)*z^rho*D^rho f`; rho0 is identity and rho1 is the
+endpoint `z*f'`, not an iterated fractional derivative. A finite rational product
+avoids numerical gamma evaluation. `inverse=True` divides these multipliers,
+not functional reversion. The bare exact tuple certifies no global analyticity,
+univalence, preservation, omitted tail or source theorem. Source applications:
+DOI10.5269/bspm.79103 Eq1.7 and DOI10.5269/bspm.79357 Definition1.2.
+
+### Linear subordinations and ordinary logarithms (low-level API)
+
+`linear_subordination_coefficients(B, gammas, alpha=alpha, order=N)` returns
+`a2..a_(N+1)` for `(1-alpha)f/z + alpha*f' = phi(omega)` with exact rational
+`0 <= alpha <= 1`. At alpha=1 this is bounded turning, **not** convexity;
+at alpha=0 it is `f/z` subordination. It recovers the composed generator via
+the existing starlike recurrence rather than maintaining another Schur engine.
+Real rational Schur parameters, depth five, order eight, polynomial treatment
+of omitted B entries, and caller-owned analytic hypotheses are unchanged.
+
+`logarithmic_coefficients([a2,...,a5])` accepts one to four exact coefficients
+and returns the corresponding signed gamma1..gamma4 with
+`log(f(z)/z)=2 sum gamma_n*z^n`. For example:
+
+```python
+import sympy as sp
+from geometric_function_atlas import linear_subordination_coefficients, logarithmic_coefficients
+jet = linear_subordination_coefficients([1,0,-sp.Rational(1,3)], [1], alpha=1, order=3)
+assert jet == (sp.Rational(1,2), 0, -sp.Rational(1,12))  # f'=1+tanh(z)
+assert logarithmic_coefficients([2,3,4]) == (1,sp.Rational(1,2),sp.Rational(1,3))
+```
+
+Both return exact tuples only, not theorem certification, global extremization,
+whole-function tail declarations, or newly released CLI commands.
+
+### Mixed derivative and product subordinations (low-level API)
+
+`mixed_derivative_coefficients(B, gammas, alpha=alpha, order=N)` solves the
+**different, nonlinear** equation `(1-alpha)f' + alpha*(1+zf''/f')=phi(omega)`.
+Alpha is an exact rational in [0,1]; endpoints are bounded turning and convexity.
+The triangular formal solution at interior alpha does not certify analytic
+continuation or nonvanishing of f' on the whole disk.
+
+`product_subordination_coefficients(base, B, gammas, order=N)` returns the jet of
+`f=g*phi(omega)`, with exactly N exact base coefficients `[b2,...,b_(N+1)]`.
+For example, a Koebe base `[2,3,4]`, sine B=`[1,0,-Rational(1,6)]` and `[1]`
+(omega=z) returns `(3,5,Rational(41,6))`; this is **not** sine starlikeness.
+Both reuse real Schur composition, with depth five/order eight, return exact
+bare tuples and certify no global bound, univalence, unknown tail or theorem.
+
+### Ruscheweyh coefficient multipliers (low-level API)
+
+`ruscheweyh_coefficients([a2,...,a9], degree=m, inverse=False)` applies
+`D^m f = z + sum binomial(m+n-1,n-1)*a_n*z^n` to a nonempty exact jet
+of length at most eight, for integer `0 <= m <= 64`. `inverse=True` divides
+by those multipliers; it is **not functional inversion**. For example,
+`ruscheweyh_coefficients([1,1,1], degree=2)` returns `(3,6,10)`.
+Independent differentiation of `z/m! * (z^(m-1)*f)^(m)` anchors the convention.
+This API returns exact tuples only, not global membership, univalence, unknown
+tail, or theorem certification. Source application: DOI10.5269/bspm.83160 (1.4).
+
+### Jackson q-difference jets (low-level API)
+
+`q_starlike_member_coefficients(B, gammas, q=q, order=N)` solves the formal
+coefficient equation `z*D_q f/f=phi(omega)`, where
+`D_q f=(f(z)-f(q*z))/((1-q)*z)`. Exact rational `0<q<=1` is required;
+`q=1` is the ordinary derivative limit. It reuses real Schur composition
+(depth five, order eight, omitted B entries mean a polynomial generator).
+The coefficient divisor is `[n+1]_q-1`, not `n` or `[n]_q`.
+
+`q_ruscheweyh_coefficients(jet, q=q, degree=m, inverse=False)` applies
+`[m+n-1]_q!/([m]_q!*[n-1]_q!)` to a2..a9. Integer degree0..64 only;
+noninteger q-gamma conventions are not implemented. `inverse=True` divides
+multipliers, not functional inversion. At q=1 this equals the ordinary API.
+For example, q=1/2, degree1 maps `[1,1,1]` to `(3/2,7/4,15/8)`.
+Existing exact-expression resource bounds still apply to input jets.
+
+These return bare exact tuples, not global q-starlikeness, analyticity,
+nonvanishing, univalence, bounds, or unknown-tail certificates. In particular,
+the triangular q-difference solution can have poles in the disk; a finite jet
+alone does not establish class membership. Source application:
+DOI10.5269/bspm.81781 Definition1.1/1.2; this does not endorse its formulas.
+
+### Exact convex jets and inverse logarithms (low-level API)
+
+```python
+import sympy as sp
+from geometric_function_atlas import (
+    Generator, convex_member_coefficients, generator_series,
+    inverse_logarithmic_coefficients, z,
+)
+
+apple = Generator(key="apple", name="Apple-like", expression=sp.exp(z)*sp.sqrt(1+z),
+                  citation="arXiv:2606.15780v1, Theorem 3.1, equations (3.1)-(3.3)")
+B = generator_series(apple, order=3).coefficients
+jet = convex_member_coefficients(B, [1], order=3)  # omega(z)=z
+assert jet == (sp.Rational(3,4), sp.Rational(25,48), sp.Rational(385,1152))
+assert inverse_logarithmic_coefficients(jet) == (
+    -sp.Rational(3,8), sp.Rational(31,192), -sp.Rational(205,2304),
+)
+```
+
+`convex_member_coefficients` reuses the bounded Schur recurrence and Alexander's
+identity, returning `[a2,...,a_(order+1)]` for `1+zf''/f'=phi(omega)`.
+Schur parameters are exact **real rationals**, not arbitrary complex parameters;
+order is at most eight, depth at most five. Supply every `B1..B_order` for a
+nonpolynomial generator. Missing entries have the existing polynomial-generator
+meaning, not an unknown-tail guarantee. Admissibility of a custom generator is
+not certified by this transform.
+
+`inverse_logarithmic_coefficients([a2,...])` accepts one to four preconstructed
+exact coefficients and returns signed `Gamma1..Gamma4` under the convention
+`log(f^(-1)(w)/w)=2*sum(Gamma_n*w^n)`. It rejects strings, floats, infinities,
+and booleans. Symbolic coefficients are permitted. Formal local reversion does
+not prove global univalence or a disk of inversion. Both operations return bare
+SymPy tuples (no CLI envelope), as permitted for low-level exact helpers; they
+compute finite jets, not full Taylor polynomials, sharp bounds, or source-paper
+validation. Keep source/page/PDF hashes and theorem evidence in the caller's
+research manifest. Released snapshots and evidence schemas are unchanged.
 
 ### Exact Fekete–Szegő constants
 

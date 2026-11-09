@@ -2,6 +2,26 @@
 
 ## Claim boundary
 
+The existing generator/product/Bernardi helpers also accept the exact entire
+Wright factor `1+(0F1(;L;n*z)-1)/0F1(;L;n)` at fixed positive rational n and
+L=1,2. Independent anchors use the hypergeometric ODE `z*Y''+L*Y'=n*Y`
+and normalized integral identity `z*F'=f`, not a second coefficient engine.
+Source: DOI10.28924/2291-8639-24-2026-75 Eq1.5/4.1. Literal malformed
+class definitions, shifted-moment discrepancies and whole-series membership
+arguments remain explicitly scoped campaign evidence, not package certifications.
+No factorial-growth all-disk operator is added for DOI10.31642/JoKMC/2018/120203:
+a normalized disk-analytic input need not have an analytic image under its
+printed integral/multiplier. Finite jets do not establish that missing domain.
+
+Independent low-level anchors also cover the exact removable Gregory generator
+`z/log(1+z)` via its binomial-integral coefficients and a nonradial defining
+starlike equation, plus a fourfold half-plane target. Identical image ranges do
+not imply identical coefficient sequences: source comparisons must distinguish
+fixed-target range inclusion from auxiliary-function equality. These anchors
+exercise existing APIs only and do not endorse literature bounds or silently
+repair source definitions (DOI 10.19139/soic-2310-5070-3241 and
+10.31801/cfsuasmas.1637685).
+
 A returned number is not enough. Structured result objects and CLI records identify:
 
 1. the canonical mathematical problem;
@@ -18,8 +38,132 @@ The versioned schema and fail-closed check semantics are specified in
 `src/geometric_function_atlas/schema/`.
 
 Low-level exact helpers may return bare SymPy expressions or tuples for use in
-other symbolic programs. Their structured counterparts (`generator_series`,
+other symbolic programs. `convex_member_coefficients` and
+`inverse_logarithmic_coefficients` are bounded jet transforms in that category:
+Alexander's identity reuses the existing Schur recurrence; inverse logarithms
+use formal reversion through degree five. Anchors include the classical convex
+function z/(1-z), the odd function atanh(z), and the source-linked apple-like
+extremal from arXiv:2606.15780v1 (3.1)-(3.3). Exact attained coefficients do not
+validate a sharp global bound, the paper's complete theorem, or an unknown
+tail. They do not modify frozen artifacts or emit evidence/CLI envelopes.
+`linear_subordination_coefficients` additionally recovers phi(omega)-1 from
+that same recurrence and divides coefficient n by 1+n*alpha for
+(1-alpha)f/z+alpha*f'=phi(omega), alpha rational in [0,1].
+`logarithmic_coefficients` expands the formal near-zero logarithm through gamma4.
+Independent tests directly substitute a rational Schwarz function in the linear
+ODE and compare the ordinary log with a symbolic series (including Koebe).
+Literature applications include DOI 10.5269/bspm.81468 and
+10.63673/SJS.1882993, but the package does not endorse their sharpness claims.
+`inverse_coefficients` returns formal A2..A5 from an exact normalized jet,
+independently checked by composition in both directions and Koebe/Catalan anchors.
+`schippers_origin` returns sigma3(0) and sigma4(0) under Schippers' recurrence,
+independently checked from f''/f' and its derivatives and a Möbius zero anchor.
+Source applications are DOI 10.5644/SJM.22.01.04 (1.12), (2.4) and
+arXiv:2607.26268v1 (1.2)-(1.3). These API-only bounded transforms do not certify
+an inverse domain, global univalence, disk norm or source sharpness claim.
+Their fourth-order entries have independent symbolic-log and recursive inverse
+composition tests through degree five, plus Koebe and Möbius anchors. Source
+applications include DOI 10.24193/subbmath.2026.1.06 (1.6), (2.5) and
+10.64721/240cr737 (11). Source formula discrepancies remain caller-owned evidence;
+these algebraic transforms do not endorse a paper's global upper bounds.
+`mixed_derivative_coefficients` solves the distinct nonlinear interpolation
+(1-alpha)f' + alpha*(1+zf''/f')=phi(omega), with rational alpha in [0,1],
+by a triangular recurrence for f'. `product_subordination_coefficients` returns
+f=g*phi(omega) from a complete exact base jet. Both reuse the existing bounded
+real Schur composition route rather than a campaign-specific engine. Direct
+symbolic ODE/product tests and endpoint identities are independent anchors.
+Applications include DOI 10.47000/tjmcs.1786554 Definition1.1 and
+10.47372/ejua-ba.2026.2.545 Definition1.1; these are not starlike subordinations.
+Interior mixed jets do not certify analytic continuation or nonvanishing of f'
+in the disk. Product jets do not establish the base's starlikeness or f's
+univalence. No theorem, global bound, unknown tail or source sharpness is endorsed.
+`schwarzian_derivative_origin` returns the exact scalar S_f'(0) for exactly
+[a2,a3,a4], not the next Schippers invariant. The identity is independently
+anchored by differentiating (f''/f')'-(f''/f')²/2 and by Koebe/Mobius tests.
+Source application: arXiv:2606.03433v1 (2), Theorems1-3. This is local algebra,
+not a disk norm, global bound, or source-paper certification.
+`ruscheweyh_coefficients` applies or undoes the exact integer-degree coefficient
+multiplier binomial(m+n-1,n-1), bounded to degree0..64 and jets a2..a9.
+Independent derivative-definition and geometric-function anchors verify the
+convention, including degree0 identity and degree1 Alexander scaling. Source
+application: DOI10.5269/bspm.83160 Definition1.1. Inverse multipliers are not
+functional inverses; no global membership, univalence, tail or bound is certified.
+`q_starlike_member_coefficients` solves the distinct Jackson equation
+z*D_q f/f=phi(omega) for exact rational0<q<=1 (q=1 classical limit),
+reusing real Schur composition and dividing by [n+1]_q-1. The formal solution
+may have disk poles; no global member is inferred from a finite jet.
+`q_ruscheweyh_coefficients` applies/undoes integer-degree q-binomial multipliers
+(degree0..64, jet length1..8); no noninteger q-gamma convention is selected.
+Direct defining-difference substitution, independent finite products, classical
+limit and roundtrip controls anchor both. Source application:
+DOI10.5269/bspm.81781 Definition1.1/1.2. No paper formula, global bound,
+analytic continuation, univalence, tail or theorem certification is endorsed.
+`bernardi_coefficients` applies/undoes the normalized integral multipliers
+(gamma+1)/(gamma+n), exact rational gamma>=0, jets a2..a9. Independent direct
+integration and zF'+gamma*F=(gamma+1)*f anchor the convention.
+`q_al_oboudi_coefficients` applies/undoes [1+(n-1)*lam]_q**degree for integer
+lam1..64, degree0..64, exact rational0<q<=1. This is not [n*lam]_q**degree
+or a linear combination of q-integers. Independent Jackson monomial differences,
+lam1 operator iterations and classical-limit controls anchor the implementation.
+Both are bare bounded tuple APIs, not global preservation, analyticity,
+univalence, functional inversion, unknown-tail or source-bound certificates.
+Sources: DOI10.36948/ijfmr.2026.v08i05.89311 Definition2.3 Eq(2)-(3), and
+DOI10.5269/bspm.79733 Eq(1.3)-(1.5). Noninteger lambda is deliberately unsupported.
+`euler_differential_coefficients` applies/undoes the normalized expression
+`a*z²*f''+b*z*f'+(1-b)*f`, exact rational a,b, jets a2..a9. Inverse mode
+rejects zero multipliers and is not functional inversion. Generic symbolic
+polynomial differentiation and singular/roundtrip guards anchor the convention.
+Source: DOI10.47772/IJRISS.2026.100300432 Eq8/10; the ambiguous earlier generalized
+operator is not endorsed. This bounded API proves no global membership or bound.
+A separate q-Al-Oboudi audit checks nonunit integer lambda by the polynomial
+conjugacy `P_lambda T=(z*D_q) P_lambda`, where `P_lambda f=z^(1-lambda)*f(z^lambda)`.
+No mismatch was found; neither a real-lambda extension nor paper endorsement follows.
+Existing Euler and q-Al-Oboudi APIs also compose for H=(1-beta)*D^j f+beta*z*(D^j f)'
+at q=1,delta1. Generic polynomial differentiation and a nonradial Schwarz
+substitution anchor the composite without adding another mathematical engine;
+see [the bounded composition workflow](workflows/composed-operators.md).
+Interior-beta formal algebra does not certify disk membership. A q-exponential
+source generator does not by itself change ordinary derivatives to Jackson ones.
+The existing convex jet solver also accepts negative and exact complex generator
+coefficients: it solves an equation without asserting that the member is convex.
+A direct rational nonradial substitution and sign-mutation control anchor this
+reuse for arXiv:2603.16388v1; see the
+[rotated-halfplane workflow](workflows/rotated-halfplane-jets.md). Batch14 also
+anchors the existing starlike recurrence against the direct binomial primitive
+`f=z*(1-z)^(-(1-i))` (spirallike angle pi/4), and the existing linear derivative
+solver against the whole quadratic `f=z+41*z²/100`. Positive-real f' establishes
+that quadratic's univalence but does not imply lemniscate membership; the exact
+complex-point defect is retained in an independent regression. These fixed
+controls neither extend real-Schur support nor endorse a source inequality.
+Batch15 independently anchors the existing exponential starlike/convex solvers
+against the entire primitive of `(exp(-z)-1)/z`. It also composes product
+subordination with inverse q-Al-Oboudi (lambda1,degree1) and checks the direct
+Jackson equation for `f=z/(1-t*z)`, `z*D_q(f)/f=1/(1-q*t*z)`.
+These source-linked controls (arXiv:2609.26154v1; DOI10.24996/ijs.2026.67.9.22)
+add no new API or global class-optimization claim. No positive-real
+admissibility or arbitrary complex-Schur support follows.
+Batch16 independently checks scaled-exponential starlike jets against the
+integrated defining equation at a nonradial rational Schwarz function, and
+inverse composition through degree4. A generic two-point Mobius kernel and its
+diagonal limit independently anchor the convex solver used for completely
+convex members (arXiv:2610.36737v2 Eq3/4 and arXiv:2607.09925v1 Example2.2).
+No new API is needed; these tests do not certify all-Schwarz optimization,
+source sharpness, arbitrary complex-Schur support, or whole papers.
+Batch17 anchors scalar specializations of arXiv:2610.13869v1 Theorems1.1/1.2,
+arXiv:2610.15497v1 Theorems2.1/2.3, and arXiv:2610.33031v1 Theorem3.1:
+independent binomial differentiation through a9, genuinely complex rotations of
+symmetric (not Hermitian) Toeplitz determinants, and the nonradial convex
+primitive f'=1/(1-z+z²). Existing APIs suffice. These controls do not extend the
+real-Schur parameter engine or certify higher-dimensional/global bounds.
+Their structured counterparts (`generator_series`,
 the theorem result objects, and CLI JSON) carry the full record above.
+
+`hadamard_coefficients` reuses the existing exact-jet validator for bounded
+normalized coefficientwise products. Independent symbolic and rational-function
+anchors check normalization, unequal/unknown tails, and unsafe string refusal.
+Source application: arXiv:2606.20861v1 p2. This unreleased API does not certify
+the universal convolution-duality theorem, continuum membership, a radius or
+a whole paper. Scalar quartic isolations and numerical rcc remain distinct.
 
 ## Evidence statuses
 
@@ -107,6 +251,85 @@ radius computation. Its source rows and target columns are ordered explicitly;
 the diagonal, missing directed pairs, evidence status, and availability of a
 local replay certificate remain distinct. A colored cell therefore never
 turns a snapshot value into a proof or implies the reverse direction.
+
+## Normalized Owa fractional coefficient transform
+
+`owa_fractional_coefficients` supplies the missing bounded reusable multiplier
+for DOI10.5269/bspm.79103 Eq1.7 and DOI10.5269/bspm.79357 Definition1.2.
+The rational product `product(k/(k-rho),k=2..n)` equals the printed normalized
+gamma ratio. Exact rational rho in [0,1], jets a2..a9, and apply/undo only;
+rho1 is the endpoint extension, not a fractional-order iteration.
+An independent half-order Abel integral, after t=z-v² removes the square-root
+kernel, anchors all eight monomials. Identity/Euler endpoints, exact symbolic
+and complex coefficients, inverses and malformed inputs have separate tests.
+This is finite coefficient algebra; campaign-specific whole polynomial
+membership and strict-boundary findings are not package theorem claims.
+
+Batch35 adds an independent rho2/3 Abel-kernel anchor: t=z*(1-u³) removes
+its integrable singularity, giving the multiplier
+`(n+1/3)*integral_0^1 (1-u³)^n du`. Independent symbolic input coefficients
+check the existing Owa API through a9 without a new API or dependency.
+Existing starlike and linear-subordination solvers are independently anchored
+against `f=z*exp(t*z²/2-t³*z^6/18)` and
+`f=z+t*z³/3-t³*z^7/21`, including exact imaginary t. Their equations use
+`q(t*z²)=1+t*z²-t³*z^6/3`; these fixed whole-function controls do not
+extend the real-Schur parameter domain or certify a nephroid source bound.
+Source locators: DOI10.11113/mjfas.v22n3.5097 Definition2.3 and
+DOI10.3389/fams.2026.1923663 Definition1.3, Theorem3.1.
+
+## Batch36: independent Bernardi/Jackson defining-equation anchors
+
+Existing `bernardi_coefficients` and `q_al_oboudi_coefficients` suffice for
+DOI10.24996/ijs.2026.67.5.28 Eq2/Theorem1.1 at s=k1,q0 and
+DOI10.29304/jqcsm.2026.18.12464 Eq4, Definitions2.1/2.2, Theorems3.1/3.2
+at beta0,k=z/(1-z). Independent normalized-integral, arbitrary-symbol ODE,
+exact Jackson-dilation and whole rational-function tests anchor the conventions
+through a9. The latter source's beta0/1 images are zD_q f and f; their linear
+combination needs no new generalized operator API. These are additional tests,
+not new production capabilities. Literal sufficient-condition failures and the
+source H_n notation conflict remain campaign evidence, not package theorem
+claims, class-preservation assertions or global coefficient certificates.
+
+## Batch39: polynomial and meromorphic normalization anchors
+
+Existing derivative-endpoint and Jackson q-Al-Oboudi operations suffice for
+retained arXiv:2406.01709v2 Theorem2.1 at alpha2 and
+DOI10.30546/09090.2025.510.1013 Definition1.1/Theorem2.1 at degree0.
+Independent arbitrary-coefficient integration anchors the derivative solver;
+terminated Gauss polynomials anchor z*(1-(k-1)*z²/(k+1)). A generic Laurent
+product-rule test retains the z^-2 factor when normalizing H=z²*f; applying
+normalized Jackson jets directly to f is rejected by a separate negative control.
+These are regression anchors, not a new harmonic/meromorphic engine, a class
+preservation claim, an alpha-interior Landau-radius theorem or source-bound
+certification. Campaign-level B<A versus A<B ambiguity remains explicit.
+
+## Batch40: whole Poisson and fixedpoint controls
+
+Existing custom-generator/product, Bernardi gamma0, derivative-endpoint and
+Ruscheweyh degree0 APIs suffice for DOI10.37193/CMI.2026.01.12 and
+DOI10.22271/math.2026.v7.i1c.347. Independent direct exponential coefficients
+through a9, the gamma0 ODE and exact negative-fixedpoint polynomials anchor
+these operations. No new production API or dependency is justified. Literal
+convex-spiral sufficient-condition failures, negative-versus-positive target
+classes and exact-radius overstatements remain source-specific campaign
+evidence, not global preservation, optimization or whole-paper certificates.
+
+## Batch41: Bessel-factor and iterated-product anchors
+
+Existing exact generator, product-subordination and quadratic Euler operations
+suffice for selected comparisons in DOI10.24193/subbmath.2026.3.3 Eq1.14,
+DOI10.12688/f1000research.172490.2 Eq5, and the Raducanu-Orhan operator in
+*Inequality Estimations of Subclass of Univalent Functions Involving
+Raducanu-Orhan Operator*. Independent circle-cosine integral moments anchor
+`0F1(;1;-z/4)` through a9; direct polynomial differentiation anchors three
+iterations of the RO expression, and whole rational functions anchor Mobius
+powers. No new API or dependency is justified. Native-source Bessel
+normalization/ODE defects, local binomial omissions, and a missing selfmap
+premise in an integral-mean argument remain campaign-level comparisons, not
+package theorem claims, unrestricted inverse-Bessel attainment or whole-paper
+certificates. The source's Bessel coefficient upper theorem retains modulus
+bars omitted by text extraction; these tests do not allege a missing-modulus
+bound counterexample.
 
 ## Collaborator bundles
 
@@ -206,3 +429,103 @@ prefilter and discards a trailing odd row or column, so its package parity
 includes accepted odd-sized inputs. Image metrics and transforms are empirical
 statistics and convolutions, not analytic image-domain or conformal-warp
 results.
+
+## Strongly starlike scalar source anchors
+
+Existing Schur member and ordinary logarithm helpers suffice for scalar controls
+of arXiv:2610.20849v1, Theorems5.1,5.3-5.5,7.1 and witnesses6.1/6.2.
+The generator is `((1+z)/(1-z))**alpha`, with the disk-analytic principal branch
+for real0<alpha<=1. Independent tests compose a nonradial rational Schwarz
+function directly, integrate the defining logarithmic derivative and exponentiate;
+they also check the source symmetric/asymmetric jets through a5. The symmetric
+logarithmic Hankel is **-alpha²/4**; its absolute value attains alpha²/4.
+No generic complex-Schur capability or Banach-space lifting proof is inferred.
+The source's two conditional a5 bounds have a genuine applicability gap; finite
+replays must retain an unavailable bound there rather than interpolate one.
+These are additional anchors, not a new production API or whole-paper proof.
+
+## Generalized Fekete–Szegő and scalar Bavrin anchors
+
+Existing starlike/convex jet solvers suffice for selected planar comparisons of
+arXiv:2607.17584v1 (Lemma2.3, Theorems3.1/3.3/4.1),
+DOI10.1007/s11785-026-02039-8 (Theorems7/10) and
+DOI10.1007/s40840-026-02137-y (Theorems2.1/2.2, scalar3.1).
+For the latter, the scalar factor f=F/z is distinct from normalized F;
+L(f)=f+zf' identifies M with starlike F and N with convex F.
+The independent primitive F'=1/(1-z+z²), Schwarz function
+z*(1/2-z)/(1-z/2), has (a2,a3,a4)=(1/2,0,-1/4) and H22=-1/8.
+It anchors the nonradial N extremal through a6 without a new operator API.
+
+For the generalized functional |a3-lambda*a2²|-mu*|a2|, the penalty is signed,
+not clipped to zero. Direct differentiation gives the convex identity
+`a3-lambda*a2²=(b2-(3*lambda/2-1)*b1²)/6`.
+The second source's native p28 proof instead prints `2*lambda/3-1`, which
+fails at the genuine convex F=z/(1-z), lambda1,mu0: 0 versus5/9.
+Its p27 Theorem10(38) uses the correct factor; the local proof error does not
+refute that upper theorem. Exact i-rotations and independent differentiation
+anchor the existing APIs. No generalized-FS theorem API, global optimization,
+arbitrary complex-Schur capability, Banach lifting or whole-paper certificate
+is added.
+
+## Elastic and biunivalent whole-function anchors
+
+DOI10.1007/s13324-026-01235-1 Eq17/18 supplies a custom normalized
+square-root generator w_alpha solving
+`alpha*w+(1-alpha)/w=(1+z)/(1-z)`. The branch has w_alpha(0)=1;
+alpha<=0 uses the reciprocal of w_(1-alpha). Existing generator-series and
+starlike-member APIs suffice. Independent substitution anchors these jets at
+alpha0,1,3/2,2,-1, without a new solver or general Banach-space assertion.
+
+The genuine biunivalent functions z/(1-t*z), |t|<=1, have inverse
+w/(1+t*w); exact compositions anchor inverse jets through a5. These controls
+also distinguish the literal inverse and operator-definition discrepancies in
+DOI10.24996/ijs.2026.67.2.30 from unreviewed later class bounds. Source-specific
+Borel arithmetic and rejected advertised witnesses remain campaign evidence,
+not new package APIs or endorsements of source sharpness claims.
+
+Batch21 independently anchors the existing member solver against the nonradial
+whole primitive `F=z*exp(2z)*(1-z/2)^3`, whose logarithmic derivative is
+`1+z*(1/2-z)/(1-z/2)`. This supplies a genuine endpoint of the exponential
+characterization in DOI10.3389/fams.2026.1777576, Definition1.1, sigma1,
+K=exp(z). It does not solve the interior-sigma nonlinear class. A separate
+literal Jackson subtraction for Mobius members gives
+`z^2*D_q F/F=z/(1-q*t*z)` and checks the defining expression and the native
+bracket structure of Eq17 in DOI10.31926/but.mif.2026.6.68.1.8. No new API,
+arbitrary complex-Schur support, global optimization or paper certification is
+introduced. Beta-negative-binomial probability and source-radius comparisons
+remain source-specific campaign evidence rather than a new package engine.
+
+Batch25 adds independent anchors for the entire error factor
+`1F1(1/2;3/2;-z)=integral_0^1 exp(-z*t²)dt` and rational Pascal factors.
+Existing generator-series, product-subordination and Bernardi APIs suffice;
+no new operator or inverse-Hadamard API is introduced. Integral coefficients,
+a nonradial rational Schwarz composition, direct rational differentiation and
+the Bernardi ODE anchor the conventions. Sources: DOI10.36753/mathenot.1838201
+Eq1.2 and DOI10.28924/2291-8639-24-2026-333 Eq1.4. Error-image attainment,
+signed-weight coefficient claims and literal-versus-repaired Pascal notation
+remain source-specific campaign comparisons, not package theorem claims.
+
+Batch26 independently anchors normalized Cesàro composition without a new API:
+apply the existing product-subordination operation with `1/(1-z)`, then
+Bernardi at gamma1. The result satisfies `(z*F)'=2*h/(1-z)` for arbitrary
+independent symbolic coefficients. Subtract the normalized baseline for a
+coanalytic component whose first derivative is zero. Existing quadratic Euler
+multipliers followed by ordinary differentiation recover
+`F'+lambda*z*F''+delta*z²*F'''` with `second=delta,first=lambda-2*delta`.
+Source: DOI10.34198/ejms.16626.75.11831199 Eq3/8, Theorems3.1/3.3/3.5.
+Source-specific sufficient radii and literal signed coanalytic bounds from
+arXiv:2602.13613v1 remain campaign evidence, not harmonic solver APIs,
+sharp-radius claims or whole-paper certifications.
+
+Batch27 anchors the existing convex solver against whole derivatives
+`f'=(1-z^m)^(-alpha/m)`, m1,2, and Schippers sigma3(0) against direct
+Schwarzian differentiation. Source: arXiv:2601.07842v2, Eq1.1 and Theorem4.2.
+At m2, alpha7/4, S_f(0)=7/4; comparing that with the literal source norm
+bound7/8 remains source-specific campaign evidence. No general norm optimizer
+or replacement sharp theorem is added. Existing generator-series and linear
+subordination alpha1 also recover jets with
+`H_k'=1/[(1-z)^2*(1-k*z)]`, independently anchored by clearing the rational
+ODE denominator and exact complex rotation. Source: arXiv:2505.17157v1 Eq2.4
+and Theorem2.1 (the reviewed cached version predates its indexing year).
+Whole harmonic convexity, endpoint-attainment comparisons and global growth
+inequalities remain separate claims; these anchors do not certify a whole paper.

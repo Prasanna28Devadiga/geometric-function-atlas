@@ -16,6 +16,28 @@ import json
 import geometric_function_atlas as gfa
 
 assert gfa.__version__
+import sympy as sp
+jet = gfa.convex_member_coefficients([sp.Integer(2)]*3, [1], order=3)
+assert jet == (1,1,1)
+assert gfa.inverse_logarithmic_coefficients(jet) == (
+    -sp.Rational(1,2), sp.Rational(1,4), -sp.Rational(1,6),
+)
+assert gfa.logarithmic_coefficients([2,3,4]) == (1,sp.Rational(1,2),sp.Rational(1,3))
+assert gfa.linear_subordination_coefficients([1,0,-sp.Rational(1,3)],[1],alpha=1,order=3) == (sp.Rational(1,2),0,-sp.Rational(1,12))
+assert gfa.hadamard_coefficients([2,3,4], [2,3,4]) == (4,9,16)
+try:
+    gfa.hadamard_coefficients([1], [1,2])
+except ValueError:
+    pass
+else:
+    raise AssertionError("unknown Hadamard tail unexpectedly padded")
+assert gfa.inverse_coefficients([2,3,4,5]) == (-2,5,-14,42)
+assert gfa.schippers_origin([2,3,4]) == (-6,48)
+assert gfa.mixed_derivative_coefficients([2,2,2], [1], alpha=1, order=3) == (1,1,1)
+assert gfa.product_subordination_coefficients([2,3,4], [1,0,-sp.Rational(1,6)], [1], order=3) == (3,5,sp.Rational(41,6))
+assert gfa.euler_differential_coefficients([2,3,4], second=1, first=0) == (6,21,52)
+assert gfa.euler_differential_coefficients([6,21,52], second=1, first=0, inverse=True) == (2,3,4)
+assert gfa.q_al_oboudi_coefficients([2], q=sp.Rational(1,2), lam=2, degree=1, inverse=True) == (sp.Rational(8,7),)
 result = gfa.generator_series("sine", order=3).to_dict()
 assert result["schema_version"] == 1
 assert result["verification"]["success"] is True

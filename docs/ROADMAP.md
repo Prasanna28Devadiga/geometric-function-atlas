@@ -21,6 +21,37 @@ Status: shipped.
 - Exact Taylor coefficients `B_1, …, B_n` via `generator_series`.
 - Exact Ma–Minda Fekete–Szegő constants under declared assumptions via
   `fekete_szego`.
+- Bounded low-level exact convex member jets via Alexander + the existing real
+  Schur recurrence, and signed inverse logarithmic coefficients through Gamma4.
+  Exact linear subordinations (1-alpha)f/z+alpha*f'=phi(omega), including
+  bounded turning, and ordinary logarithms through gamma4 use the same engine.
+  Formal inverse jets through A5 and Schippers sigma3/sigma4 at the origin
+  have independent composition/differential anchors; disk norms remain out of scope.
+  `schwarzian_derivative_origin` supplies the ordinary S_f'(0), distinct from
+  Schippers sigma4(0), with an independent generic differential identity test.
+  - `mixed_derivative_coefficients`: nonlinear derivative/convex interpolation,
+    distinct from the linear class; `product_subordination_coefficients`:
+    exact normalized base times phi(omega). Both reuse real Schur composition,
+    return bounded jets only, and have direct equation/product anchors.
+  - `ruscheweyh_coefficients`: apply/undo integer-degree0..64 binomial
+    multipliers on exact a2..a9 jets; independent derivative-definition anchors.
+  - `owa_fractional_coefficients`: normalized Owa gamma-ratio multipliers,
+    exact rational rho0..1, apply/undo exact a2..a9 jets; independent half-order
+    Abel-integral and identity/Euler endpoint anchors, no preservation claim.
+  - `bernardi_coefficients`: normalized integral multiplier (gamma+1)/(gamma+n),
+    gamma rational>=0; `q_al_oboudi_coefficients`: integer-lam1..64
+    [1+(n-1)*lam]_q**degree multipliers, degree0..64, exact rational0<q<=1.
+    Both apply/undo bounded exact jets a2..a9, not functional inversion or
+    a global preservation theorem; independent ODE/integral/Jackson anchors.
+  - `euler_differential_coefficients`: normalized quadratic Euler expression,
+    exact rational parameters, apply/undo a2..a9 jets with zero-divisor refusal.
+    Direct generic differentiation anchors Eq8/10 of DOI10.47772/IJRISS.2026.100300432;
+    no generalized-operator repair or global preservation inference.
+  These API-only transforms return bare SymPy tuples; no new theorem/evidence
+  envelope or automatic sharp-bound claim is introduced.
+- `hadamard_coefficients`: bounded normalized exact coefficientwise products,
+  equal nonempty jets a2..a9, no zero-padding or convolution-duality certificate.
+  API-only, with independent symbolic/rational anchors and unsafe-input guards.
 - Classical starlike anchors and JSON-capable CLI.
 
 ## Function verification, class screens, and witness replay
