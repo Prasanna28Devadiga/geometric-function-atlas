@@ -23,7 +23,7 @@ def test_posix_installer_uses_uv_as_a_managed_python_tool(tmp_path: Path) -> Non
     fake_uv.chmod(0o755)
     fake_gfa = tool_bin / "gfa"
     fake_gfa.write_text(
-        "#!/bin/sh\nprintf 'geometric-function-atlas 0.6.0\\n'\n",
+        "#!/bin/sh\nprintf 'geometric-function-atlas 0.7.0\\n'\n",
         encoding="utf-8",
     )
     fake_gfa.chmod(0o755)
@@ -49,7 +49,7 @@ def test_posix_installer_uses_uv_as_a_managed_python_tool(tmp_path: Path) -> Non
     assert "tool install --managed-python --python 3.12 --force local-wheel.whl" in invocations
     assert "tool update-shell" in invocations
     assert "tool dir --bin" in invocations
-    assert "geometric-function-atlas 0.6.0" in completed.stdout
+    assert "geometric-function-atlas 0.7.0" in completed.stdout
 
 
 def test_windows_installer_has_the_same_managed_python_contract() -> None:
@@ -90,7 +90,7 @@ def test_public_installation_has_one_command_per_supported_shell() -> None:
     assert install.count("/main/scripts/install.ps1") == 1
     assert "gfa walkthrough" in readme
     for public_guide in (readme, install):
-        assert "published v0.6.0 wheel" in public_guide
+        assert "published v0.7.0 wheel" in public_guide
         assert "uv tool install" not in public_guide
         assert "Review before running" not in public_guide
         assert "inspect-first" not in public_guide
@@ -118,8 +118,8 @@ def test_pypi_project_links_prioritize_the_product_and_installer() -> None:
 def test_installers_default_to_the_immutable_published_release_wheel() -> None:
     release_wheel = (
         "https://github.com/Prasanna28Devadiga/geometric-function-atlas/"
-        "releases/download/v0.6.0/"
-        "geometric_function_atlas-0.6.0-py3-none-any.whl"
+        "releases/download/v0.7.0/"
+        "geometric_function_atlas-0.7.0-py3-none-any.whl"
     )
 
     posix = (ROOT / "scripts" / "install.sh").read_text(encoding="utf-8")
@@ -130,13 +130,24 @@ def test_installers_default_to_the_immutable_published_release_wheel() -> None:
     assert "releases/download/v0.5.0/" not in posix + windows
 
 
+def test_linux_ci_exercises_default_published_wheel_and_walkthrough() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    linux = workflow.split("  linux-installer:", 1)[1].split("  windows-installer:", 1)[0]
+    assert "GFA_PACKAGE_SPEC" not in linux
+    assert "UV_TOOL_DIR:" in linux
+    assert "UV_PYTHON_INSTALL_DIR:" in linux
+    assert "sh scripts/install.sh" in linux
+    assert "geometric-function-atlas 0.7.0" in linux
+    assert '"$gfa" walkthrough' in linux
+
+
 def test_windows_ci_exercises_published_wheel_and_walkthrough() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     windows = workflow.split("  windows-installer:", 1)[1]
     assert "$env:GFA_PACKAGE_SPEC" not in windows
     assert "$env:UV_TOOL_DIR" in windows
     assert "$env:UV_PYTHON_INSTALL_DIR" in windows
-    assert "geometric-function-atlas 0.6.0" in windows
+    assert "geometric-function-atlas 0.7.0" in windows
     assert "& $gfa walkthrough" in windows
 
 
