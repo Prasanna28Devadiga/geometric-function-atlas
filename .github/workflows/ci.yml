@@ -51,6 +51,26 @@ jobs:
       - run: uv run --frozen python scripts/check_clean_install.py dist/geometric_function_atlas-*.whl
       - run: uv run --frozen python scripts/check_uv_tool_install.py dist/geometric_function_atlas-*.whl --python 3.12
 
+  linux-installer:
+    name: Linux published installer smoke
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.3"
+          enable-cache: false
+      - name: Install default published wheel with fresh managed Python
+        env:
+          UV_TOOL_DIR: ${{ runner.temp }}/gfa-tools
+          UV_TOOL_BIN_DIR: ${{ runner.temp }}/gfa-bin
+          UV_PYTHON_INSTALL_DIR: ${{ runner.temp }}/gfa-python
+        run: |
+          sh scripts/install.sh
+          gfa="$(uv tool dir --bin)/gfa"
+          test "$("$gfa" --version)" = "geometric-function-atlas 0.7.0"
+          "$gfa" walkthrough
+
   windows-installer:
     name: Windows PowerShell installer smoke
     runs-on: windows-2025
@@ -69,6 +89,6 @@ jobs:
           $env:UV_PYTHON_INSTALL_DIR = Join-Path $env:RUNNER_TEMP "gfa-python"
           ./scripts/install.ps1
           $gfa = Join-Path ((uv tool dir --bin).Trim()) "gfa.exe"
-          if ((& $gfa --version) -ne "geometric-function-atlas 0.6.0") { throw "Unexpected gfa version" }
+          if ((& $gfa --version) -ne "geometric-function-atlas 0.7.0") { throw "Unexpected gfa version" }
           & $gfa walkthrough
           if ($LASTEXITCODE -ne 0) { throw "Walkthrough failed" }

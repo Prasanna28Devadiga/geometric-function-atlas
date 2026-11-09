@@ -17,7 +17,7 @@ On Windows, open PowerShell and run:
 irm https://raw.githubusercontent.com/Prasanna28Devadiga/geometric-function-atlas/main/scripts/install.ps1 | iex
 ```
 
-Both installers use the immutable published v0.6.0 wheel. They supply the
+Both installers use the immutable published v0.7.0 wheel. They supply the
 `gfa` command and a uv-managed Python; no preinstalled Python is needed.
 
 ## Understand the example
