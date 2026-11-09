@@ -296,6 +296,17 @@ These are regression anchors, not a new harmonic/meromorphic engine, a class
 preservation claim, an alpha-interior Landau-radius theorem or source-bound
 certification. Campaign-level B<A versus A<B ambiguity remains explicit.
 
+## Batch40: whole Poisson and fixedpoint controls
+
+Existing custom-generator/product, Bernardi gamma0, derivative-endpoint and
+Ruscheweyh degree0 APIs suffice for DOI10.37193/CMI.2026.01.12 and
+DOI10.22271/math.2026.v7.i1c.347. Independent direct exponential coefficients
+through a9, the gamma0 ODE and exact negative-fixedpoint polynomials anchor
+these operations. No new production API or dependency is justified. Literal
+convex-spiral sufficient-condition failures, negative-versus-positive target
+classes and exact-radius overstatements remain source-specific campaign
+evidence, not global preservation, optimization or whole-paper certificates.
+
 ## Collaborator bundles
 
 A collaborator-bundle manifest is integrity provenance, not theorem evidence.
