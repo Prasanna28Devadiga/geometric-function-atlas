@@ -4,6 +4,39 @@ All notable changes to Geometric Function Atlas are recorded here.
 
 ## Unreleased
 
+## 0.7.0 — 2026-11-09
+
+### Added
+
+- Bounded exact coefficient APIs for convex, linear, mixed-derivative,
+  product, and Jackson q-starlike subordinations, reusing the existing real
+  rational Schur engine. Interior mixed-derivative and q-difference solutions
+  are formal jets, not whole-disk membership certificates.
+- Ordinary and inverse logarithmic coefficients through order four, formal
+  inverse jets through A5, origin Schippers invariants, and the ordinary
+  Schwarzian derivative at the origin (distinct from Schippers sigma4).
+- Exact normalized Ruscheweyh, q-Ruscheweyh, Bernardi, integer-parameter
+  q-Al-Oboudi, quadratic Euler, and Owa fractional coefficient multipliers,
+  with apply/undo modes; bounded normalized Hadamard coefficientwise products
+  reject unequal jet lengths rather than padding unknown tails.
+- Independent defining-equation, composition, differential, and integral
+  regression anchors for the bounded APIs, plus selected literal-source
+  coefficient and witness comparisons. A discrepancy concerns the checked
+  display or witness, not automatically a paper's universal upper theorem.
+- Selected cross-version computational examples for the software paper,
+  labelled SELFREPRODUCTION, not independent external mathematical validation.
+
+### Scope and release boundary
+
+- These low-level APIs return exact finite SymPy tuples, not new CLI theorem
+  certificates. Their stated order, parameter, and expression-resource limits
+  remain enforced. They do not certify omitted tails, global analyticity,
+  univalence, preservation, disk norms, sharp bounds, or whole papers.
+- Existing artifact snapshots, evidence schemas, and historical release assets
+  remain unchanged. Public installers and the frozen PyPI publication manifest
+  stay pinned to published 0.6.0 until the new release exists and is verified;
+  switching them requires a separately reviewed follow-up.
+
 ## 0.6.0 — 2026-09-27
 
 ### Added

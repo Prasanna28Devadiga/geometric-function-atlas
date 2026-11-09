@@ -8,13 +8,13 @@ from geometric_function_atlas import __version__
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_060_identity_is_consistent() -> None:
+def test_070_identity_is_consistent() -> None:
     citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert __version__ == "0.6.0"
-    assert "\nversion: 0.6.0\n" in citation
-    assert "\ndate-released: 2026-09-27\n" in citation
-    assert "\n## 0.6.0 — 2026-09-27\n" in changelog
+    assert __version__ == "0.7.0"
+    assert "\nversion: 0.7.0\n" in citation
+    assert "\ndate-released: 2026-11-09\n" in citation
+    assert "\n## 0.7.0 — 2026-11-09\n" in changelog
 
 
 def test_release_procedure_selects_single_current_wheel() -> None:
